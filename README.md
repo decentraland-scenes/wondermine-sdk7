@@ -1,4 +1,4 @@
-# WonderMine Crafting Game in Decentraland (SDK6) #
+# WonderMine Crafting Game in Decentraland (SDK7) #
 
 ### Design Documents
 
