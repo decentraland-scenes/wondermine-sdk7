@@ -1,0 +1,567 @@
+[
+  {
+    "id": "R0001",
+    "name": "Bronze Pickaxe",
+    "desc": "Forged from copper, with a hardwood handle,\nthis axe is 10% more efficient than stone!",
+    "qty": 100,
+    "itemId": "AxeCopper",
+    "itemClass": "pickaxe",
+    "wi": 0,
+    "isActive": true,
+    "isNft": false,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 20, "itemId": "WG" },
+      { "qty": 1, "itemId": "AxeStone", "useAll": true },
+      { "qty": 15, "itemId": "MetalCopper" },
+      { "qty": 15, "itemId": "GemSapphire" }
+    ]
+  },
+  {
+    "id": "R0002",
+    "name": "Iron Pickaxe",
+    "desc": "The crafting machine will forge you a hard iron axe\nthat's 20% more efficient than stone!",
+    "qty": 100,
+    "itemId": "AxeIron",
+    "itemClass": "pickaxe",
+    "wi": 0,
+    "isActive": true,
+    "isNft": false,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 30, "itemId": "WG" },
+      { "qty": 1, "itemId": "AxeCopper", "useAll": true },
+      { "qty": 20, "itemId": "MetalIron" },
+      { "qty": 20, "itemId": "GemSapphire" },
+      { "qty": 10, "itemId": "GemEmerald" }
+    ]
+  },
+  {
+    "id": "R0003",
+    "name": "Titanium Pickaxe",
+    "desc": "This axe is as strong as steel but lighter weight\nand more damage-resistant. It gives a 30% bonus\nwhen mining meteors!",
+    "qty": 100,
+    "itemId": "AxeTitanium",
+    "itemClass": "pickaxe",
+    "wi": 0,
+    "isActive": true,
+    "isNft": false,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 40, "itemId": "WG" },
+      { "qty": 1, "itemId": "AxeIron", "useAll": true },
+      { "qty": 50, "itemId": "MetalTitanium" },
+      { "qty": 20, "itemId": "GemEmerald" },
+      { "qty": 10, "itemId": "GemRuby" }
+    ]
+  },
+  {
+    "id": "R0004",
+    "name": "Golden Pickaxe",
+    "desc": "Golden highlights decorate this titanium-steel axe\nthat mines 40% more out of meteors!",
+    "qty": 100,
+    "itemId": "AxeGolden",
+    "itemClass": "pickaxe",
+    "wi": 0,
+    "isActive": true,
+    "isNft": false,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 50, "itemId": "WG" },
+      { "qty": 1, "itemId": "AxeTitanium", "useAll": true },
+      { "qty": 50, "itemId": "MetalGold" },
+      { "qty": 20, "itemId": "GemRuby" },
+      { "qty": 10, "itemId": "GemDiamond" }
+    ]
+  },
+  {
+    "id": "R0075",
+    "name": "Lava Pickaxe NFT (SOLD OUT!)",
+    "desc": "Metal-encased molten lava channels enough heat\nto split meteors! 50% mining bonus plus 40% ruby bonus!\n(ONE PER PLAYER. MUST BE LEVEL 50+)",
+    "qty": 500,
+    "itemId": "AxeLava",
+    "itemClass": "pickaxe",
+    "wi": 1005,
+    "isActive": false,
+    "isNft": true,
+    "levelMin": 50,
+    "limitOne": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 150, "itemId": "WG" },
+      { "qty": 350, "itemId": "MetalCopper" },
+      { "qty": 250, "itemId": "MetalIron" },
+      { "qty": 150, "itemId": "MetalTitanium" },
+      { "qty": 50, "itemId": "GemRuby" },
+      { "qty": 20, "itemId": "GemDiamond" }
+    ]
+  },
+  {
+    "id": "R0057",
+    "name": "Extravagant Pickaxe NFT",
+    "desc": "An alloy of copper, iron, and titanium encases\nliving gems to drive this axe. 50% mining bonus plus\nextra Diamonds and Wondergems! Limit 1 per player.\n(MUST BE LEVEL 100+)",
+    "qty": 700,
+    "itemId": "AxeExtra",
+    "itemClass": "pickaxe",
+    "wi": 1003,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 100,
+    "limitOne": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 700, "itemId": "WG" },
+      { "qty": 1500, "itemId": "MetalCopper" },
+      { "qty": 1000, "itemId": "MetalIron" },
+      { "qty": 700, "itemId": "MetalTitanium" },
+      { "qty": 1500, "itemId": "GemSapphire" },
+      { "qty": 700, "itemId": "GemEmerald" }
+    ]
+  },
+  {
+    "id": "R0006",
+    "name": "Glowmetal",
+    "desc": "Glowing, alien metal refined from meteor ore.",
+    "qty": 1,
+    "itemId": "Glowmetal",
+    "wi": 0,
+    "isActive": true,
+    "isNft": false,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 10, "itemId": "WG" },
+      { "qty": 20, "itemId": "MetalCopper" },
+      { "qty": 7, "itemId": "MetalIron" },
+      { "qty": 15, "itemId": "GemEmerald" }
+    ]
+  },
+  {
+    "id": "R0007",
+    "name": "Blue Fabric",
+    "desc": "Flexible but durable blue fabric used to make\nWonderZone wearables.",
+    "qty": 1,
+    "itemId": "BlueFabric",
+    "wi": 0,
+    "isActive": true,
+    "isNft": false,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 10, "itemId": "WG" },
+      { "qty": 10, "itemId": "MetalIron" },
+      { "qty": 7, "itemId": "MetalTitanium" },
+      { "qty": 20, "itemId": "GemSapphire" }
+    ]
+  },
+  {
+    "id": "R0008",
+    "name": "Wearables Token",
+    "desc": "Create and collect these tokens plus other needed materials\nto craft Wearables!",
+    "qty": 1,
+    "itemId": "WearablesToken",
+    "wi": 0,
+    "isActive": true,
+    "isNft": false,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 20, "itemId": "WG" },
+      { "qty": 10, "itemId": "MetalTitanium" },
+      { "qty": 10, "itemId": "MetalGold" },
+      { "qty": 10, "itemId": "GemRuby" },
+      { "qty": 3, "itemId": "Glowmetal" },
+      { "qty": 3, "itemId": "BlueFabric" }
+    ]
+  },
+  {
+    "id": "R0026",
+    "name": "Wearable: WonderZone Logo T-shirt Fall '21",
+    "desc": "Stand out in the crowd with this bright WonderZone tee.\nGives a 2% mining bonus!",
+    "qty": 1,
+    "itemId": "wear_wz_logo_shirt",
+    "itemClass": "wearable",
+    "wi": 3001,
+    "isActive": true,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 15, "itemId": "WG" },
+      { "qty": 4, "itemId": "MetalGold" },
+      { "qty": 3, "itemId": "MetalPlatinum" },
+      { "qty": 3, "itemId": "GemDiamond" },
+      { "qty": 2, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0027",
+    "name": "Wearable: WonderZone Logo Cap Fall '21",
+    "desc": "Shade your eyes while mining meteors.\nGives a 2% mining bonus!",
+    "qty": 1,
+    "itemId": "wear_wz_logo_cap",
+    "itemClass": "wearable",
+    "wi": 3000,
+    "isActive": true,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 15, "itemId": "WG" },
+      { "qty": 4, "itemId": "MetalGold" },
+      { "qty": 3, "itemId": "MetalPlatinum" },
+      { "qty": 3, "itemId": "GemDiamond" },
+      { "qty": 2, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0067",
+    "name": "S1 Wearable: Headless",
+    "desc": "You might want to duck next time.\nBut at least now you get an extra 2% mining bonus!",
+    "qty": 1,
+    "itemId": "wear_headless",
+    "itemClass": "wearable",
+    "wi": 17001,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 20,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 25, "itemId": "WG" },
+      { "qty": 6, "itemId": "MetalGold" },
+      { "qty": 5, "itemId": "MetalPlatinum" },
+      { "qty": 5, "itemId": "GemDiamond" },
+      { "qty": 3, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0073",
+    "name": "S1 Wearable: Marcel Mask",
+    "desc": "Masquerade as Marcel, the hardest-working pug\nin the metaverse! You might even get a cookie.\nAnd a 2% mining bonus!",
+    "qty": 1,
+    "itemId": "wear_marcel_mask",
+    "itemClass": "wearable",
+    "wi": 17007,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 40,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 25, "itemId": "WG" },
+      { "qty": 6, "itemId": "MetalGold" },
+      { "qty": 5, "itemId": "MetalPlatinum" },
+      { "qty": 5, "itemId": "GemDiamond" },
+      { "qty": 3, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0066",
+    "name": "S1 Wearable: Venetian Red Cap",
+    "desc": "The perfect red cap for any sharp-dressed\nVenetian merchant. Adds a 2% mining bonus!",
+    "qty": 1,
+    "itemId": "wear_venetian_red_cap",
+    "itemClass": "wearable",
+    "wi": 17000,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 30,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 25, "itemId": "WG" },
+      { "qty": 6, "itemId": "MetalGold" },
+      { "qty": 5, "itemId": "MetalPlatinum" },
+      { "qty": 5, "itemId": "GemDiamond" },
+      { "qty": 3, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0068",
+    "name": "S1 Wearable: Venetian Green Cap",
+    "desc": "The perfect green cap for any sharp-dressed\nVenetian merchant. Adds a 2% mining bonus!",
+    "qty": 1,
+    "itemId": "wear_venetian_green_cap",
+    "itemClass": "wearable",
+    "wi": 17002,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 30,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 25, "itemId": "WG" },
+      { "qty": 6, "itemId": "MetalGold" },
+      { "qty": 5, "itemId": "MetalPlatinum" },
+      { "qty": 5, "itemId": "GemDiamond" },
+      { "qty": 3, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0074",
+    "name": "S1 Wearable: Cowboy Hat",
+    "desc": "With this hat you'll feel like roping wild meteors!\nAdds a 2% mining bonus too.",
+    "qty": 1,
+    "itemId": "wear_cowboy_hat",
+    "itemClass": "wearable",
+    "wi": 17008,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 20,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 25, "itemId": "WG" },
+      { "qty": 6, "itemId": "MetalGold" },
+      { "qty": 5, "itemId": "MetalPlatinum" },
+      { "qty": 5, "itemId": "GemDiamond" },
+      { "qty": 3, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0069",
+    "name": "S1 Wearable: Galaxy Sneakers",
+    "desc": "You'll feel like flying in these space-age sneakers.\nWe think there's Glowmetal in the soles.\nGives a 2% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_galaxy_sneakers",
+    "itemClass": "wearable",
+    "wi": 17003,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 30,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 35, "itemId": "WG" },
+      { "qty": 8, "itemId": "MetalGold" },
+      { "qty": 6, "itemId": "MetalPlatinum" },
+      { "qty": 6, "itemId": "GemDiamond" },
+      { "qty": 4, "itemId": "WearablesToken" }
+    ]
+  },
+
+  {
+    "id": "R0076",
+    "name": "S2 Wearable: Nebula Sneakers",
+    "desc": "Glowing sneakers with filaments of stardust woven\ninto the fabric! Gives a 2% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_nebula_sneakers",
+    "itemClass": "wearable",
+    "wi": 18000,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 30,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 35, "itemId": "WG" },
+      { "qty": 8, "itemId": "MetalGold" },
+      { "qty": 6, "itemId": "MetalPlatinum" },
+      { "qty": 6, "itemId": "GemDiamond" },
+      { "qty": 4, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0077",
+    "name": "S2 Emote: Mole Dive!",
+    "desc": "Here comes a meteor. Dive underground like a mole\nwith this incredible emote!",
+    "qty": 1,
+    "itemId": "wear_mole_dive_emote",
+    "itemClass": "wearable",
+    "wi": 18004,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 20,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 35, "itemId": "WG" },
+      { "qty": 8, "itemId": "MetalGold" },
+      { "qty": 6, "itemId": "MetalPlatinum" },
+      { "qty": 6, "itemId": "GemDiamond" },
+      { "qty": 4, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0078",
+    "name": "S2 Wearable: Bulging Eyes",
+    "desc": "Big, beautiful, bulging eyes!\nGives a 2% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_bulging_eyes",
+    "itemClass": "wearable",
+    "wi": 18006,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 20,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 35, "itemId": "WG" },
+      { "qty": 8, "itemId": "MetalGold" },
+      { "qty": 6, "itemId": "MetalPlatinum" },
+      { "qty": 6, "itemId": "GemDiamond" },
+      { "qty": 4, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0079",
+    "name": "S2 Wearable: Wireframe Body",
+    "desc": "Loading... Loading... Loading...\nGives a 2% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_wireframe",
+    "itemClass": "wearable",
+    "wi": 18005,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 30,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 35, "itemId": "WG" },
+      { "qty": 8, "itemId": "MetalGold" },
+      { "qty": 6, "itemId": "MetalPlatinum" },
+      { "qty": 6, "itemId": "GemDiamond" },
+      { "qty": 4, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0080",
+    "name": "S2 Wearable: Mongolian Helmet",
+    "desc": "This helmet once belonged to a rider in the Golden Horde!\nGrants a 3% mining bonus!",
+    "qty": 1,
+    "itemId": "wear_mongolian_helmet",
+    "itemClass": "wearable",
+    "wi": 18008,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 50,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 55, "itemId": "WG" },
+      { "qty": 12, "itemId": "MetalGold" },
+      { "qty": 8, "itemId": "MetalPlatinum" },
+      { "qty": 8, "itemId": "GemDiamond" },
+      { "qty": 6, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0081",
+    "name": "S2 Wearable: Night Stalker Guardian Helmet",
+    "desc": "Night Stalker Guardians protect the streets after curfew.\nGrants a 3% mining bonus!",
+    "qty": 1,
+    "itemId": "wear_nightstalker_helmet",
+    "itemClass": "wearable",
+    "wi": 18007,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 50,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 55, "itemId": "WG" },
+      { "qty": 12, "itemId": "MetalGold" },
+      { "qty": 8, "itemId": "MetalPlatinum" },
+      { "qty": 8, "itemId": "GemDiamond" },
+      { "qty": 6, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0082",
+    "name": "S2 Wearable: Cyber Druid Head",
+    "desc": "The Cyber Druid roams the desert to aid\ndehydrated humans. It doesn't always bring water.\nGrants a 3% mining bonus!",
+    "qty": 1,
+    "itemId": "wear_cyber_druid_head",
+    "itemClass": "wearable",
+    "wi": 18001,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 50,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 55, "itemId": "WG" },
+      { "qty": 12, "itemId": "MetalGold" },
+      { "qty": 8, "itemId": "MetalPlatinum" },
+      { "qty": 8, "itemId": "GemDiamond" },
+      { "qty": 6, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0083",
+    "name": "S2 Wearable: Cyber Druid Torso",
+    "desc": "The Cyber Druid roams the desert to aid\ndehydrated humans. It doesn't always bring water.\nGrants a 3% mining bonus!",
+    "qty": 1,
+    "itemId": "wear_cyber_druid_torso",
+    "itemClass": "wearable",
+    "wi": 18002,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 50,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 55, "itemId": "WG" },
+      { "qty": 12, "itemId": "MetalGold" },
+      { "qty": 8, "itemId": "MetalPlatinum" },
+      { "qty": 8, "itemId": "GemDiamond" },
+      { "qty": 6, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0084",
+    "name": "S2 Wearable: Cyber Druid Legs",
+    "desc": "The Cyber Druid roams the desert to aid\ndehydrated humans. It doesn't always bring water.\nGrants a 3% mining bonus!",
+    "qty": 1,
+    "itemId": "wear_cyber_druid_legs",
+    "itemClass": "wearable",
+    "wi": 18003,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 50,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 55, "itemId": "WG" },
+      { "qty": 12, "itemId": "MetalGold" },
+      { "qty": 8, "itemId": "MetalPlatinum" },
+      { "qty": 8, "itemId": "GemDiamond" },
+      { "qty": 6, "itemId": "WearablesToken" }
+    ]
+  },
+
+  {
+    "id": "R0062",
+    "name": "Wearable: Extravagant Vest",
+    "desc": "Reserved for the most dedicated players.\nThis luxurious gold-plated vest gives a 5% mining bonus.\n(MUST BE LEVEL 100+ TO CRAFT)",
+    "qty": 1,
+    "itemId": "wear_extra_vest",
+    "itemClass": "wearable",
+    "wi": 15001,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 100,
+    "limitOne": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 250, "itemId": "WG" },
+      { "qty": 50, "itemId": "MetalGold" },
+      { "qty": 50, "itemId": "MetalPlatinum" },
+      { "qty": 50, "itemId": "GemDiamond" },
+      { "qty": 12, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0063",
+    "name": "Wearable: Extravagant Regalia",
+    "desc": "Reserved for the most dedicated players. This golden helmet\nwith diamond-infused epaulets gives a 5% mining bonus.\n(MUST BE LEVEL 100+ TO CRAFT)",
+    "qty": 1,
+    "itemId": "wear_extra_regalia",
+    "itemClass": "wearable",
+    "wi": 15000,
+    "isActive": true,
+    "isNft": true,
+    "levelMin": 100,
+    "limitOne": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 250, "itemId": "WG" },
+      { "qty": 50, "itemId": "MetalGold" },
+      { "qty": 50, "itemId": "MetalPlatinum" },
+      { "qty": 50, "itemId": "GemDiamond" },
+      { "qty": 12, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0010",
+    "name": "Repair your Mining Tool",
+    "desc": "Has your pickaxe or mining tool run out of uses?\nFor a few WonderCoins we can fix that right up!",
+    "qty": 100,
+    "itemId": "AxeRepair",
+    "wi": 0,
+    "isActive": true,
+    "isNft": false,
+    "consumes": [{ "qty": 15, "itemId": "WC" }]
+  }
+]
