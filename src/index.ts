@@ -1,6 +1,6 @@
-import { GameManager } from './gamemanager';
+import { GameManager } from './gamemanager'
 import { som } from './som'
-import { svr } from './svr';
+import { svr } from './svr'
 
 export function main() {
   /**
@@ -8,5 +8,5 @@ export function main() {
    */
 
   console.log('scene: ' + som.scene.title)
-  GameManager.createAndAddToEngine(svr.t);
+  GameManager.createAndAddToEngine(svr.t)
 }

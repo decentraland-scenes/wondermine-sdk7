@@ -7,12 +7,22 @@
     "deploy": "sdk-commands deploy",
     "build": "sdk-commands build",
     "upgrade-sdk": "npm install --save-dev @dcl/sdk@latest",
-    "upgrade-sdk:next": "npm install --save-dev @dcl/sdk@next"
+    "upgrade-sdk:next": "npm install --save-dev @dcl/sdk@next",
+     "format": "prettier --config .prettierrc -c ./**/*.{ts,tsx,js,jsx}",
+  "format:fix": "prettier --config .prettierrc -w ./**/*.{ts,tsx,js,jsx}"
   },
   "devDependencies": {
+    "@dcl/asset-packs": "latest",
     "@dcl/js-runtime": "7.6.7",
     "@dcl/sdk": "latest",
-    "@dcl/asset-packs": "latest"
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-config-standard-with-typescript": "^43.0.1",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-react": "^7.37.3",
+    "prettier": "^3.4.2"
   },
   "engines": {
     "node": ">=16.0.0",
