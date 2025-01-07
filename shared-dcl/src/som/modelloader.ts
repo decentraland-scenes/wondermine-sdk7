@@ -30,18 +30,8 @@ export class ModelLoader
         GltfContainer.create(mod,{src: shape})
 
         Transform.create(mod,{position: Vector3.create(...so.pos),scale: Vector3.create(...so.scale)})
-        Transform.getMutable(mod).rotation = Quaternion.create(...so.angles);
-        console.log('gltf ',GltfContainer.get(mod).src)
-        // Rotation can be specified as a Quaternion or as Euler angles
-        // if (data['rotation'] != null)
-        // {
-        //     Transform.getMutable(mod).rotation = Quaternion.create(...so.rotation)
-        // }
-        // else if (data['angles'] != null)
-        // {
-        //     Transform.getMutable(mod).rotation = Quaternion.create(...so.angles);
-        // }
-
+        Transform.getMutable(mod).rotation = Quaternion.fromEulerDegrees(so.angles[0], so.angles[1], so.angles[2]);
+        console.log('gltf ',GltfContainer.get(mod).src, 'quaternion ',Transform.get(mod).rotation)
         return mod;
     }
     populate<T>(target: T, ...sources: Partial<T>[]): T {
