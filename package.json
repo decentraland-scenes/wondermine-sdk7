@@ -8,8 +8,8 @@
     "build": "sdk-commands build",
     "upgrade-sdk": "npm install --save-dev @dcl/sdk@latest",
     "upgrade-sdk:next": "npm install --save-dev @dcl/sdk@next",
-     "format": "prettier --config .prettierrc -c ./**/*.{ts,tsx,js,jsx}",
-  "format:fix": "prettier --config .prettierrc -w ./**/*.{ts,tsx,js,jsx}"
+    "format": "prettier --config .prettierrc -c ./**/*.{ts,tsx,js,jsx}",
+    "format:fix": "prettier --config .prettierrc -w ./**/*.{ts,tsx,js,jsx}"
   },
   "devDependencies": {
     "@dcl/asset-packs": "latest",

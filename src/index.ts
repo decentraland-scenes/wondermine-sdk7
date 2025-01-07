@@ -8,5 +8,6 @@ export function main() {
    */
 
   console.log('scene: ' + som.scene.title)
-  GameManager.createAndAddToEngine(svr.t)
+  const gameManager = new GameManager('test')
+  gameManager.init()
 }
