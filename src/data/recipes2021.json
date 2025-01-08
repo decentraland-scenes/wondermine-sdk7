@@ -1,609 +1,609 @@
 [
-	{
-		"id": "R0001",
-		"name": "Bronze Pickaxe",
-		"desc": "Forged from copper, with a hardwood handle,\nthis axe is 10% more efficient than stone!",
-		"qty": 100,
-		"itemId": "AxeCopper",
-		"wi": 0,
-		"isActive": true,
-		"isNft": false,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 20, "itemId": "WG" },
-			{ "qty": 1, "itemId": "AxeStone", "useAll": true },
-			{ "qty": 15, "itemId": "MetalCopper" },
-			{ "qty": 15, "itemId": "GemSapphire" }
-		]
-	},
-	{
-		"id": "R0002",
-		"name": "Iron Pickaxe",
-		"desc": "The crafting machine will forge you a hard iron axe\nthat's 20% more efficient than stone!",
-		"qty": 100,
-		"itemId": "AxeIron",
-		"wi": 0,
-		"isActive": true,
-		"isNft": false,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 30, "itemId": "WG" },
-			{ "qty": 1, "itemId": "AxeCopper", "useAll": true },
-			{ "qty": 20, "itemId": "MetalIron" },
-			{ "qty": 20, "itemId": "GemSapphire" },
-			{ "qty": 10, "itemId": "GemEmerald" }
-		]
-	},
-	{
-		"id": "R0003",
-		"name": "Titanium Pickaxe",
-		"desc": "This axe is as strong as steel but lighter weight\nand more damage-resistant. It gives a 30% bonus\nwhen mining meteors!",
-		"qty": 100,
-		"itemId": "AxeTitanium",
-		"wi": 0,
-		"isActive": true,
-		"isNft": false,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 40, "itemId": "WG" },
-			{ "qty": 1, "itemId": "AxeIron", "useAll": true },
-			{ "qty": 50, "itemId": "MetalTitanium" },
-			{ "qty": 20, "itemId": "GemEmerald" },
-			{ "qty": 10, "itemId": "GemRuby" }
-		]
-	},
-	{
-		"id": "R0004",
-		"name": "Golden Pickaxe",
-		"desc": "Golden highlights decorate this titanium-steel axe\nthat mines 40% more out of meteors!",
-		"qty": 100,
-		"itemId": "AxeGolden",
-		"wi": 0,
-		"isActive": true,
-		"isNft": false,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 50, "itemId": "WG" },
-			{ "qty": 1, "itemId": "AxeTitanium", "useAll": true },
-			{ "qty": 50, "itemId": "MetalGold" },
-			{ "qty": 20, "itemId": "GemRuby" },
-			{ "qty": 10, "itemId": "GemDiamond" }
-		]
-	},
-	{
-		"id": "R0005",
-		"name": "Diamond Pickaxe NFT",
-		"desc": "Diamond-tipped and platinum-decorated titanium-steel pickaxe.\nThe ultimate mining tool, with a 50% bonus!\n(Out of Stock) (New NFT axe coming soon!)",
-		"qty": 500,
-		"itemId": "AxeDiamond",
-		"wi": 0,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 100, "itemId": "WG" },
-			{ "qty": 1, "itemId": "AxeGolden", "useAll": true },
-			{ "qty": 20, "itemId": "MetalPlatinum" },
-			{ "qty": 25, "itemId": "GemRuby" },
-			{ "qty": 12, "itemId": "GemDiamond" }
-		]
-	},
-	{
-		"id": "R0009",
-		"name": "Wondergem Pickaxe NFT",
-		"desc": "Tough titanium pickaxe with a hard Wondergem shell.\nGives a 50% mining bonus, plus extra Wondergems!\n(Coming soon)",
-		"qty": 500,
-		"itemId": "AxeWondergem",
-		"wi": 0,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 100, "itemId": "WG" },
-			{ "qty": 1, "itemId": "AxeGolden", "useAll": true },
-			{ "qty": 20, "itemId": "MetalPlatinum" },
-			{ "qty": 25, "itemId": "GemRuby" },
-			{ "qty": 12, "itemId": "GemDiamond" }
-		]
-	},
-	{
-		"id": "R0006",
-		"name": "Glowmetal",
-		"desc": "Glowing, alien metal refined from meteor ore.",
-		"qty": 1,
-		"itemId": "Glowmetal",
-		"wi": 0,
-		"isActive": true,
-		"isNft": false,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 10, "itemId": "WG" },
-			{ "qty": 20, "itemId": "MetalCopper" },
-			{ "qty": 7, "itemId": "MetalIron" },
-			{ "qty": 15, "itemId": "GemEmerald" }
-		]
-	},
-	{
-		"id": "R0007",
-		"name": "Blue Fabric",
-		"desc": "Flexible but durable blue fabric used to make\nWonderZone wearables.",
-		"qty": 1,
-		"itemId": "BlueFabric",
-		"wi": 0,
-		"isActive": true,
-		"isNft": false,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 10, "itemId": "WG" },
-			{ "qty": 10, "itemId": "MetalIron" },
-			{ "qty": 7, "itemId": "MetalTitanium" },
-			{ "qty": 20, "itemId": "GemSapphire" }
-		]
-	},
-	{
-		"id": "R0008",
-		"name": "Wearables Token",
-		"desc": "Create and collect these tokens, plus other needed materials,\nto craft Wearables!",
-		"qty": 1,
-		"itemId": "WearablesToken",
-		"wi": 0,
-		"isActive": true,
-		"isNft": false,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 20, "itemId": "WG" },
-			{ "qty": 10, "itemId": "MetalTitanium" },
-			{ "qty": 10, "itemId": "MetalGold" },
-			{ "qty": 10, "itemId": "GemRuby" },
-			{ "qty": 3, "itemId": "Glowmetal" },
-			{ "qty": 3, "itemId": "BlueFabric" }
-		]
-	},
-	{
-		"id": "R0016",
-		"name": "Wearable: Meteor Chaser Earpiece NFT",
-		"desc": "Keep current with Legendary Meteor Chaser Ear Transmitters.\n(Must pay Ethereum gas fees to mint this.)\nProvides a 3% mining bonus!",
-		"qty": 1,
-		"itemId": "meteorchaser_transmitter_earring",
-		"wi": 1000,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 35, "itemId": "WG" },
-			{ "qty": 8, "itemId": "MetalGold" },
-			{ "qty": 6, "itemId": "MetalPlatinum" },
-			{ "qty": 6, "itemId": "GemDiamond" },
-			{ "qty": 4, "itemId": "WearablesToken" }
-		]
-	},
-	{
-		"id": "R0014",
-		"name": "Wearable: Meteor Chaser Mask NFT",
-		"desc": "Breathe easy with a Legendary Meteor Chaser Dust Mask.\n(Must pay Ethereum gas fees to mint this.)\nProvides a 3% mining bonus!",
-		"qty": 1,
-		"itemId": "meteorite_dustmask_mask",
-		"wi": 1004,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 35, "itemId": "WG" },
-			{ "qty": 8, "itemId": "MetalGold" },
-			{ "qty": 6, "itemId": "MetalPlatinum" },
-			{ "qty": 6, "itemId": "GemDiamond" },
-			{ "qty": 4, "itemId": "WearablesToken" }
-		]
-	},
-	{
-		"id": "R0011",
-		"name": "Wearable: Meteor Chaser Shoes NFT",
-		"desc": "Speedy and Legendary Meteor Chaser shoes!\n(Must pay Ethereum gas fees to mint this.)\nProvides a 3% mining bonus!",
-		"qty": 1,
-		"itemId": "meteorchaser_shoes_feet",
-		"wi": 1001,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 35, "itemId": "WG" },
-			{ "qty": 8, "itemId": "MetalGold" },
-			{ "qty": 6, "itemId": "MetalPlatinum" },
-			{ "qty": 6, "itemId": "GemDiamond" },
-			{ "qty": 4, "itemId": "WearablesToken" }
-		]
-	},
-	{
-		"id": "R0012",
-		"name": "Wearable: Meteor Chaser Hard Hat NFT",
-		"desc": "This Legendary Hard Hat protects your head while mining.\n(Must pay Ethereum gas fees to mint this.)\nProvides a 3% mining bonus!",
-		"qty": 1,
-		"itemId": "meteorite_protective_hardhat_hat",
-		"wi": 1002,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 45, "itemId": "WG" },
-			{ "qty": 10, "itemId": "MetalGold" },
-			{ "qty": 7, "itemId": "MetalPlatinum" },
-			{ "qty": 7, "itemId": "GemDiamond" },
-			{ "qty": 5, "itemId": "WearablesToken" }
-		]
-	},
-	{
-		"id": "R0013",
-		"name": "Wearable: Meteor Chaser Trousers NFT",
-		"desc": "Move fast in these Legendary Meteor Chaser Trousers.\n(Must pay Ethereum gas fees to mint this.)\nProvides a 3% mining bonus!",
-		"qty": 1,
-		"itemId": "meteorchaser_trousers_lower_body",
-		"wi": 1003,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 45, "itemId": "WG" },
-			{ "qty": 10, "itemId": "MetalGold" },
-			{ "qty": 7, "itemId": "MetalPlatinum" },
-			{ "qty": 7, "itemId": "GemDiamond" },
-			{ "qty": 5, "itemId": "WearablesToken" }
-		]
-	},
-	{
-		"id": "R0015",
-		"name": "Wearable: Meteor Chaser Jacket NFT",
-		"desc": "Stay warm and safe in the Legendary Meteor Chaser Jacket.\n(Must pay Ethereum gas fees to mint this.)\nProvides a 3% mining bonus!",
-		"qty": 1,
-		"itemId": "meteorchaser_vest_upper_body",
-		"wi": 1005,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 45, "itemId": "WG" },
-			{ "qty": 10, "itemId": "MetalGold" },
-			{ "qty": 7, "itemId": "MetalPlatinum" },
-			{ "qty": 7, "itemId": "GemDiamond" },
-			{ "qty": 5, "itemId": "WearablesToken" }
-		]
-	},
-	{
-		"id": "R0026",
-		"name": "Wearable: WonderZone Logo T-shirt Fall '21",
-		"desc": "Stand out in the crowd with this bright WonderZone tee.\nGives a 2% mining bonus!",
-		"qty": 1,
-		"itemId": "wear_wz_logo_shirt",
-		"wi": 3001,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 15, "itemId": "WG" },
-			{ "qty": 4, "itemId": "MetalGold" },
-			{ "qty": 3, "itemId": "MetalPlatinum" },
-			{ "qty": 3, "itemId": "GemDiamond" },
-			{ "qty": 2, "itemId": "WearablesToken" }
-		]
-	},
-	{
-		"id": "R0027",
-		"name": "Wearable: WonderZone Logo Cap Fall '21",
-		"desc": "Shade your eyes while mining meteors.\nGives a 2% mining bonus!",
-		"qty": 1,
-		"itemId": "wear_wz_logo_cap",
-		"wi": 3000,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 15, "itemId": "WG" },
-			{ "qty": 4, "itemId": "MetalGold" },
-			{ "qty": 3, "itemId": "MetalPlatinum" },
-			{ "qty": 3, "itemId": "GemDiamond" },
-			{ "qty": 2, "itemId": "WearablesToken" }
-		]
-	},
-	{
-		"id": "R0028",
-		"name": "Wearable: Big Nose",
-		"desc": "Smell better and add some personality\n with this impressive new nose.\nOffers a 3% mining bonus!",
-		"qty": 1,
-		"itemId": "wear_big_nose",
-		"wi": 4000,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 25, "itemId": "WG" },
-			{ "qty": 6, "itemId": "MetalGold" },
-			{ "qty": 5, "itemId": "MetalPlatinum" },
-			{ "qty": 5, "itemId": "GemDiamond" },
-			{ "qty": 3, "itemId": "WearablesToken" }
-		]
-    },
+  {
+    "id": "R0001",
+    "name": "Bronze Pickaxe",
+    "desc": "Forged from copper, with a hardwood handle,\nthis axe is 10% more efficient than stone!",
+    "qty": 100,
+    "itemId": "AxeCopper",
+    "wi": 0,
+    "isActive": true,
+    "isNft": false,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 20, "itemId": "WG" },
+      { "qty": 1, "itemId": "AxeStone", "useAll": true },
+      { "qty": 15, "itemId": "MetalCopper" },
+      { "qty": 15, "itemId": "GemSapphire" }
+    ]
+  },
+  {
+    "id": "R0002",
+    "name": "Iron Pickaxe",
+    "desc": "The crafting machine will forge you a hard iron axe\nthat's 20% more efficient than stone!",
+    "qty": 100,
+    "itemId": "AxeIron",
+    "wi": 0,
+    "isActive": true,
+    "isNft": false,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 30, "itemId": "WG" },
+      { "qty": 1, "itemId": "AxeCopper", "useAll": true },
+      { "qty": 20, "itemId": "MetalIron" },
+      { "qty": 20, "itemId": "GemSapphire" },
+      { "qty": 10, "itemId": "GemEmerald" }
+    ]
+  },
+  {
+    "id": "R0003",
+    "name": "Titanium Pickaxe",
+    "desc": "This axe is as strong as steel but lighter weight\nand more damage-resistant. It gives a 30% bonus\nwhen mining meteors!",
+    "qty": 100,
+    "itemId": "AxeTitanium",
+    "wi": 0,
+    "isActive": true,
+    "isNft": false,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 40, "itemId": "WG" },
+      { "qty": 1, "itemId": "AxeIron", "useAll": true },
+      { "qty": 50, "itemId": "MetalTitanium" },
+      { "qty": 20, "itemId": "GemEmerald" },
+      { "qty": 10, "itemId": "GemRuby" }
+    ]
+  },
+  {
+    "id": "R0004",
+    "name": "Golden Pickaxe",
+    "desc": "Golden highlights decorate this titanium-steel axe\nthat mines 40% more out of meteors!",
+    "qty": 100,
+    "itemId": "AxeGolden",
+    "wi": 0,
+    "isActive": true,
+    "isNft": false,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 50, "itemId": "WG" },
+      { "qty": 1, "itemId": "AxeTitanium", "useAll": true },
+      { "qty": 50, "itemId": "MetalGold" },
+      { "qty": 20, "itemId": "GemRuby" },
+      { "qty": 10, "itemId": "GemDiamond" }
+    ]
+  },
+  {
+    "id": "R0005",
+    "name": "Diamond Pickaxe NFT",
+    "desc": "Diamond-tipped and platinum-decorated titanium-steel pickaxe.\nThe ultimate mining tool, with a 50% bonus!\n(Out of Stock) (New NFT axe coming soon!)",
+    "qty": 500,
+    "itemId": "AxeDiamond",
+    "wi": 0,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 100, "itemId": "WG" },
+      { "qty": 1, "itemId": "AxeGolden", "useAll": true },
+      { "qty": 20, "itemId": "MetalPlatinum" },
+      { "qty": 25, "itemId": "GemRuby" },
+      { "qty": 12, "itemId": "GemDiamond" }
+    ]
+  },
+  {
+    "id": "R0009",
+    "name": "Wondergem Pickaxe NFT",
+    "desc": "Tough titanium pickaxe with a hard Wondergem shell.\nGives a 50% mining bonus, plus extra Wondergems!\n(Coming soon)",
+    "qty": 500,
+    "itemId": "AxeWondergem",
+    "wi": 0,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 100, "itemId": "WG" },
+      { "qty": 1, "itemId": "AxeGolden", "useAll": true },
+      { "qty": 20, "itemId": "MetalPlatinum" },
+      { "qty": 25, "itemId": "GemRuby" },
+      { "qty": 12, "itemId": "GemDiamond" }
+    ]
+  },
+  {
+    "id": "R0006",
+    "name": "Glowmetal",
+    "desc": "Glowing, alien metal refined from meteor ore.",
+    "qty": 1,
+    "itemId": "Glowmetal",
+    "wi": 0,
+    "isActive": true,
+    "isNft": false,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 10, "itemId": "WG" },
+      { "qty": 20, "itemId": "MetalCopper" },
+      { "qty": 7, "itemId": "MetalIron" },
+      { "qty": 15, "itemId": "GemEmerald" }
+    ]
+  },
+  {
+    "id": "R0007",
+    "name": "Blue Fabric",
+    "desc": "Flexible but durable blue fabric used to make\nWonderZone wearables.",
+    "qty": 1,
+    "itemId": "BlueFabric",
+    "wi": 0,
+    "isActive": true,
+    "isNft": false,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 10, "itemId": "WG" },
+      { "qty": 10, "itemId": "MetalIron" },
+      { "qty": 7, "itemId": "MetalTitanium" },
+      { "qty": 20, "itemId": "GemSapphire" }
+    ]
+  },
+  {
+    "id": "R0008",
+    "name": "Wearables Token",
+    "desc": "Create and collect these tokens, plus other needed materials,\nto craft Wearables!",
+    "qty": 1,
+    "itemId": "WearablesToken",
+    "wi": 0,
+    "isActive": true,
+    "isNft": false,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 20, "itemId": "WG" },
+      { "qty": 10, "itemId": "MetalTitanium" },
+      { "qty": 10, "itemId": "MetalGold" },
+      { "qty": 10, "itemId": "GemRuby" },
+      { "qty": 3, "itemId": "Glowmetal" },
+      { "qty": 3, "itemId": "BlueFabric" }
+    ]
+  },
+  {
+    "id": "R0016",
+    "name": "Wearable: Meteor Chaser Earpiece NFT",
+    "desc": "Keep current with Legendary Meteor Chaser Ear Transmitters.\n(Must pay Ethereum gas fees to mint this.)\nProvides a 3% mining bonus!",
+    "qty": 1,
+    "itemId": "meteorchaser_transmitter_earring",
+    "wi": 1000,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 35, "itemId": "WG" },
+      { "qty": 8, "itemId": "MetalGold" },
+      { "qty": 6, "itemId": "MetalPlatinum" },
+      { "qty": 6, "itemId": "GemDiamond" },
+      { "qty": 4, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0014",
+    "name": "Wearable: Meteor Chaser Mask NFT",
+    "desc": "Breathe easy with a Legendary Meteor Chaser Dust Mask.\n(Must pay Ethereum gas fees to mint this.)\nProvides a 3% mining bonus!",
+    "qty": 1,
+    "itemId": "meteorite_dustmask_mask",
+    "wi": 1004,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 35, "itemId": "WG" },
+      { "qty": 8, "itemId": "MetalGold" },
+      { "qty": 6, "itemId": "MetalPlatinum" },
+      { "qty": 6, "itemId": "GemDiamond" },
+      { "qty": 4, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0011",
+    "name": "Wearable: Meteor Chaser Shoes NFT",
+    "desc": "Speedy and Legendary Meteor Chaser shoes!\n(Must pay Ethereum gas fees to mint this.)\nProvides a 3% mining bonus!",
+    "qty": 1,
+    "itemId": "meteorchaser_shoes_feet",
+    "wi": 1001,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 35, "itemId": "WG" },
+      { "qty": 8, "itemId": "MetalGold" },
+      { "qty": 6, "itemId": "MetalPlatinum" },
+      { "qty": 6, "itemId": "GemDiamond" },
+      { "qty": 4, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0012",
+    "name": "Wearable: Meteor Chaser Hard Hat NFT",
+    "desc": "This Legendary Hard Hat protects your head while mining.\n(Must pay Ethereum gas fees to mint this.)\nProvides a 3% mining bonus!",
+    "qty": 1,
+    "itemId": "meteorite_protective_hardhat_hat",
+    "wi": 1002,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 45, "itemId": "WG" },
+      { "qty": 10, "itemId": "MetalGold" },
+      { "qty": 7, "itemId": "MetalPlatinum" },
+      { "qty": 7, "itemId": "GemDiamond" },
+      { "qty": 5, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0013",
+    "name": "Wearable: Meteor Chaser Trousers NFT",
+    "desc": "Move fast in these Legendary Meteor Chaser Trousers.\n(Must pay Ethereum gas fees to mint this.)\nProvides a 3% mining bonus!",
+    "qty": 1,
+    "itemId": "meteorchaser_trousers_lower_body",
+    "wi": 1003,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 45, "itemId": "WG" },
+      { "qty": 10, "itemId": "MetalGold" },
+      { "qty": 7, "itemId": "MetalPlatinum" },
+      { "qty": 7, "itemId": "GemDiamond" },
+      { "qty": 5, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0015",
+    "name": "Wearable: Meteor Chaser Jacket NFT",
+    "desc": "Stay warm and safe in the Legendary Meteor Chaser Jacket.\n(Must pay Ethereum gas fees to mint this.)\nProvides a 3% mining bonus!",
+    "qty": 1,
+    "itemId": "meteorchaser_vest_upper_body",
+    "wi": 1005,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 45, "itemId": "WG" },
+      { "qty": 10, "itemId": "MetalGold" },
+      { "qty": 7, "itemId": "MetalPlatinum" },
+      { "qty": 7, "itemId": "GemDiamond" },
+      { "qty": 5, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0026",
+    "name": "Wearable: WonderZone Logo T-shirt Fall '21",
+    "desc": "Stand out in the crowd with this bright WonderZone tee.\nGives a 2% mining bonus!",
+    "qty": 1,
+    "itemId": "wear_wz_logo_shirt",
+    "wi": 3001,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 15, "itemId": "WG" },
+      { "qty": 4, "itemId": "MetalGold" },
+      { "qty": 3, "itemId": "MetalPlatinum" },
+      { "qty": 3, "itemId": "GemDiamond" },
+      { "qty": 2, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0027",
+    "name": "Wearable: WonderZone Logo Cap Fall '21",
+    "desc": "Shade your eyes while mining meteors.\nGives a 2% mining bonus!",
+    "qty": 1,
+    "itemId": "wear_wz_logo_cap",
+    "wi": 3000,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 15, "itemId": "WG" },
+      { "qty": 4, "itemId": "MetalGold" },
+      { "qty": 3, "itemId": "MetalPlatinum" },
+      { "qty": 3, "itemId": "GemDiamond" },
+      { "qty": 2, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0028",
+    "name": "Wearable: Big Nose",
+    "desc": "Smell better and add some personality\n with this impressive new nose.\nOffers a 3% mining bonus!",
+    "qty": 1,
+    "itemId": "wear_big_nose",
+    "wi": 4000,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 25, "itemId": "WG" },
+      { "qty": 6, "itemId": "MetalGold" },
+      { "qty": 5, "itemId": "MetalPlatinum" },
+      { "qty": 5, "itemId": "GemDiamond" },
+      { "qty": 3, "itemId": "WearablesToken" }
+    ]
+  },
 
-    {
-		"id": "R0030",
-		"name": "Wearable: Devil Horns",
-        "desc": "Feeling naughty? Express it, you little devil!\nGives a 2% mining bonus.",
-		"qty": 1,
-		"itemId": "wear_devil_horns",
-		"wi": 5002,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 25, "itemId": "WG" },
-			{ "qty": 6, "itemId": "MetalGold" },
-			{ "qty": 5, "itemId": "MetalPlatinum" },
-			{ "qty": 5, "itemId": "GemDiamond" },
-			{ "qty": 3, "itemId": "WearablesToken" }
-		]
-    },
-    {
-		"id": "R0031",
-		"name": "Wearable: Unicorn Horn",
-        "desc": "Fill your life with fluffy clouds and rainbows!\nLive like a unicorn.\nGives a 2% mining bonus.",
-		"qty": 1,
-		"itemId": "wear_unicorn_horn",
-		"wi": 5004,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 25, "itemId": "WG" },
-			{ "qty": 6, "itemId": "MetalGold" },
-			{ "qty": 5, "itemId": "MetalPlatinum" },
-			{ "qty": 5, "itemId": "GemDiamond" },
-			{ "qty": 3, "itemId": "WearablesToken" }
-		]
-    },
-    {
-		"id": "R0032",
-		"name": "Wearable: Antlers",
-        "desc": "Rule the forest with these mighty antlers!\nGives a 2% mining bonus.",
-		"qty": 1,
-		"itemId": "wear_antlers",
-		"wi": 5003,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 35, "itemId": "WG" },
-			{ "qty": 8, "itemId": "MetalGold" },
-			{ "qty": 6, "itemId": "MetalPlatinum" },
-			{ "qty": 6, "itemId": "GemDiamond" },
-			{ "qty": 4, "itemId": "WearablesToken" }
-		]
-    },
-    {
-		"id": "R0033",
-		"name": "Wearable: Demon Horns",
-        "desc": "Feeling possessed? Show it with diabolical horns!\nGives a 2% mining bonus.",
-		"qty": 1,
-		"itemId": "wear_demon_horns",
-		"wi": 5001,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 35, "itemId": "WG" },
-			{ "qty": 8, "itemId": "MetalGold" },
-			{ "qty": 6, "itemId": "MetalPlatinum" },
-			{ "qty": 6, "itemId": "GemDiamond" },
-			{ "qty": 4, "itemId": "WearablesToken" }
-		]
-    },
-    {
-		"id": "R0034",
-		"name": "Wearable: Wizard Horns",
-        "desc": "Feeling mystical? Try some magical horns!\nGives a 2% mining bonus.",
-		"qty": 1,
-		"itemId": "wear_wizard_horns",
-		"wi": 5005,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 35, "itemId": "WG" },
-			{ "qty": 8, "itemId": "MetalGold" },
-			{ "qty": 6, "itemId": "MetalPlatinum" },
-			{ "qty": 6, "itemId": "GemDiamond" },
-			{ "qty": 4, "itemId": "WearablesToken" }
-		]
-    },
-    {
-		"id": "R0035",
-		"name": "Wearable: Ram Horns",
-        "desc": "Get people out of your way\nwith these battering ram horns!\nGives a 2% mining bonus.",
-		"qty": 1,
-		"itemId": "wear_ram_horns",
-		"wi": 5000,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 35, "itemId": "WG" },
-			{ "qty": 8, "itemId": "MetalGold" },
-			{ "qty": 6, "itemId": "MetalPlatinum" },
-			{ "qty": 6, "itemId": "GemDiamond" },
-			{ "qty": 4, "itemId": "WearablesToken" }
-		]
-    },
+  {
+    "id": "R0030",
+    "name": "Wearable: Devil Horns",
+    "desc": "Feeling naughty? Express it, you little devil!\nGives a 2% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_devil_horns",
+    "wi": 5002,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 25, "itemId": "WG" },
+      { "qty": 6, "itemId": "MetalGold" },
+      { "qty": 5, "itemId": "MetalPlatinum" },
+      { "qty": 5, "itemId": "GemDiamond" },
+      { "qty": 3, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0031",
+    "name": "Wearable: Unicorn Horn",
+    "desc": "Fill your life with fluffy clouds and rainbows!\nLive like a unicorn.\nGives a 2% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_unicorn_horn",
+    "wi": 5004,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 25, "itemId": "WG" },
+      { "qty": 6, "itemId": "MetalGold" },
+      { "qty": 5, "itemId": "MetalPlatinum" },
+      { "qty": 5, "itemId": "GemDiamond" },
+      { "qty": 3, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0032",
+    "name": "Wearable: Antlers",
+    "desc": "Rule the forest with these mighty antlers!\nGives a 2% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_antlers",
+    "wi": 5003,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 35, "itemId": "WG" },
+      { "qty": 8, "itemId": "MetalGold" },
+      { "qty": 6, "itemId": "MetalPlatinum" },
+      { "qty": 6, "itemId": "GemDiamond" },
+      { "qty": 4, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0033",
+    "name": "Wearable: Demon Horns",
+    "desc": "Feeling possessed? Show it with diabolical horns!\nGives a 2% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_demon_horns",
+    "wi": 5001,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 35, "itemId": "WG" },
+      { "qty": 8, "itemId": "MetalGold" },
+      { "qty": 6, "itemId": "MetalPlatinum" },
+      { "qty": 6, "itemId": "GemDiamond" },
+      { "qty": 4, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0034",
+    "name": "Wearable: Wizard Horns",
+    "desc": "Feeling mystical? Try some magical horns!\nGives a 2% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_wizard_horns",
+    "wi": 5005,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 35, "itemId": "WG" },
+      { "qty": 8, "itemId": "MetalGold" },
+      { "qty": 6, "itemId": "MetalPlatinum" },
+      { "qty": 6, "itemId": "GemDiamond" },
+      { "qty": 4, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0035",
+    "name": "Wearable: Ram Horns",
+    "desc": "Get people out of your way\nwith these battering ram horns!\nGives a 2% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_ram_horns",
+    "wi": 5000,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 35, "itemId": "WG" },
+      { "qty": 8, "itemId": "MetalGold" },
+      { "qty": 6, "itemId": "MetalPlatinum" },
+      { "qty": 6, "itemId": "GemDiamond" },
+      { "qty": 4, "itemId": "WearablesToken" }
+    ]
+  },
 
-	{
-		"id": "R0036",
-		"name": "Wearable: Tiger Warrior Kilt",
-		"desc": "From the WonderZone Pride 2021 collection.\nGives a 3% mining bonus.",
-		"qty": 1,
-		"itemId": "wear_tiger_warrior_kilt",
-		"wi": 6002,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 45, "itemId": "WG" },
-			{ "qty": 10, "itemId": "MetalGold" },
-			{ "qty": 7, "itemId": "MetalPlatinum" },
-			{ "qty": 7, "itemId": "GemDiamond" },
-			{ "qty": 5, "itemId": "WearablesToken" }
-		]
-	},
-	{
-		"id": "R0037",
-		"name": "Wearable: Tiger Warrior Torso",
-        "desc": "From the WonderZone Pride 2021 collection.\nGives a 3% mining bonus.",
-        "qty": 1,
-		"itemId": "wear_tiger_warrior_torso",
-		"wi": 6000,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 45, "itemId": "WG" },
-			{ "qty": 10, "itemId": "MetalGold" },
-			{ "qty": 7, "itemId": "MetalPlatinum" },
-			{ "qty": 7, "itemId": "GemDiamond" },
-			{ "qty": 5, "itemId": "WearablesToken" }
-		]
-	},
-	{
-		"id": "R0038",
-		"name": "Wearable: Tiger Warrior Headdress",
-        "desc": "From the WonderZone Pride 2021 collection.\nGives a 3% mining bonus.",
-		"qty": 1,
-		"itemId": "wear_tiger_warrior_headdress",
-		"wi": 6001,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 45, "itemId": "WG" },
-			{ "qty": 10, "itemId": "MetalGold" },
-			{ "qty": 7, "itemId": "MetalPlatinum" },
-			{ "qty": 7, "itemId": "GemDiamond" },
-			{ "qty": 5, "itemId": "WearablesToken" }
-		]
-    },
+  {
+    "id": "R0036",
+    "name": "Wearable: Tiger Warrior Kilt",
+    "desc": "From the WonderZone Pride 2021 collection.\nGives a 3% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_tiger_warrior_kilt",
+    "wi": 6002,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 45, "itemId": "WG" },
+      { "qty": 10, "itemId": "MetalGold" },
+      { "qty": 7, "itemId": "MetalPlatinum" },
+      { "qty": 7, "itemId": "GemDiamond" },
+      { "qty": 5, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0037",
+    "name": "Wearable: Tiger Warrior Torso",
+    "desc": "From the WonderZone Pride 2021 collection.\nGives a 3% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_tiger_warrior_torso",
+    "wi": 6000,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 45, "itemId": "WG" },
+      { "qty": 10, "itemId": "MetalGold" },
+      { "qty": 7, "itemId": "MetalPlatinum" },
+      { "qty": 7, "itemId": "GemDiamond" },
+      { "qty": 5, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0038",
+    "name": "Wearable: Tiger Warrior Headdress",
+    "desc": "From the WonderZone Pride 2021 collection.\nGives a 3% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_tiger_warrior_headdress",
+    "wi": 6001,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 45, "itemId": "WG" },
+      { "qty": 10, "itemId": "MetalGold" },
+      { "qty": 7, "itemId": "MetalPlatinum" },
+      { "qty": 7, "itemId": "GemDiamond" },
+      { "qty": 5, "itemId": "WearablesToken" }
+    ]
+  },
 
-    {
-		"id": "R0039",
-		"name": "Wearable: Dragon Rider Boots",
-        "desc": "Slick leather dragon-riding boots.\nGives a 3% mining bonus.",
-		"qty": 1,
-		"itemId": "wear_dragon_boots",
-		"wi": 7003,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 45, "itemId": "WG" },
-			{ "qty": 10, "itemId": "MetalGold" },
-			{ "qty": 7, "itemId": "MetalPlatinum" },
-			{ "qty": 7, "itemId": "GemDiamond" },
-			{ "qty": 5, "itemId": "WearablesToken" }
-		]
-    },
-    {
-		"id": "R0040",
-		"name": "Wearable: Dragon Rider Pants",
-        "desc": "Fiery pants for dragon riding.\nGives a 3% mining bonus.",
-		"qty": 1,
-		"itemId": "wear_dragon_pants",
-		"wi": 7001,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 45, "itemId": "WG" },
-			{ "qty": 10, "itemId": "MetalGold" },
-			{ "qty": 7, "itemId": "MetalPlatinum" },
-			{ "qty": 7, "itemId": "GemDiamond" },
-			{ "qty": 5, "itemId": "WearablesToken" }
-		]
-    },
-    {
-		"id": "R0041",
-		"name": "Wearable: Dragon Rider Helmet",
-        "desc": "Fireproof dragon battle helmet.\nGives a 3% mining bonus.",
-		"qty": 1,
-		"itemId": "wear_dragon_helmet",
-		"wi": 7004,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 45, "itemId": "WG" },
-			{ "qty": 10, "itemId": "MetalGold" },
-			{ "qty": 7, "itemId": "MetalPlatinum" },
-			{ "qty": 7, "itemId": "GemDiamond" },
-			{ "qty": 5, "itemId": "WearablesToken" }
-		]
-    },
-    {
-		"id": "R0042",
-		"name": "Wearable: Dragon Rider Jacket",
-        "desc": "Fireproof Dragon Scale jacket.\nGives a 3% mining bonus.",
-		"qty": 1,
-		"itemId": "wear_dragon_jacket",
-		"wi": 7002,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 55, "itemId": "WG" },
-			{ "qty": 12, "itemId": "MetalGold" },
-			{ "qty": 8, "itemId": "MetalPlatinum" },
-			{ "qty": 8, "itemId": "GemDiamond" },
-			{ "qty": 6, "itemId": "WearablesToken" }
-		]
-    },
-    {
-		"id": "R0043",
-		"name": "Wearable: Dragon Rider Head",
-        "desc": "Become the Dragon!\nGives a 3% mining bonus.",
-		"qty": 1,
-		"itemId": "wear_dragon_head",
-		"wi": 7000,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 55, "itemId": "WG" },
-			{ "qty": 12, "itemId": "MetalGold" },
-			{ "qty": 8, "itemId": "MetalPlatinum" },
-			{ "qty": 8, "itemId": "GemDiamond" },
-			{ "qty": 6, "itemId": "WearablesToken" }
-		]
-    },
+  {
+    "id": "R0039",
+    "name": "Wearable: Dragon Rider Boots",
+    "desc": "Slick leather dragon-riding boots.\nGives a 3% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_dragon_boots",
+    "wi": 7003,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 45, "itemId": "WG" },
+      { "qty": 10, "itemId": "MetalGold" },
+      { "qty": 7, "itemId": "MetalPlatinum" },
+      { "qty": 7, "itemId": "GemDiamond" },
+      { "qty": 5, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0040",
+    "name": "Wearable: Dragon Rider Pants",
+    "desc": "Fiery pants for dragon riding.\nGives a 3% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_dragon_pants",
+    "wi": 7001,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 45, "itemId": "WG" },
+      { "qty": 10, "itemId": "MetalGold" },
+      { "qty": 7, "itemId": "MetalPlatinum" },
+      { "qty": 7, "itemId": "GemDiamond" },
+      { "qty": 5, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0041",
+    "name": "Wearable: Dragon Rider Helmet",
+    "desc": "Fireproof dragon battle helmet.\nGives a 3% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_dragon_helmet",
+    "wi": 7004,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 45, "itemId": "WG" },
+      { "qty": 10, "itemId": "MetalGold" },
+      { "qty": 7, "itemId": "MetalPlatinum" },
+      { "qty": 7, "itemId": "GemDiamond" },
+      { "qty": 5, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0042",
+    "name": "Wearable: Dragon Rider Jacket",
+    "desc": "Fireproof Dragon Scale jacket.\nGives a 3% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_dragon_jacket",
+    "wi": 7002,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 55, "itemId": "WG" },
+      { "qty": 12, "itemId": "MetalGold" },
+      { "qty": 8, "itemId": "MetalPlatinum" },
+      { "qty": 8, "itemId": "GemDiamond" },
+      { "qty": 6, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0043",
+    "name": "Wearable: Dragon Rider Head",
+    "desc": "Become the Dragon!\nGives a 3% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_dragon_head",
+    "wi": 7000,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 55, "itemId": "WG" },
+      { "qty": 12, "itemId": "MetalGold" },
+      { "qty": 8, "itemId": "MetalPlatinum" },
+      { "qty": 8, "itemId": "GemDiamond" },
+      { "qty": 6, "itemId": "WearablesToken" }
+    ]
+  },
 
-    {
-		"id": "R0044",
-		"name": "Wearable: Cybertorian Coat",
-        "desc": "Get that metaverse steampunk vibe\nwith our cyberpunk Victorian coat!\nGives a 3% mining bonus.",
-		"qty": 1,
-		"itemId": "wear_cybertorian_coat",
-		"wi": 8000,
-		"isActive": false,
-		"isNft": true,
-		"consumes": [
-			{ "qty": 10, "itemId": "WC" },
-			{ "qty": 55, "itemId": "WG" },
-			{ "qty": 12, "itemId": "MetalGold" },
-			{ "qty": 8, "itemId": "MetalPlatinum" },
-			{ "qty": 8, "itemId": "GemDiamond" },
-			{ "qty": 6, "itemId": "WearablesToken" }
-		]
-    },
-	{
-		"id": "R0010",
-		"name": "Repair your Pickaxe",
-		"desc": "Has your pickaxe run out of uses?\nFor a few WonderCoins we can fix that right up!",
-		"qty": 100,
-		"itemId": "AxeRepair",
-		"wi": 0,
-		"isActive": true,
-		"isNft": false,
-		"consumes": [{ "qty": 15, "itemId": "WC" }]
-	}
+  {
+    "id": "R0044",
+    "name": "Wearable: Cybertorian Coat",
+    "desc": "Get that metaverse steampunk vibe\nwith our cyberpunk Victorian coat!\nGives a 3% mining bonus.",
+    "qty": 1,
+    "itemId": "wear_cybertorian_coat",
+    "wi": 8000,
+    "isActive": false,
+    "isNft": true,
+    "consumes": [
+      { "qty": 10, "itemId": "WC" },
+      { "qty": 55, "itemId": "WG" },
+      { "qty": 12, "itemId": "MetalGold" },
+      { "qty": 8, "itemId": "MetalPlatinum" },
+      { "qty": 8, "itemId": "GemDiamond" },
+      { "qty": 6, "itemId": "WearablesToken" }
+    ]
+  },
+  {
+    "id": "R0010",
+    "name": "Repair your Pickaxe",
+    "desc": "Has your pickaxe run out of uses?\nFor a few WonderCoins we can fix that right up!",
+    "qty": 100,
+    "itemId": "AxeRepair",
+    "wi": 0,
+    "isActive": true,
+    "isNft": false,
+    "consumes": [{ "qty": 15, "itemId": "WC" }]
+  }
 ]
