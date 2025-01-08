@@ -12,6 +12,7 @@ export class ScoreData {
   public multiplier: number = 0
   public finalScore: number = 0
 
+  // eslint-disable-next-line @typescript-eslint/ban-types
   public gateScores: Object = {}
 
   public leaderboardPlace: number = 0

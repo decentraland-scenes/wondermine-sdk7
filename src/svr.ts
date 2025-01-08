@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class svr {
   public static k: string = 'WD8SWU5HPENRBEMUZKH9OGTFRKZTSN35EW9NHYOSNX97BWYWAX'
   public static l: string = '0xfB20ea4'
