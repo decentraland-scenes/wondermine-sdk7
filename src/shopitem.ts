@@ -62,7 +62,7 @@ export class ShopItem {
 
     // --- load the GLTF model
     si.pos = [0, 0, 0]
-    si.angles = [0, 0, 0]
+    si.angles = [0, 90, 0]
     this.modelEntity = loader.spawnSceneObject(si)
     Transform.getMutable(this.modelEntity).parent = this.entity
     this.shape = GltfContainer.get(this.modelEntity).src
