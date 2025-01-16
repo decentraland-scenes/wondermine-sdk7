@@ -1,5 +1,5 @@
 import { Billboard, BillboardMode, engine, Material, MeshCollider, MeshRenderer, Transform } from '@dcl/sdk/ecs'
-import {  Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
+import { Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
 
 /**
  * A simple PlaneShape with a solid color texture.
@@ -31,7 +31,11 @@ export class ColorPlane {
     MeshRenderer.setPlane(this.entity)
     MeshCollider.setPlane(this.entity)
 
-    Transform.createOrReplace(this.entity,{position: _pos,scale: _scale, rotation: Quaternion.fromEulerDegrees(_angles.x,_angles.y,_angles.z)})
+    Transform.createOrReplace(this.entity, {
+      position: _pos,
+      scale: _scale,
+      rotation: Quaternion.fromEulerDegrees(_angles.x, _angles.y, _angles.z)
+    })
 
     this.changeHexColor(_hexColor)
 
@@ -41,13 +45,13 @@ export class ColorPlane {
   }
 
   changeColor(_color: Color4): void {
-    if (Material.getMutableOrNull(this.entity)!= null){
+    if (Material.getMutableOrNull(this.entity) != null) {
       Material.deleteFrom(this.entity)
     }
     Material.setPbrMaterial(this.entity, {
       albedoColor: _color,
       roughness: 0.9,
-      specularIntensity: 0,
+      specularIntensity: 0
     })
   }
 
@@ -56,14 +60,14 @@ export class ColorPlane {
   }
 
   hide(): void {
-    if (Material.getMutableOrNull(this.entity)!= null){
+    if (Material.getMutableOrNull(this.entity) != null) {
       // add hide logics
     }
   }
 
   show(): void {
-    if (Material.getMutableOrNull(this.entity)!= null){
-     // add show logics
+    if (Material.getMutableOrNull(this.entity) != null) {
+      // add show logics
     }
   }
 }

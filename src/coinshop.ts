@@ -195,7 +195,7 @@ export class CoinShop {
 
     ts.width = 80
     ts.height = 40
- 
+
     ts.textAlign = TextAlignMode.TAM_TOP_CENTER
     // ts.fontWeight = "bold";
 
