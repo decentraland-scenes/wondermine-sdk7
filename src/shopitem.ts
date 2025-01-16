@@ -9,7 +9,8 @@ import {
   PointerEvents,
   PointerEventType,
   InputAction,
-  inputSystem
+  inputSystem,
+  MeshCollider
 } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 
@@ -75,6 +76,8 @@ export class ShopItem {
     Animator.createOrReplace(this.modelEntity, {
       states: [{ clip: this.idleAnim, loop: false }]
     })
+
+    MeshCollider.setBox(this.modelEntity)
 
     PointerEvents.createOrReplace(this.modelEntity, {
       pointerEvents: [
