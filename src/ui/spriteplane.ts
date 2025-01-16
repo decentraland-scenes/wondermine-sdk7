@@ -1,4 +1,4 @@
-import { Billboard, BillboardMode, engine, Material, MeshCollider, MeshRenderer, Transform } from '@dcl/sdk/ecs'
+import { Billboard, BillboardMode, engine, Material, MeshRenderer, Transform } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
 
 // @Component("SpritePlane")
@@ -32,9 +32,6 @@ export class SpritePlane {
     _angles: Vector3 = Vector3.Zero(),
     _isBillboard: boolean = false
   ) {
-    MeshRenderer.setPlane(this.entity, this.uvs)
-    MeshCollider.setPlane(this.entity)
-
     Transform.createOrReplace(this.entity, {
       position: _pos,
       scale: _scale,
@@ -83,14 +80,8 @@ export class SpritePlane {
     // log("loading " + _textureFile);
 
     SpritePlane.cache = [_textureFile]
+
     if (Material.getMutableOrNull(this.entity) === null) {
-      Material.setPbrMaterial(this.entity, {
-        texture: Material.Texture.Common({
-          src: _textureFile
-        }),
-        transparencyMode: 2,
-        roughness: 0.9
-      })
       // this.material.emissiveTexture = _textureFile;
       // this.material.emissiveIntensity = 0.5;
       // this.material.reflectionColor = Color3.White();
@@ -106,14 +97,57 @@ export class SpritePlane {
     if (this.framesY <= 0) this.framesY = 1
 
     this.totalFrames = _framesX * _framesY
-
     this.changeFrame(_frameNum)
 
-    Material.createOrReplace(this.entity)
+    Material.setPbrMaterial(this.entity, {
+      texture: Material.Texture.Common({
+        src: _textureFile
+      }),
+      transparencyMode: 2,
+      roughness: 0.9
+    })
+    MeshRenderer.setPlane(this.entity, this.setUVsFromAtlas(770, 400, 130, 112, 1024, 1024))
   }
 
   changeFrame(_frameNum: number): void {
     this.frameNum = _frameNum
     this.uvs = this.getUVs(_frameNum, this.framesX, this.framesY)
+  }
+
+  // This method is used for setting UVs in SDK7
+  setUVsFromAtlas(
+    xStart: number,
+    yStart: number,
+    width: number,
+    height: number,
+    atlasWidth: number,
+    atlasHeight: number
+  ): number[] {
+    const uMin = xStart / atlasWidth
+    const vMin = yStart / atlasHeight
+    const uMax = (xStart + width) / atlasWidth
+    const vMax = (yStart + height) / atlasHeight
+
+    return [
+      // Front face (North)
+      uMin,
+      vMin, // Bottom Left
+      uMax,
+      vMin, // Bottom Right
+      uMax,
+      vMax, // Top Right
+      uMin,
+      vMax, // Top Left
+
+      // Back face (South)
+      uMax,
+      vMin, // Bottom Right
+      uMin,
+      vMin, // Bottom Left
+      uMin,
+      vMax, // Top Left
+      uMax,
+      vMax // Top Right
+    ]
   }
 }

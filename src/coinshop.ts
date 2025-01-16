@@ -49,7 +49,7 @@ export class CoinShop {
 
   public products: ShopItem[] = []
   public storeData: StoreItem[] = []
-  public textureFile: string = 'models/textures/resources_atlas_1024.png'
+  public textureFile: string = 'assets/models/textures/resources_atlas_1024.png'
 
   public txInProgress: boolean = false
 
