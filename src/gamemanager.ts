@@ -1,15 +1,19 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { som } from './som'
 import { ProjectLoader } from './projectloader'
+import { CoinShop } from './coinshop'
 
 export class GameManager {
   public loader: ProjectLoader
+  public shop: CoinShop | null = null
   constructor(titleId: string) {
     this.loader = new ProjectLoader()
   }
 
   async init(): Promise<void> {
     this.loadScenery()
+    this.loadShop()
   }
 
   loadScenery(): void {
@@ -55,5 +59,11 @@ export class GameManager {
 
     const tower = this.loader.spawnSceneObject(som.scene.tower)
     const hammer01 = this.loader.spawnSceneObject(som.scene.hammer01)
+  }
+
+  loadShop():void {
+    // log("loadShop()");
+    this.shop = new CoinShop(som.scene.cart, som.scene.cartSign)
+    this.shop.loadProducts();
   }
 }
