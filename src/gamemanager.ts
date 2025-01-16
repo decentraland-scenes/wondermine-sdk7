@@ -64,5 +64,6 @@ export class GameManager {
   loadShop():void {
     // log("loadShop()");
     this.shop = new CoinShop(som.scene.cart, som.scene.cartSign)
+    this.shop.loadProducts();
   }
 }

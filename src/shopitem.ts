@@ -29,7 +29,7 @@ export class ShopItem {
 
   public enabled: boolean = false
 
-  public onClickCallback: ((m: ShopItemInstance) => boolean) | undefined
+  public onClickCallback: ((itemData: ShopItemInstance, hitPoint?: Vector3) => boolean) | undefined
 
   /**
    * Create a ShopItem given a ShopItemInstance data object.
@@ -103,18 +103,20 @@ export class ShopItem {
   idle(): void {
     // log("ShopItem.onIdle()");
     this.stopAnimations()
-
-    if (this.idleAnim != null) {
-      Animator.playSingleAnimation(this.entity, this.idleAnim)
+    if (Animator.getMutableOrNull(this.entity) != null) {
+      if (this.idleAnim != null) {
+        Animator.playSingleAnimation(this.entity, this.idleAnim)
+      }
     }
   }
 
   playAnimation(): void {
     // log("ShopItem.onIdle()");
     this.stopAnimations()
-
-    if (this.idleAnim != null) {
-      Animator.playSingleAnimation(this.entity, this.idleAnim)
+    if (Animator.getMutableOrNull(this.entity) != null) {
+      if (this.idleAnim != null) {
+        Animator.playSingleAnimation(this.entity, this.idleAnim)
+      }
     }
   }
 
@@ -131,8 +133,10 @@ export class ShopItem {
   }
 
   stopAnimations(): void {
-    if (this.idleAnim != null) {
-      Animator.getClip(this.entity, this.idleAnim).playing = false
+    if (Animator.getMutableOrNull(this.entity) != null) {
+      if (this.idleAnim != null) {
+        Animator.getClip(this.entity, this.idleAnim).playing = false
+      }
     }
   }
 
