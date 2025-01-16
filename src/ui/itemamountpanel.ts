@@ -40,7 +40,7 @@ export class ItemAmountPanel {
     // let trans:Transform = new Transform({ position: _pos, scale: Vector3.One() });
     // trans.rotation.eulerAngles = Vector3.create(0, 0, -90);
     // this.addComponent(trans);
-    let bgSize: Vector3 = Vector3.create(0,0,0)
+    let bgSize: Vector3 = Vector3.create(0, 0, 0)
     let iconScale: number = 0.14
     if (_isSmall) {
       bgSize = Vector3.create(0.32, 0.12, 0.1)
@@ -106,7 +106,7 @@ export class ItemAmountPanel {
 
   show(_frameNum: number, _value: number, _numOwned: number = 0): void {
     // log("show(" + _frameNum + ", " + _value + ", " + _numOwned) + ")";
-    if (_numOwned >= _value) { 
+    if (_numOwned >= _value) {
       this.enable()
     } else {
       this.disable()
