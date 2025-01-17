@@ -3,10 +3,14 @@
 import { som } from './som'
 import { ProjectLoader } from './projectloader'
 import { CoinShop } from './coinshop'
+import { CraftingMachine } from './craftingmachine'
+import { AvatarModifierArea, AvatarModifierType, engine, Transform } from '@dcl/sdk/ecs'
+import { Vector3 } from '@dcl/sdk/math'
 
 export class GameManager {
   public loader: ProjectLoader
   public shop: CoinShop | null = null
+  public machine: CraftingMachine | null = null
   constructor(titleId: string) {
     this.loader = new ProjectLoader()
   }
@@ -14,6 +18,7 @@ export class GameManager {
   async init(): Promise<void> {
     this.loadScenery()
     this.loadShop()
+    this.loadCrafting()
   }
 
   loadScenery(): void {
@@ -61,9 +66,44 @@ export class GameManager {
     const hammer01 = this.loader.spawnSceneObject(som.scene.hammer01)
   }
 
-  loadShop():void {
+  loadCrafting(): void {
+    this.machine = new CraftingMachine(
+      som.scene.recipeSelector,
+      som.scene.crafter,
+      som.scene.backArrow,
+      som.scene.greenLever
+    )
+
+    // let pos = new Vector3(...som.scene.recipeSelector.pos);
+    // add avatar invisiblity area
+    const modArea = engine.addEntity()
+    AvatarModifierArea.create(modArea, {
+      area: Vector3.create(4, 4, 4),
+      modifiers: [AvatarModifierType.AMT_HIDE_AVATARS],
+      excludeIds: []
+    })
+
+    Transform.create(modArea, {
+      position: Vector3.create(13, 0, 9)
+    })
+
+    // listen for crafting events
+    // Eventful.instance.addListener(CraftItemEvent, null, ({ recipeId, wearableId, itemClass }) =>
+    // {
+    //   log("crafting recipe:", recipeId, wearableId, itemClass);
+    //   this.craftItem(recipeId, wearableId, itemClass);
+    // });
+  }
+
+  loadShop(): void {
     // log("loadShop()");
     this.shop = new CoinShop(som.scene.cart, som.scene.cartSign)
-    this.shop.loadProducts();
+    this.shop.loadProducts()
+
+    // Eventful.instance.addListener(BenchmarkEvent, null, ({ value }) =>
+    //   {
+    //     log("event value:", value);
+    //     this.doIt();
+    //   });
   }
 }
