@@ -8,7 +8,7 @@ import {
   PointerEventType,
   Transform
 } from '@dcl/sdk/ecs'
-import { WearablesState } from './enums'
+import { ItemIcons, WearablesState } from './enums'
 import { type Recipe } from './projectdata'
 import { type ItemAmountPanel } from './ui/itemamountpanel'
 import { type SpritePlane } from './ui/spriteplane'
@@ -17,6 +17,7 @@ import { ProjectLoader } from './projectloader'
 import { som } from './som'
 import { SoundManager } from '../shared-dcl/src/sound/soundmanager'
 import { openExternalUrl } from '~system/RestrictedActions'
+import { GameData } from './gamedata'
 
 export type MachineData = {
   filename: string
@@ -58,10 +59,10 @@ export class CraftingMachine {
 
   public nameTextEntity: Entity = engine.addEntity()
   public nameTxt: string = ''
-  public descTxt: string = ''
+  public descTxt: string = '' 
   public idTxt: string = ''
   public levelMinTxt: string = ''
-  public readyTxt: string = ''
+  public readyTxt: string = '' 
 
   public iconSprite: SpritePlane | null = null
   public arrowSprite: SpritePlane | null = null
@@ -214,13 +215,98 @@ export class CraftingMachine {
     return loader.spawnSceneObject(_data, false)
   }
 
-  prevRecipe(): void {}
+  loadScreen(): void {}
 
-  nextRecipe(): void {}
+  prevRecipe(): void {
+    if (this.isBusy) return
+    if (--this.recipeIndex < -1) {
+      this.recipeIndex = GameData.recipes.length - 1
+    }
+    if (this.recipeIndex === -1) {
+      this.showInstructions()
+    } else {
+      this.showRecipe(this.recipeIndex)
+    }
+  }
+
+  refreshRecipe(): void {
+    if (this.recipeIndex < 0) {
+      this.showInstructions()
+    } else {
+      this.showRecipe(this.recipeIndex)
+    }
+  }
+
+  nextRecipe(): void {
+    if (this.isBusy) return
+    const numRecipes = GameData.recipes.length
+    if (++this.recipeIndex > numRecipes) {
+      this.recipeIndex = 0
+    }
+    if (this.recipeIndex === numRecipes) {
+      this.showInstructions()
+    } else {
+      this.showRecipe(this.recipeIndex)
+    }
+  }
 
   startCrafting(recipeNum: number): void {}
 
   enableCrafting(onOrOff: boolean = true): void {}
 
-  loadScreen(): void {}
+  showInstructions(): void {
+    this.pageIndex = 0
+    this.recipeIndex = -1
+
+    this.showName('Craft-O-Matic')
+    this.showDesc(
+      'Use the red arrows below to see the crafting recipes.\nWhen you have all the ingredients, the lever to the right\nwill glow. Click the lever to craft your item!'
+    )
+    this.showId('')
+
+    // clear the ingredients
+    this.clearRecipe()
+
+    // this.readyTxt.color = Color3.FromHexString('#DDDDDD') // "#22BB44"
+    this.setCooldownStatus()
+  }
+
+  showRecipe(recipeNum: number): void {}
+
+  showName(msg: string): void {
+    if (this.nameTxt != null) {
+      this.nameTxt = msg
+    }
+  }
+
+  showDesc(msg: string): void {
+    if (this.descTxt != null) {
+      this.descTxt = msg
+    }
+  }
+
+  showId(msg: string): void {
+    if (this.idTxt != null) {
+      this.idTxt = msg
+    }
+  }
+
+  clearRecipe(): void {
+    if (this.iconSprite != null) {
+      this.iconSprite.changeFrame(ItemIcons.Empty)
+    }
+
+    this.enableCrafting(false)
+
+    let tile
+    for (var i: number = 0; i < this.ingredientPanels.length; i++) {
+      tile = this.ingredientPanels[i]
+      tile.clear(ItemIcons.Empty)
+      tile.showText('')
+    }
+
+    this.levelMinTxt = ''
+  }
+
+  setCooldownStatus(): void {}
 }
