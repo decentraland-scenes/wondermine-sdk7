@@ -33,7 +33,7 @@ export type StoreItem = {
   ItemId: string
   // Add any other properties that are expected in the store item
 }
-
+ 
 export class CoinShop {
   private readonly entity = engine.addEntity()
   public trans: TransformType = { position: Vector3.create(), scale: Vector3.create(), rotation: Quaternion.create() }
