@@ -4,10 +4,9 @@
     "strict": true
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "shared-dcl/**/*.tsx",
-    "shared-dcl/**/*.ts"
-  ],
+  "src/**/*.ts",
+  "src/**/*.tsx",
+  "shared-dcl/**/*.ts"
+],
   "extends": "@dcl/sdk/types/tsconfig.ecs7.json"
 }
