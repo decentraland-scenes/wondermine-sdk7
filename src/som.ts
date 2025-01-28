@@ -1,4 +1,4 @@
-export var som = {
+export var som: any = {
   scene: {
     title: 'WonderMine v1.1.1',
     changeLog:

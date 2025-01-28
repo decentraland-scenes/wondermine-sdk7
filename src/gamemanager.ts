@@ -1,14 +1,17 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { som } from './som'
 import { ProjectLoader } from './projectloader'
 import { executeTask } from '@dcl/sdk/ecs'
 import { DclUser } from '../shared-dcl/src/playfab/dcluser'
 import { WondermineApi } from '../shared-dcl/src/playfab/wondermineapi'
+import { CoinShop } from './coinshop'
 
 export class GameManager {
   public loader: ProjectLoader
   public api: WondermineApi | undefined
   private readonly enableShared: boolean = true
+  public shop: CoinShop | null = null
   constructor(titleId: string) {
     this.loader = new ProjectLoader()
     this.api = new WondermineApi(titleId)
@@ -16,6 +19,7 @@ export class GameManager {
 
   async init(): Promise<void> {
     this.loadScenery()
+    this.loadShop()
   }
 
   loadScenery(): void {
@@ -128,5 +132,10 @@ export class GameManager {
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
   onGotStoreProducts(errorObj: any, jsonObj: any) {
     throw new Error('Method not implemented.')
+  }
+  loadShop():void {
+    // log("loadShop()");
+    this.shop = new CoinShop(som.scene.cart, som.scene.cartSign)
+    this.shop.loadProducts();
   }
 }
