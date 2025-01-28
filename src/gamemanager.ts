@@ -2,13 +2,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { som } from './som'
 import { ProjectLoader } from './projectloader'
+import { executeTask } from '@dcl/sdk/ecs'
+import { DclUser } from '../shared-dcl/src/playfab/dcluser'
+import { WondermineApi } from '../shared-dcl/src/playfab/wondermineapi'
 import { CoinShop } from './coinshop'
 
 export class GameManager {
   public loader: ProjectLoader
+  public api: WondermineApi | undefined
+  private readonly enableShared: boolean = true
   public shop: CoinShop | null = null
   constructor(titleId: string) {
     this.loader = new ProjectLoader()
+    this.api = new WondermineApi(titleId)
   }
 
   async init(): Promise<void> {
@@ -61,6 +67,72 @@ export class GameManager {
     const hammer01 = this.loader.spawnSceneObject(som.scene.hammer01)
   }
 
+  async getCurrentUser(): Promise<void> {
+    executeTask(async () => {
+      console.log('########################## calling loginToPlayFab()')
+      await this.loginToPlayFab()
+
+      if (this.enableShared) {
+        console.log('enable true')
+      }
+    })
+  }
+
+  async loginToPlayFab(): Promise<void> {
+    executeTask(async () => {
+      console.log('calling DoLoginAsync(' + DclUser.displayName + ')')
+      // await getUser();
+      await this.api?.DoLoginAsync(DclUser.displayName, DclUser.userId)
+
+      // the following call only seems to work at login time, not later.
+      const json = await this.api?.GetStoreItems('coinshop', 'WonderMine01', (errorObj, jsonObj) => {
+        this.onGotStoreProducts(errorObj, jsonObj)
+      })
+      console.log(json, ' :Store Items')
+      // Load the leaderboard stats
+      // this.board.loadDefaultBoard();
+
+      // log("Getting combined data...");
+      await this.api?.GetPlayerCombinedInfoAsync(DclUser.playfabId)
+
+      // log("Checking axes...");
+
+      // A player must always have at least one pickaxe.
+      // If this is a brand new player, or an existing player who sold off all their NFT pickaxes somehow,
+      // grant them a new Stone Axe (lowest-level axe)
+      // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+      if (!DclUser.activeUser.toolArray || DclUser.activeUser.toolArray.length === 0) {
+        console.log('Granting first tool...')
+        // await this.api.CallCloudScriptAsync("grantFirstTool", {}, false);
+        // 2DO: Figure out why async CloudScript fails here
+        // eslint-disable-next-line @typescript-eslint/unbound-method
+        this.api?.CallCloudScript('grantFirstTool', {}, this.onGrantFirstToolComplete, false)
+      }
+
+      // 2DO: Why don't Cloudscript Azure Functions work from Javascript?
+      // await this.api.GetCraftingRecipes();
+
+      // GameUi.instance.showBalances(DclUser.activeUser.coins, DclUser.activeUser.gems);
+      // GameUi.instance.setLevel(DclUser.activeUser.level, DclUser.activeUser.xp);
+
+      // await this.api.CountClaimableItems();
+
+      // this.checkContracts();
+
+      // DclUser.activeUser.checkT();
+      // this.machine.setCooldownStatus();
+      // this.checkWearables();
+    })
+  }
+
+  onGrantFirstToolComplete(): void {
+    throw new Error('Method not implemented.')
+  }
+
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+  onGotStoreProducts(errorObj: any, jsonObj: any) {
+    throw new Error('Method not implemented.')
+  }
   loadShop():void {
     // log("loadShop()");
     this.shop = new CoinShop(som.scene.cart, som.scene.cartSign)
