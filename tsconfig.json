@@ -1,7 +1,12 @@
 {
   "compilerOptions": {
     "allowJs": true,
-    "strict": true
+    "strict": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "~system/*": ["node_modules/decentraland-system/*"]
+    }
   },
   "include": [
   "src/**/*.ts",

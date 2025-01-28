@@ -153,51 +153,50 @@ export class PlayFabApi {
     authType: AuthType = AuthType.None
   ): Promise<ResponseData> {
     // log("SendAsyncRequest: " + methodName + ", authType=" + authType);
-  
-    const callUrl: string = this.GetServerUrl() + methodName;
-  
-    const errorJson = { error: true, url: callUrl };
+
+    const callUrl: string = this.GetServerUrl() + methodName
+
+    const errorJson = { error: true, url: callUrl }
     try {
-      const reqHeaders: ReqHeaders = { 'Content-Type': 'application/json' };
+      const reqHeaders: ReqHeaders = { 'Content-Type': 'application/json' }
       if (authType === AuthType.Session) {
-        reqHeaders['X-Authorization'] = PlayFabApi.sessionTicket;
+        reqHeaders['X-Authorization'] = PlayFabApi.sessionTicket
       } else if (authType === AuthType.Entity) {
-        reqHeaders['X-EntityToken'] = PlayFabApi.entityToken.EntityToken;
+        reqHeaders['X-EntityToken'] = PlayFabApi.entityToken.EntityToken
       } else if (authType === AuthType.DevSecret) {
-        reqHeaders['X-SecretKey'] = this.settings.developerSecretKey;
+        reqHeaders['X-SecretKey'] = this.settings.developerSecretKey
       }
-  
+
       // Filtra valores null y undefined en los headers
       const filteredHeaders = Object.fromEntries(
         Object.entries(reqHeaders).filter(([_, value]) => value != null)
-      ) as Record<string, string>;
-  
+      ) as Record<string, string>
+
       // Realiza la solicitud
       const response: Response = await fetch(callUrl, {
         headers: filteredHeaders,
         method: 'POST',
-        body: JSON.stringify(request), // Envía el cuerpo directamente
-      });
-  
-      const json = await response.json();
-  
+        body: JSON.stringify(request) // Envía el cuerpo directamente
+      })
+
+      const json = await response.json()
+
       if (response.ok) {
         if (callback != null) {
-          callback(null, json);
+          callback(null, json)
         }
-        return json;
+        return json as ResponseData
       } else {
         if (callback != null) {
-          callback(errorJson, { status: 'error' });
+          callback(errorJson, { status: 'error' })
         }
-        return errorJson;
+        return errorJson
       }
     } catch {
-      console.log('Failed to reach URL: ' + callUrl);
-      return errorJson;
+      console.log('Failed to reach URL: ' + callUrl)
+      return errorJson
     }
   }
-  
 
   // --- CLOUDSCRIPT ---
   TestHelloWorld(): void {
