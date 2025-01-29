@@ -72,7 +72,7 @@ export class DclUser {
   //     });
   // }
 
-  public static setUserInfo(_id: string, _name: string, _key: string , _isTemp: boolean = false): void {
+  public static setUserInfo(_id: string, _name: string, _key: string, _isTemp: boolean = false): void {
     // log("SetUserInfo(" + _id + ")");
     DclUser.userId = _id
     if (_name == null || _name === '') {
@@ -125,8 +125,10 @@ export class DclUser {
     }
   }
 
-  public static setRealm(r: Realm): void {
-    this.realm = r
+  public static setRealm(r: Realm | undefined): void {
+    if (r != null) {
+      this.realm = r
+    }
   }
 
   public static getRealmName(): string {

@@ -2,7 +2,6 @@ import { GameData } from '../../../src/gamedata'
 import { HttpCaller } from '../../../src/httpcaller'
 import { DclUser } from './dcluser'
 import { ItemInfo } from './iteminfo'
-// import { GameData } from "../../../src/gamedata"
 import { PlayFabApi, AuthType, type ResponseData } from './playfabapi'
 // import { HttpCaller } from "src/httpcaller";
 type TitleData = {
