@@ -4,20 +4,24 @@ import {
   type Entity,
   InputAction,
   inputSystem,
+  type PBTextShape,
   PointerEvents,
   PointerEventType,
+  TextAlignMode,
+  TextShape,
   Transform
 } from '@dcl/sdk/ecs'
 import { ItemIcons, WearablesState } from './enums'
-import { type Recipe } from './projectdata'
-import { type ItemAmountPanel } from './ui/itemamountpanel'
-import { type SpritePlane } from './ui/spriteplane'
-import { Quaternion, Vector3 } from '@dcl/sdk/math'
+import { UiTextData, type Recipe } from './projectdata'
+import { ItemAmountPanel } from './ui/itemamountpanel'
+import { SpritePlane } from './ui/spriteplane'
+import { Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
 import { ProjectLoader } from './projectloader'
 import { som } from './som'
 import { SoundManager } from '../shared-dcl/src/sound/soundmanager'
 import { openExternalUrl } from '~system/RestrictedActions'
 import { GameData } from './gamedata'
+import { ColorPlane } from './ui/colorplane'
 
 export type MachineData = {
   filename: string
@@ -58,11 +62,11 @@ export class CraftingMachine {
   public screenEntity: Entity = engine.addEntity()
 
   public nameTextEntity: Entity = engine.addEntity()
-  public nameTxt: string = ''
-  public descTxt: string = '' 
-  public idTxt: string = ''
-  public levelMinTxt: string = ''
-  public readyTxt: string = '' 
+  public nameTxt: PBTextShape | null = null
+  public descTxt: PBTextShape | null = null
+  public idTxt: PBTextShape | null = null
+  public levelMinTxt: PBTextShape | null = null
+  public readyTxt: PBTextShape | null = null
 
   public iconSprite: SpritePlane | null = null
   public arrowSprite: SpritePlane | null = null
@@ -215,7 +219,190 @@ export class CraftingMachine {
     return loader.spawnSceneObject(_data, false)
   }
 
-  loadScreen(): void {}
+  loadScreen(): void {
+    // hack to reduce texture usage
+    // check if GameUi has already loaded the resorce atlas, and if so just grab it instead of loading our own
+    // let tex:Texture = GameUi.instance.getResourceAtlas();
+
+    Transform.create(this.screenEntity, {
+      position: Vector3.create(0, 2, 0),
+      scale: Vector3.One(),
+      rotation: Quaternion.fromEulerDegrees(0, 90, 0),
+      parent: this.selectorModelEntity
+    })
+
+    // add background shapes
+    const colorPlane1 = new ColorPlane(
+      '#282828',
+      Vector3.create(0.42, -0.3, 0),
+      Vector3.create(0.6, 0.6, 0.1),
+      Vector3.create(0, 0, 0)
+    )
+    Transform.getMutable(colorPlane1.entity).parent = this.screenEntity
+
+    // recipe name
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    let obj: UiTextData = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.name)
+    // log("obj.fontSize=" + obj.fontSize);
+    this.nameTxt = this.addTextField(obj, this.screenEntity)
+
+    // recipe description
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.desc)
+    this.descTxt = this.addTextField(obj, this.screenEntity, false)
+
+    // recipe id
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.id)
+    this.idTxt = this.addTextField(obj, this.screenEntity)
+
+    // level minimum
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.levelMin)
+    this.levelMinTxt = this.addTextField(obj, this.screenEntity)
+
+    // instructions
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.youNeed)
+    const youNeed = this.addTextField(obj, this.screenEntity)
+    youNeed.text = 'YOU NEED'
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.toMake)
+    const toMake = this.addTextField(obj, this.screenEntity)
+    toMake.text = 'TO MAKE'
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.ready)
+    this.readyTxt = this.addTextField(obj, this.screenEntity)
+
+    // item to create
+    this.iconSprite = new SpritePlane(
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.Empty,
+      Vector3.create(0.4, -0.3, -0.05),
+      Vector3.create(0.5, 0.5, 0.5),
+      Vector3.create(0, 0, -90)
+    )
+    Transform.getMutable(this.iconSprite.entity).parent = this.screenEntity
+
+    // arrow icon
+    this.arrowSprite = new SpritePlane(
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.ArrowGray,
+      Vector3.create(0.035, -0.29, -0.05),
+      Vector3.create(0.18, 0.15, 0.15),
+      Vector3.create(0, 0, -90)
+    )
+    Transform.getMutable(this.arrowSprite.entity).parent = this.screenEntity
+
+    // log("*** LOADING ITEM TILES ***")
+    const itemTile1 = new ItemAmountPanel(
+      this.screenEntity,
+      Vector3.create(-0.59, -0.08, 0),
+      '#333333',
+      '#229944',
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.Empty,
+      1.5,
+      true
+    )
+    // itemTile1.showText("20");
+
+    const itemTile2 = new ItemAmountPanel(
+      this.screenEntity,
+      Vector3.create(-0.59, -0.24, 0),
+      '#333333',
+      '#229944',
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.Empty,
+      1.5,
+      true
+    )
+    // itemTile2.showText("30");
+
+    const itemTile3 = new ItemAmountPanel(
+      this.screenEntity,
+      Vector3.create(-0.59, -0.4, 0),
+      '#333333',
+      '#229944',
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.Empty,
+      1.5,
+      true
+    )
+    // itemTile3.showText("10");
+
+    const itemTile4 = new ItemAmountPanel(
+      this.screenEntity,
+      Vector3.create(-0.22, -0.08, 0),
+      '#333333',
+      '#229944',
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.Empty,
+      1.5,
+      true
+    )
+    // itemTile4.showText("15");
+
+    const itemTile5 = new ItemAmountPanel(
+      this.screenEntity,
+      Vector3.create(-0.22, -0.24, 0),
+      '#333333',
+      '#229944',
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.Empty,
+      1.5,
+      true
+    )
+    // itemTile5.showText("7");
+    // itemTile5.enable();
+
+    const itemTile6 = new ItemAmountPanel(
+      this.screenEntity,
+      Vector3.create(-0.22, -0.4, 0),
+      '#333333',
+      '#229944',
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.Empty,
+      1.5,
+      true
+    )
+    // itemTile6.showText("1");
+
+    const itemTile0 = new ItemAmountPanel(
+      this.screenEntity,
+      Vector3.create(-0.4, -0.54, 0),
+      '#333333',
+      '#229944',
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.Empty,
+      1.0,
+      true,
+      true
+    )
+    // itemTile0.showText("10");
+
+    this.ingredientPanels = [itemTile0, itemTile1, itemTile2, itemTile3, itemTile4, itemTile5, itemTile6]
+
+    this.showInstructions()
+  }
 
   prevRecipe(): void {
     if (this.isBusy) return
@@ -266,8 +453,9 @@ export class CraftingMachine {
 
     // clear the ingredients
     this.clearRecipe()
-
-    // this.readyTxt.color = Color3.FromHexString('#DDDDDD') // "#22BB44"
+    if (this.readyTxt != null) { 
+      this.readyTxt.textColor = Color4.fromHexString('#DDDDDD') // "#22BB44"
+    }
     this.setCooldownStatus()
   }
 
@@ -275,19 +463,19 @@ export class CraftingMachine {
 
   showName(msg: string): void {
     if (this.nameTxt != null) {
-      this.nameTxt = msg
+      this.nameTxt.text = msg
     }
   }
 
   showDesc(msg: string): void {
     if (this.descTxt != null) {
-      this.descTxt = msg
+      this.descTxt.text = msg
     }
   }
 
   showId(msg: string): void {
     if (this.idTxt != null) {
-      this.idTxt = msg
+      this.idTxt.text = msg
     }
   }
 
@@ -304,9 +492,35 @@ export class CraftingMachine {
       tile.clear(ItemIcons.Empty)
       tile.showText('')
     }
-
-    this.levelMinTxt = ''
+    if (this.levelMinTxt != null) {
+      this.levelMinTxt.text = ''
+    }
   }
 
   setCooldownStatus(): void {}
+
+  addTextField(_data: UiTextData, _parent: Entity, _wrap: boolean = false): PBTextShape {
+    const ent = engine.addEntity()
+    TextShape.create(ent)
+    const ts: PBTextShape = TextShape.getMutable(ent)
+    if (_data.fontSize != null && _data.fontSize >= 1) {
+      ts.fontSize = _data.fontSize
+    }
+    if (_data.hexColor != null && _data.hexColor !== '') {
+      ts.textColor = Color4.fromHexString(_data.hexColor) // "#22BB44"
+    }
+    ts.width = Math.max(parseInt(_data.width), 10)
+    ts.height = Math.max(parseInt(_data.height), 10)
+
+    ts.textAlign = TextAlignMode.TAM_TOP_CENTER
+    ts.textWrapping = _wrap
+    if (_data.pos != null) {
+      Transform.create(ent, {
+        position: Vector3.create(_data.pos),
+        scale: Vector3.create(0.25, 0.25, 0.25),
+        parent: _parent
+      })
+    }
+    return ts
+  }
 }

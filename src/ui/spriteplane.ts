@@ -67,6 +67,18 @@ export class SpritePlane {
       yUnit + y * yUnit,
       // bottom right
       xUnit + x * xUnit,
+      y * yUnit,
+      // bottom left
+      x * xUnit,
+      y * yUnit,
+      // top left
+      x * xUnit,
+      yUnit + y * yUnit,
+      // top right
+      xUnit + x * xUnit,
+      yUnit + y * yUnit,
+      // bottom right
+      xUnit + x * xUnit,
       y * yUnit
     ]
     // log("uvs=" + JSON.stringify(uvs));
@@ -106,48 +118,11 @@ export class SpritePlane {
       transparencyMode: 2,
       roughness: 0.9
     })
-    MeshRenderer.setPlane(this.entity, this.setUVsFromAtlas(770, 400, 130, 112, 1024, 1024))
+    MeshRenderer.setPlane(this.entity, this.uvs)
   }
 
   changeFrame(_frameNum: number): void {
     this.frameNum = _frameNum
     this.uvs = this.getUVs(_frameNum, this.framesX, this.framesY)
-  }
-
-  // This method is used for setting UVs in SDK7
-  setUVsFromAtlas(
-    xStart: number,
-    yStart: number,
-    width: number,
-    height: number,
-    atlasWidth: number,
-    atlasHeight: number
-  ): number[] {
-    const uMin = xStart / atlasWidth
-    const vMin = yStart / atlasHeight
-    const uMax = (xStart + width) / atlasWidth
-    const vMax = (yStart + height) / atlasHeight
-
-    return [
-      // Front face (North)
-      uMin,
-      vMin, // Bottom Left
-      uMax,
-      vMin, // Bottom Right
-      uMax,
-      vMax, // Top Right
-      uMin,
-      vMax, // Top Left
-
-      // Back face (South)
-      uMax,
-      vMin, // Bottom Right
-      uMin,
-      vMin, // Bottom Left
-      uMin,
-      vMax, // Top Left
-      uMax,
-      vMax // Top Right
-    ]
   }
 }
