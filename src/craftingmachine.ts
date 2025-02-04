@@ -9,8 +9,7 @@ import {
   PointerEventType,
   TextAlignMode,
   TextShape,
-  Transform
-} from '@dcl/sdk/ecs'
+  Transform} from '@dcl/sdk/ecs'
 import { ItemIcons, WearablesState } from './enums'
 import { type CraftMaterial, UiTextData, type Recipe } from './projectdata'
 import { ItemAmountPanel } from './ui/itemamountpanel'
@@ -26,6 +25,7 @@ import { DclUser } from 'shared-dcl/src/playfab/dcluser'
 import { type ItemInfo } from 'shared-dcl/src/playfab/iteminfo'
 import * as utils from '@dcl-sdk/utils'
 import { CraftItemEvent, Eventful } from './events'
+import { type LootItem } from './wondermine/lootitem'
 
 export type MachineData = {
   filename: string
@@ -89,6 +89,8 @@ export class CraftingMachine {
   public craftedVoucher: string = ''
   public wearablesState: WearablesState = WearablesState.Inactive
   public timer: number = 0
+
+  public onCraftingCompleteCallback: ((lootEnt: LootItem) => void) | undefined
 
   // public onCraftingCompleteCallback: (lootEnt:LootItem) => void;
   constructor(_selectorData: SelectorData, _machineData: MachineData, _arrowButtonData: Data, _leverData: Data) {
@@ -198,12 +200,11 @@ export class CraftingMachine {
         void openExternalUrl({ url: 'https://wondermine.wonderzone.io/claimItem' })
       }
     })
-    // engine.removeEntity(this.greenLever);
+    engine.removeEntity(this.greenLever);
 
     // 2DO: store filePrefix centrally
     this.textureFile = this.filePrefix + som.ui.resourceIcons.atlasFile
     this.loadScreen()
-
     // this.setupStateMachine();
   }
 
@@ -678,6 +679,7 @@ export class CraftingMachine {
       if (cooldownRemaining === 0) {
         this.wearablesState = WearablesState.Active
         this.showWearStatus('Active')
+        console.log('cooldown=active')
       } else if (cooldownRemaining < 0) {
         // -1 error condition
         this.wearablesState = WearablesState.Inactive
@@ -735,47 +737,77 @@ export class CraftingMachine {
   }
 
   enableCrafting(onOrOff: boolean = true): void {
-    if (onOrOff)
-      {
-        if (this.arrowSprite !== null){
-          this.arrowSprite.changeFrame(ItemIcons.ArrowGreen);
-        }
-        if (this.readyTxt !== null){
-          this.readyTxt.textColor = Color4.fromHexString("#22BB44"); 
-          this.readyTxt.text = "READY! Push the lever to craft your item >>>";
-        }
-        // engine.addEntity(this.greenLever);
-        // make the lever green
+    if (onOrOff) {
+      if (this.arrowSprite !== null) {
+        this.arrowSprite.changeFrame(ItemIcons.ArrowGreen)
       }
-      else
-      {
-        if (this.arrowSprite !== null){
-          this.arrowSprite.changeFrame(ItemIcons.ArrowGray);
-        }
-        if (this.readyTxt !== null){
-          this.readyTxt.text = "";
-        }
-        // remove lever highlight
-        // if (this.greenLever && this.greenLever.isAddedToEngine())
-        // {
-        //   engine.removeEntity(this.greenLever);
-        // }
+      if (this.readyTxt !== null) {
+        this.readyTxt.textColor = Color4.fromHexString('#22BB44')
+        this.readyTxt.text = 'READY! Push the lever to craft your item >>>'
       }
+      this.greenLever = engine.addEntity()
+      // make the lever green
+    } else {
+      if (this.arrowSprite !== null) {
+        this.arrowSprite.changeFrame(ItemIcons.ArrowGray)
+      }
+      if (this.readyTxt !== null) {
+        this.readyTxt.text = ''
+      }
+      // remove lever highlight
+      if (engine.getEntityState(this.greenLever) !== null ){
+        engine.removeEntity(this.greenLever);
+      }
+    }
   }
 
   startCrafting(recipeNum: number): void {
-    this.craftedRecipe = GameData.getRecipeNum(recipeNum);
-    this.isBusy = true;
-    this.enableCrafting(false);
+    this.craftedRecipe = GameData.getRecipeNum(recipeNum)
+    this.isBusy = true
+    this.enableCrafting(false)
     // make the server call
-    if (this.craftedRecipe != null){
-      Eventful.instance.fireEvent(new CraftItemEvent(this.craftedRecipe.id, this.craftedRecipe.wi, this.craftedRecipe.itemClass));
+    if (this.craftedRecipe != null) {
+      Eventful.instance.fireEvent(
+        new CraftItemEvent(this.craftedRecipe.id, this.craftedRecipe.wi, this.craftedRecipe.itemClass)
+      )
     }
     // GameManager.instance.craftItem(this.craftedRecipe.id, this.craftedRecipe.wi);
   }
 
-  animateMachine(): void {}
+  animateMachine(itemEnt: LootItem, isRepair: boolean = false): void {
+    console.log('animateMachine()')
+    Animator.getClip(this.machineModelEntity, this.craftingClip).playing = false
+    Animator.playSingleAnimation(this.machineModelEntity, this.craftingClip)
 
-  showCraftedItem(): void {
+    SoundManager.playOnce(this.machineModelEntity, 0.8)
+
+    // after a delay, show the item
+    utils.timers.setTimeout(() => {
+      this.showCraftedItem(itemEnt)
+      if (isRepair) {
+        // GameUi.instance.showTimedMessage("Your pickaxe is fixed!", 7000);
+      }
+    }, 7200)
+  }
+
+  showCraftedItem(itemEnt: LootItem): void {
+    console.log('CRAFTED ' + itemEnt.instanceData?.itemId + '!')
+
+    if (itemEnt?.instanceData != null) {
+      // Obtener la posición actual del objeto
+      const pos = Transform.get(this.entity).position
+
+      // Sumar los valores (-2.5, 0.2, -2.5) y reasignar a pos
+      const newPos = Vector3.add(pos, Vector3.create(-2.5, 0.2, -2.5))
+
+      // Mostrar el objeto en la nueva posición
+      itemEnt.showAt(newPos)
+    }
+
+    this.reset()
+
+    if (this.onCraftingCompleteCallback != null) {
+      this.onCraftingCompleteCallback(itemEnt)
+    }
   }
 }

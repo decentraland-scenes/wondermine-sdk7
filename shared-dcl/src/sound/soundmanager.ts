@@ -1,4 +1,4 @@
-import { engine, type Entity, AudioSource } from '@dcl/sdk/ecs'
+import { engine, type Entity, AudioSource, type PBAudioSource } from '@dcl/sdk/ecs'
 
 // eslint-disable-next-line @typescript-eslint/no-extraneous-class
 export class SoundManager {
@@ -52,19 +52,35 @@ export class SoundManager {
     audioSource.playing = false
   }
 
+  // /**
+  //  * Play a named sound once.
+  //  * @param name The unique name of the sound
+  //  * @param volume Playback volume (default 1.0)
+  //  */
+  // static playOnce(name: string, volume: number = 1.0): void {
+  //   const soundEntity = this.clips[name]
+  //   // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+  //   if (soundEntity) {
+  //     const audioSource = AudioSource.getMutable(soundEntity)
+  //     audioSource.loop = false
+  //     audioSource.volume = volume
+  //     audioSource.playing = true
+  //   }
+  // }
   /**
-   * Play a named sound once.
-   * @param name The unique name of the sound
-   * @param volume Playback volume (default 1.0)
+   * Play the sound that's attached to an entity once.
+   * @param _ent The entity the AudioSource is attached to
+   * @param _vol Playback volume
    */
-  static playOnce(name: string, volume: number = 1.0): void {
-    const soundEntity = this.clips[name]
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (soundEntity) {
-      const audioSource = AudioSource.getMutable(soundEntity)
-      audioSource.loop = false
-      audioSource.volume = volume
-      audioSource.playing = true
+  static playOnce(_ent: Entity, _vol: number = 1.0): void {
+    const as: PBAudioSource | null = AudioSource.getOrNull(_ent)
+    if (as != null) {
+      as.loop = false
+      if (as.playing ?? false) {
+        as.playing = false
+      }
+      as.volume = Math.max(_vol, 1.0)
+      as.playing = true
     }
   }
 
@@ -96,4 +112,4 @@ export class SoundManager {
       audioSource.playing = false
     }
   }
-}  
+}
