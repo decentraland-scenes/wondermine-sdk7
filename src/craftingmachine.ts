@@ -22,6 +22,10 @@ import { SoundManager } from '../shared-dcl/src/sound/soundmanager'
 import { openExternalUrl } from '~system/RestrictedActions'
 import { GameData } from './gamedata'
 import { ColorPlane } from './ui/colorplane'
+import { DclUser } from 'shared-dcl/src/playfab/dcluser'
+import { type ItemInfo } from 'shared-dcl/src/playfab/iteminfo'
+import * as utils from '@dcl-sdk/utils'
+import { CraftItemEvent, Eventful } from './events'
 
 export type MachineData = {
   filename: string
@@ -461,7 +465,100 @@ export class CraftingMachine {
     }
   }
 
-  showRecipe(recipeNum: number): void {}
+  showRecipe(recipeNum: number): void {
+    this.pageIndex = recipeNum + 1
+    const recipe: Recipe | null = GameData.getRecipeNum(recipeNum)
+
+    if (recipe != null) {
+      // show the details: title, description
+      this.showName(recipe.name)
+      this.showDesc(recipe.desc)
+
+      // show ingredient icons and values
+      let hasAll: boolean = this.showIngredients(recipe.consumes)
+      const wearCount: number = GameData.getWearableCount(recipe.wi)
+
+      if (recipe.limitOne) {
+        // log("LIMIT ONE RECIPE. itemId:", recipe.itemId);
+        console.log('Player items:', DclUser.activeUser.limitOneItems)
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+        if (DclUser.activeUser.hasAlreadyCrafted(recipe.itemId)) {
+          // TODO add an indicator when someone has already crafted it
+          hasAll = false
+          console.log('PLAYER ALREADY CRAFTED ', recipe.itemId)
+        }
+      }
+      console.log('itemId: ' + recipe.itemId + ', isActive: ' + recipe.isActive)
+      // 2DO: Clean this up - for wearables only
+      if (recipe.itemClass === 'wearable') {
+        if (recipe.isActive) {
+          // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+          if (DclUser.weLive || DclUser.activeUser.isT) {
+            // testers can try to craft experimental stuff
+            this.showId(wearCount + ' AVAILABLE')
+            if (wearCount <= 0 || this.wearablesState !== WearablesState.Active) {
+              hasAll = false
+            }
+          } else {
+            hasAll = false
+            this.showId('INACTIVE')
+          }
+        } else {
+          // log("isActive", recipe.isActive);
+          hasAll = false
+          this.showId('0 AVAILABLE')
+        }
+      } else if (recipe.itemClass === 'pickaxe') {
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+        if (recipe.isActive || DclUser.activeUser.isT) {
+          if (recipe.limitOne) {
+            this.showId('LIMITED')
+          } else {
+            this.showId('UNLIMITED')
+          }
+        } else {
+          hasAll = false
+          this.showId('INACTIVE')
+        }
+      } else {
+        this.showId('UNLIMITED')
+      }
+
+      // check player level
+      if (recipe.levelMin != null && recipe.levelMin > 1) {
+        // show level requirement
+        if (DclUser.activeUser.level >= recipe.levelMin) {
+          // show green
+          if (this.levelMinTxt !== null) {
+            this.levelMinTxt.textColor = Color4.fromHexString('#33FF33')
+          }
+        } else {
+          // show red
+          if (this.levelMinTxt !== null) {
+            this.levelMinTxt.textColor = Color4.fromHexString('#FF6600')
+          }
+          hasAll = false
+        }
+        if (this.levelMinTxt !== null) {
+          this.levelMinTxt.text = 'MIN LEVEL: ' + recipe.levelMin
+        }
+      } else {
+        if (this.levelMinTxt !== null) {
+          this.levelMinTxt.text = ''
+        }
+      }
+
+      // show the item to be crafted
+      const iconNum: number = ItemIcons[recipe.itemId as keyof typeof ItemIcons]
+      // log("iconNum=" + iconNum);
+      if (this.iconSprite !== null) {
+        this.iconSprite.changeFrame(iconNum)
+      }
+
+      console.log('hasAll', hasAll)
+      this.enableCrafting(hasAll)
+    }
+  }
 
   clearRecipe(): void {
     if (this.iconSprite != null) {
@@ -530,11 +627,72 @@ export class CraftingMachine {
     }
   }
 
-  showIngredients(consumes: CraftMaterial[]): void {}
+  showIngredients(consumes: CraftMaterial[]): boolean {
+    // console.log(DclUser.activeUser.inventoryArray);
+    let hasAll: boolean = true
+    let tile: ItemAmountPanel
+    let item: CraftMaterial
+    let invItem: ItemInfo | null
+    for (var i: number = 0; i < this.ingredientPanels.length; i++) {
+      tile = this.ingredientPanels[i]
+      try {
+        if (i < consumes.length) {
+          // there is a recipe item for this
+          item = consumes[i]
+          invItem = DclUser.activeUser.getItem(item.itemId)
+
+          let qtyOwned: number = 0
+          if (item.itemId === 'WC') {
+            qtyOwned = DclUser.activeUser.coins
+          } else if (item.itemId === 'WG') {
+            qtyOwned = DclUser.activeUser.gems
+          } else if (invItem != null) {
+            qtyOwned = invItem.RemainingUses
+          }
+          // console.log("got itemId: " + item.itemId + ", code: " + ItemIcons[item.itemId] + ", uses: " + qtyOwned); //
+          // console.log(invItem);
+          tile.show(ItemIcons[item.itemId as keyof typeof ItemIcons] ?? ItemIcons.Empty, item.qty, qtyOwned)
+          if (qtyOwned < item.qty) {
+            hasAll = false
+          }
+        } else {
+          // this panel will be blank
+          tile.clear(ItemIcons.Empty)
+        }
+      } catch {
+        tile.clear(ItemIcons.Empty)
+        tile.showText('?')
+      }
+    }
+    return hasAll
+  }
 
   // --- COOLDOWN ---
 
-  setCooldownStatus(): void {}
+  setCooldownStatus(): void {
+    // console.log("temp=", (DclUser.activeUser && DclUser.activeUser.isT));
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-optional-chain
+    if (DclUser.weLive || (DclUser.activeUser && DclUser.activeUser.isT)) {
+      const cooldownRemaining: number = DclUser.cooldownSeconds()
+      console.log('cooldown=', cooldownRemaining)
+      if (cooldownRemaining === 0) {
+        this.wearablesState = WearablesState.Active
+        this.showWearStatus('Active')
+      } else if (cooldownRemaining < 0) {
+        // -1 error condition
+        this.wearablesState = WearablesState.Inactive
+        this.showWearStatus('Inactive')
+      } else {
+        this.wearablesState = WearablesState.Cooldown
+        this.showCooldownTime(cooldownRemaining)
+        if (this.timer == null) {
+          this.startCooldownTimer()
+        }
+      }
+    } else {
+      this.showWearStatus('Inactive')
+    }
+  }
 
   showCooldownTime(millis: number): void {
     // log("millis=" + millis);
@@ -558,15 +716,66 @@ export class CraftingMachine {
     }
   }
 
-  startCooldownTimer(): void {}
+  startCooldownTimer(): void {
+    this.timer = utils.timers.setInterval(() => {
+      const millis: number = DclUser.cooldownSeconds()
+      if (millis > 0) {
+        // in cooldown period
+        this.showCooldownTime(millis)
+      } else {
+        this.stopCooldownTimer()
+      }
+    }, 1000)
+  }
 
-  stopCooldownTimer(): void {}
+  stopCooldownTimer(): void {
+    utils.timers.clearInterval(this.timer)
+    this.timer = 0
+    this.setCooldownStatus()
+  }
 
-  enableCrafting(onOrOff: boolean = true): void {}
+  enableCrafting(onOrOff: boolean = true): void {
+    if (onOrOff)
+      {
+        if (this.arrowSprite !== null){
+          this.arrowSprite.changeFrame(ItemIcons.ArrowGreen);
+        }
+        if (this.readyTxt !== null){
+          this.readyTxt.textColor = Color4.fromHexString("#22BB44"); 
+          this.readyTxt.text = "READY! Push the lever to craft your item >>>";
+        }
+        // engine.addEntity(this.greenLever);
+        // make the lever green
+      }
+      else
+      {
+        if (this.arrowSprite !== null){
+          this.arrowSprite.changeFrame(ItemIcons.ArrowGray);
+        }
+        if (this.readyTxt !== null){
+          this.readyTxt.text = "";
+        }
+        // remove lever highlight
+        // if (this.greenLever && this.greenLever.isAddedToEngine())
+        // {
+        //   engine.removeEntity(this.greenLever);
+        // }
+      }
+  }
 
-  startCrafting(recipeNum: number): void {}
+  startCrafting(recipeNum: number): void {
+    this.craftedRecipe = GameData.getRecipeNum(recipeNum);
+    this.isBusy = true;
+    this.enableCrafting(false);
+    // make the server call
+    if (this.craftedRecipe != null){
+      Eventful.instance.fireEvent(new CraftItemEvent(this.craftedRecipe.id, this.craftedRecipe.wi, this.craftedRecipe.itemClass));
+    }
+    // GameManager.instance.craftItem(this.craftedRecipe.id, this.craftedRecipe.wi);
+  }
 
   animateMachine(): void {}
 
-  showCraftedItem(): void {}
+  showCraftedItem(): void {
+  }
 }
