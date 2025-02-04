@@ -2,12 +2,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { som } from './som'
 import { ProjectLoader } from './projectloader'
-import { executeTask } from '@dcl/sdk/ecs'
+import { executeTask , AvatarModifierArea, AvatarModifierType, engine, Transform } from '@dcl/sdk/ecs'
 import { DclUser } from '../shared-dcl/src/playfab/dcluser'
 import { WondermineApi } from '../shared-dcl/src/playfab/wondermineapi'
 import { CoinShop } from './coinshop'
 import { CraftingMachine } from './craftingmachine'
-import { AvatarModifierArea, AvatarModifierType, engine, Transform } from '@dcl/sdk/ecs'
+
 import { Vector3 } from '@dcl/sdk/math'
 
 export class GameManager {
@@ -167,6 +167,7 @@ export class GameManager {
   onGotStoreProducts(errorObj: any, jsonObj: any) {
     throw new Error('Method not implemented.')
   }
+  
   loadShop():void {
     // log("loadShop()");
     this.shop = new CoinShop(som.scene.cart, som.scene.cartSign)
