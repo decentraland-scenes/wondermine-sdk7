@@ -224,7 +224,7 @@ export class LeaderboardEntry {
 export class UiElementData {
   public width: string = ''
   public height: string = ''
-  public pos?: number = 0
+  public pos?: number[] = []
   public positionX?: number = 0
   public positionY?: number = 0
   public hAlign?: string = ''

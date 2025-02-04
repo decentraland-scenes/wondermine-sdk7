@@ -12,7 +12,7 @@ import {
   Transform
 } from '@dcl/sdk/ecs'
 import { ItemIcons, WearablesState } from './enums'
-import { UiTextData, type Recipe } from './projectdata'
+import { type CraftMaterial, UiTextData, type Recipe } from './projectdata'
 import { ItemAmountPanel } from './ui/itemamountpanel'
 import { SpritePlane } from './ui/spriteplane'
 import { Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
@@ -243,7 +243,6 @@ export class CraftingMachine {
     // recipe name
     // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
     let obj: UiTextData = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.name)
-    // log("obj.fontSize=" + obj.fontSize);
     this.nameTxt = this.addTextField(obj, this.screenEntity)
 
     // recipe description
@@ -294,7 +293,7 @@ export class CraftingMachine {
       ItemIcons.ArrowGray,
       Vector3.create(0.035, -0.29, -0.05),
       Vector3.create(0.18, 0.15, 0.15),
-      Vector3.create(0, 0, -90)
+      Vector3.create(0, 0, 0)
     )
     Transform.getMutable(this.arrowSprite.entity).parent = this.screenEntity
 
@@ -404,6 +403,44 @@ export class CraftingMachine {
     this.showInstructions()
   }
 
+  addTextField(_data: UiTextData, _parent: Entity, _wrap: boolean = false): PBTextShape {
+    const ent = engine.addEntity()
+    TextShape.create(ent).text = ''
+    const ts: PBTextShape = TextShape.getMutable(ent)
+    if (_data.fontSize != null && _data.fontSize >= 1) {
+      ts.fontSize = _data.fontSize
+    }
+    if (_data.hexColor != null && _data.hexColor !== '') {
+      ts.textColor = Color4.fromHexString(_data.hexColor) // "#22BB44"
+    }
+    ts.width = Math.max(parseInt(_data.width), 10)
+    ts.height = Math.max(parseInt(_data.height), 10)
+
+    ts.textAlign = TextAlignMode.TAM_TOP_CENTER
+    ts.textWrapping = _wrap
+    if (_data.pos != null) {
+      Transform.create(ent, {
+        position: Vector3.create(..._data.pos),
+        scale: Vector3.create(0.25, 0.25, 0.25),
+        parent: _parent
+      })
+    }
+    return ts
+  }
+
+  nextRecipe(): void {
+    if (this.isBusy) return
+    const numRecipes = GameData.recipes.length
+    if (++this.recipeIndex > numRecipes) {
+      this.recipeIndex = 0
+    }
+    if (this.recipeIndex === numRecipes) {
+      this.showInstructions()
+    } else {
+      this.showRecipe(this.recipeIndex)
+    }
+  }
+
   prevRecipe(): void {
     if (this.isBusy) return
     if (--this.recipeIndex < -1) {
@@ -424,60 +461,7 @@ export class CraftingMachine {
     }
   }
 
-  nextRecipe(): void {
-    if (this.isBusy) return
-    const numRecipes = GameData.recipes.length
-    if (++this.recipeIndex > numRecipes) {
-      this.recipeIndex = 0
-    }
-    if (this.recipeIndex === numRecipes) {
-      this.showInstructions()
-    } else {
-      this.showRecipe(this.recipeIndex)
-    }
-  }
-
-  startCrafting(recipeNum: number): void {}
-
-  enableCrafting(onOrOff: boolean = true): void {}
-
-  showInstructions(): void {
-    this.pageIndex = 0
-    this.recipeIndex = -1
-
-    this.showName('Craft-O-Matic')
-    this.showDesc(
-      'Use the red arrows below to see the crafting recipes.\nWhen you have all the ingredients, the lever to the right\nwill glow. Click the lever to craft your item!'
-    )
-    this.showId('')
-
-    // clear the ingredients
-    this.clearRecipe()
-    if (this.readyTxt != null) { 
-      this.readyTxt.textColor = Color4.fromHexString('#DDDDDD') // "#22BB44"
-    }
-    this.setCooldownStatus()
-  }
-
   showRecipe(recipeNum: number): void {}
-
-  showName(msg: string): void {
-    if (this.nameTxt != null) {
-      this.nameTxt.text = msg
-    }
-  }
-
-  showDesc(msg: string): void {
-    if (this.descTxt != null) {
-      this.descTxt.text = msg
-    }
-  }
-
-  showId(msg: string): void {
-    if (this.idTxt != null) {
-      this.idTxt.text = msg
-    }
-  }
 
   clearRecipe(): void {
     if (this.iconSprite != null) {
@@ -497,30 +481,92 @@ export class CraftingMachine {
     }
   }
 
+  // --- DISPLAY ---
+
+  reset(reloadRecipe: boolean = true): void {
+    this.isBusy = false
+    this.setCooldownStatus()
+    if (reloadRecipe) {
+      this.showRecipe(this.recipeIndex)
+    } else {
+      this.showInstructions()
+    }
+    this.craftedVoucher = ''
+  }
+
+  showInstructions(): void {
+    this.pageIndex = 0
+    this.recipeIndex = -1
+
+    this.showName('Craft-O-Matic')
+    this.showDesc(
+      'Use the red arrows below to see the crafting recipes.\nWhen you have all the ingredients, the lever to the right\nwill glow. Click the lever to craft your item!'
+    )
+    this.showId('')
+
+    // clear the ingredients
+    this.clearRecipe()
+    if (this.readyTxt != null) {
+      this.readyTxt.textColor = Color4.fromHexString('#DDDDDD') // "#22BB44"
+    }
+    this.setCooldownStatus()
+  }
+
+  showName(msg: string): void {
+    if (this.nameTxt != null) {
+      this.nameTxt.text = msg
+    }
+  }
+
+  showDesc(msg: string): void {
+    if (this.descTxt != null) {
+      this.descTxt.text = msg
+    }
+  }
+
+  showId(msg: string): void {
+    if (this.idTxt != null) {
+      this.idTxt.text = msg
+    }
+  }
+
+  showIngredients(consumes: CraftMaterial[]): void {}
+
+  // --- COOLDOWN ---
+
   setCooldownStatus(): void {}
 
-  addTextField(_data: UiTextData, _parent: Entity, _wrap: boolean = false): PBTextShape {
-    const ent = engine.addEntity()
-    TextShape.create(ent)
-    const ts: PBTextShape = TextShape.getMutable(ent)
-    if (_data.fontSize != null && _data.fontSize >= 1) {
-      ts.fontSize = _data.fontSize
-    }
-    if (_data.hexColor != null && _data.hexColor !== '') {
-      ts.textColor = Color4.fromHexString(_data.hexColor) // "#22BB44"
-    }
-    ts.width = Math.max(parseInt(_data.width), 10)
-    ts.height = Math.max(parseInt(_data.height), 10)
+  showCooldownTime(millis: number): void {
+    // log("millis=" + millis);
+    if (this.recipeIndex === -1) {
+      // only show the time if the instructions page is showing
 
-    ts.textAlign = TextAlignMode.TAM_TOP_CENTER
-    ts.textWrapping = _wrap
-    if (_data.pos != null) {
-      Transform.create(ent, {
-        position: Vector3.create(_data.pos),
-        scale: Vector3.create(0.25, 0.25, 0.25),
-        parent: _parent
-      })
+      const remaining = millis // DclUser.cooldownTime - millis;
+
+      // Time calculations for days, hours, minutes and seconds
+      var hours = Math.floor(remaining / (1000 * 60 * 60))
+      var minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60))
+      var seconds = Math.floor((remaining % (1000 * 60)) / 1000)
+
+      this.showWearStatus('Ready in ' + hours + 'h ' + minutes + 'm ' + seconds + 's')
     }
-    return ts
   }
+
+  showWearStatus(status: string): void {
+    if (this.readyTxt != null) {
+      this.readyTxt.text = 'Wearables: ' + status
+    }
+  }
+
+  startCooldownTimer(): void {}
+
+  stopCooldownTimer(): void {}
+
+  enableCrafting(onOrOff: boolean = true): void {}
+
+  startCrafting(recipeNum: number): void {}
+
+  animateMachine(): void {}
+
+  showCraftedItem(): void {}
 }
