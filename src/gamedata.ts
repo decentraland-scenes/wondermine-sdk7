@@ -30,7 +30,7 @@ export class GameData {
     const recipeArray: Recipe[] = []
     let item: Recipe
 
-    for (let i: number = 0; i < recipeList.length; i++) {
+    for (var i: number = 0; i < recipeList.length; i++) {
       try {
         item = this.populate(new Recipe(), recipeList[i]) // TODO: error checking
         recipeArray.push(item)
@@ -51,8 +51,7 @@ export class GameData {
     GameData.wearableCounts = itemCounts
   }
 
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  public static getWearableCount(wi: number) {
+  public static getWearableCount(wi: number): number {
     if (wi === 0) return 0
     let count: number = GameData.wearableCounts[wi]
     if (count == null) count = 0
@@ -66,8 +65,8 @@ export class GameData {
   }
 
   // --- UTILITY FUNCTIONS ---
-  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-  static populate(target: any, ...args: any) {
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  static populate(target: Recipe, ...args: Array<Record<string, any>>): Recipe {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (!target) {
       throw TypeError('Cannot convert undefined or null to object')
@@ -75,8 +74,8 @@ export class GameData {
     for (const source of args) {
       // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       if (source) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-        Object.keys(source).forEach((key) => (target[key] = source[key]))
+        // eslint-disable-next-line no-return-assign
+        Object.keys(source).forEach((key) => ((target as any)[key] = source[key]))
       }
     }
     return target
@@ -91,7 +90,7 @@ export class GameData {
 
   public static getRecipeById(recipeId: string): Recipe | null {
     let item: Recipe
-    for (let i: number = 0; i < GameData.recipes.length; i++) {
+    for (var i: number = 0; i < GameData.recipes.length; i++) {
       item = GameData.recipes[i]
       if (item.id === recipeId) {
         return item

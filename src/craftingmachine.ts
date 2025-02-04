@@ -1,0 +1,572 @@
+import {
+  Animator,
+  engine,
+  type Entity,
+  InputAction,
+  inputSystem,
+  type PBTextShape,
+  PointerEvents,
+  PointerEventType,
+  TextAlignMode,
+  TextShape,
+  Transform
+} from '@dcl/sdk/ecs'
+import { ItemIcons, WearablesState } from './enums'
+import { type CraftMaterial, UiTextData, type Recipe } from './projectdata'
+import { ItemAmountPanel } from './ui/itemamountpanel'
+import { SpritePlane } from './ui/spriteplane'
+import { Color4, Quaternion, Vector3 } from '@dcl/sdk/math'
+import { ProjectLoader } from './projectloader'
+import { som } from './som'
+import { SoundManager } from '../shared-dcl/src/sound/soundmanager'
+import { openExternalUrl } from '~system/RestrictedActions'
+import { GameData } from './gamedata'
+import { ColorPlane } from './ui/colorplane'
+
+export type MachineData = {
+  filename: string
+  pos: number[]
+  angles: number[]
+}
+
+export type SelectorData = {
+  pos: [number, number, number]
+  angles: [number, number, number]
+}
+
+export type Data = {
+  pos: number[]
+  angles: number[]
+}
+
+export class CraftingMachine {
+  public entity: Entity
+
+  public machineModelEntity: Entity = engine.addEntity()
+  public machineModelFile: string = ''
+  public machineShape: string = ''
+  // public machineAnim:Animator;
+
+  public selectorModelEntity: Entity = engine.addEntity()
+  public selectorModelFile: string = ''
+  public selectorShape: string = ''
+
+  public backButton: Entity = engine.addEntity()
+  public nextButton: Entity = engine.addEntity()
+  public linkButton: Entity = engine.addEntity()
+  public greenLever: Entity = engine.addEntity()
+
+  public idleClip: string = ''
+  public craftingClip: string = 'machine'
+
+  public screenEntity: Entity = engine.addEntity()
+
+  public nameTextEntity: Entity = engine.addEntity()
+  public nameTxt: PBTextShape | null = null
+  public descTxt: PBTextShape | null = null
+  public idTxt: PBTextShape | null = null
+  public levelMinTxt: PBTextShape | null = null
+  public readyTxt: PBTextShape | null = null
+
+  public iconSprite: SpritePlane | null = null
+  public arrowSprite: SpritePlane | null = null
+  public ingredientPanels: ItemAmountPanel[] = []
+  public filePrefix: string = 'assets/models/textures/'
+  public textureFile: string = 'assets/models/textures/resources_atlas_1024.png'
+
+  /**
+   * The current oage number. Page 0 is the instructions page.
+   */
+  public pageIndex: number = 0
+  public recipeIndex: number = -1
+
+  public isBusy: boolean = false
+  public craftedRecipe: Recipe | null = null
+  public craftedVoucher: string = ''
+  public wearablesState: WearablesState = WearablesState.Inactive
+  public timer: number = 0
+
+  // public onCraftingCompleteCallback: (lootEnt:LootItem) => void;
+  constructor(_selectorData: SelectorData, _machineData: MachineData, _arrowButtonData: Data, _leverData: Data) {
+    this.entity = engine.addEntity()
+    this.machineModelFile = _machineData.filename
+    // use selector object as parent transform
+    const pos: Vector3 = Vector3.create(..._selectorData.pos)
+    const angles: Vector3 = Vector3.create(..._selectorData.angles)
+    Transform.create(this.entity, {
+      position: pos,
+      rotation: Quaternion.fromEulerDegrees(angles.x, angles.y, angles.z)
+    })
+    // the position and angles for the loaded model should be zero, since the parent handles positioning
+    this.machineModelEntity = this.loadModel(_machineData, [-0.1, 0, -2.7], [0, 18, 0])
+    Transform.getOrCreateMutable(this.machineModelEntity).parent = this.entity
+    Animator.create(this.machineModelEntity, {
+      states: [
+        {
+          clip: this.craftingClip,
+          loop: false
+        }
+      ]
+    })
+    // add sounds
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    SoundManager.attachSoundFile(this.machineModelEntity, 'CraftingMachine', som.scene.crafter.soundFile)
+    // the platform rotates all by itself, to stay flat
+    this.selectorModelEntity = this.loadModel(_selectorData, [0, 0, 0], [0, 0, 0])
+    Transform.getOrCreateMutable(this.selectorModelEntity).parent = this.entity
+
+    this.backButton = this.loadModel(_arrowButtonData, [-0.25, 0.93, 0.1], [0, 180, -48])
+    Transform.getOrCreateMutable(this.backButton).parent = this.entity
+    PointerEvents.createOrReplace(this.backButton, {
+      pointerEvents: [
+        {
+          eventType: PointerEventType.PET_DOWN,
+          eventInfo: {
+            button: InputAction.IA_POINTER,
+            showFeedback: true,
+            hoverText: '< BACK',
+            maxDistance: 8
+          }
+        }
+      ]
+    })
+
+    this.nextButton = this.loadModel(_arrowButtonData, [-0.25, 0.93, -0.1], [0, 0, 48])
+    Transform.getOrCreateMutable(this.nextButton).parent = this.entity
+    PointerEvents.createOrReplace(this.nextButton, {
+      pointerEvents: [
+        {
+          eventType: PointerEventType.PET_DOWN,
+          eventInfo: {
+            button: InputAction.IA_POINTER,
+            showFeedback: true,
+            hoverText: 'NEXT >',
+            maxDistance: 8
+          }
+        }
+      ]
+    })
+
+    this.greenLever = this.loadModel(_leverData, [-0.1, 0.01, -2.7], [0, 18, 0])
+    Transform.getOrCreateMutable(this.greenLever).parent = this.entity
+    PointerEvents.createOrReplace(this.greenLever, {
+      pointerEvents: [
+        {
+          eventType: PointerEventType.PET_DOWN,
+          eventInfo: {
+            button: InputAction.IA_POINTER,
+            showFeedback: true,
+            hoverText: 'CRAFT THIS ITEM',
+            maxDistance: 8
+          }
+        }
+      ]
+    })
+
+    this.linkButton = this.loadModel(_arrowButtonData, [-1.6, 1.81, -3.4], [0, 48, 90])
+    Transform.getOrCreateMutable(this.linkButton).parent = this.entity
+    PointerEvents.createOrReplace(this.linkButton, {
+      pointerEvents: [
+        {
+          eventType: PointerEventType.PET_DOWN,
+          eventInfo: {
+            button: InputAction.IA_POINTER,
+            showFeedback: true,
+            hoverText: 'To minting website >',
+            maxDistance: 8
+          }
+        }
+      ]
+    })
+
+    engine.addSystem(() => {
+      if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.backButton)) {
+        this.prevRecipe()
+      }
+      if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.nextButton)) {
+        this.nextRecipe()
+      }
+      if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.greenLever)) {
+        this.startCrafting(this.recipeIndex)
+        this.enableCrafting(false)
+      }
+      if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.linkButton)) {
+        void openExternalUrl({ url: 'https://wondermine.wonderzone.io/claimItem' })
+      }
+    })
+    // engine.removeEntity(this.greenLever);
+
+    // 2DO: store filePrefix centrally
+    this.textureFile = this.filePrefix + som.ui.resourceIcons.atlasFile
+    this.loadScreen()
+
+    // this.setupStateMachine();
+  }
+
+  loadModel(_data: Data | MachineData, _position: number[] | null = null, _angles: number[] | null = null): Entity {
+    let loader = ProjectLoader.instance
+    if (loader === undefined) {
+      loader = new ProjectLoader()
+    }
+
+    if (_position != null) {
+      _data.pos = _position
+    }
+    if (_angles != null) {
+      _data.angles = _angles
+    }
+
+    return loader.spawnSceneObject(_data, false)
+  }
+
+  loadScreen(): void {
+    // hack to reduce texture usage
+    // check if GameUi has already loaded the resorce atlas, and if so just grab it instead of loading our own
+    // let tex:Texture = GameUi.instance.getResourceAtlas();
+
+    Transform.create(this.screenEntity, {
+      position: Vector3.create(0, 2, 0),
+      scale: Vector3.One(),
+      rotation: Quaternion.fromEulerDegrees(0, 90, 0),
+      parent: this.selectorModelEntity
+    })
+
+    // add background shapes
+    const colorPlane1 = new ColorPlane(
+      '#282828',
+      Vector3.create(0.42, -0.3, 0),
+      Vector3.create(0.6, 0.6, 0.1),
+      Vector3.create(0, 0, 0)
+    )
+    Transform.getMutable(colorPlane1.entity).parent = this.screenEntity
+
+    // recipe name
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    let obj: UiTextData = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.name)
+    this.nameTxt = this.addTextField(obj, this.screenEntity)
+
+    // recipe description
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.desc)
+    this.descTxt = this.addTextField(obj, this.screenEntity, false)
+
+    // recipe id
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.id)
+    this.idTxt = this.addTextField(obj, this.screenEntity)
+
+    // level minimum
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.levelMin)
+    this.levelMinTxt = this.addTextField(obj, this.screenEntity)
+
+    // instructions
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.youNeed)
+    const youNeed = this.addTextField(obj, this.screenEntity)
+    youNeed.text = 'YOU NEED'
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.toMake)
+    const toMake = this.addTextField(obj, this.screenEntity)
+    toMake.text = 'TO MAKE'
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+    obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.ready)
+    this.readyTxt = this.addTextField(obj, this.screenEntity)
+
+    // item to create
+    this.iconSprite = new SpritePlane(
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.Empty,
+      Vector3.create(0.4, -0.3, -0.05),
+      Vector3.create(0.5, 0.5, 0.5),
+      Vector3.create(0, 0, -90)
+    )
+    Transform.getMutable(this.iconSprite.entity).parent = this.screenEntity
+
+    // arrow icon
+    this.arrowSprite = new SpritePlane(
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.ArrowGray,
+      Vector3.create(0.035, -0.29, -0.05),
+      Vector3.create(0.18, 0.15, 0.15),
+      Vector3.create(0, 0, 0)
+    )
+    Transform.getMutable(this.arrowSprite.entity).parent = this.screenEntity
+
+    // log("*** LOADING ITEM TILES ***")
+    const itemTile1 = new ItemAmountPanel(
+      this.screenEntity,
+      Vector3.create(-0.59, -0.08, 0),
+      '#333333',
+      '#229944',
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.Empty,
+      1.5,
+      true
+    )
+    // itemTile1.showText("20");
+
+    const itemTile2 = new ItemAmountPanel(
+      this.screenEntity,
+      Vector3.create(-0.59, -0.24, 0),
+      '#333333',
+      '#229944',
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.Empty,
+      1.5,
+      true
+    )
+    // itemTile2.showText("30");
+
+    const itemTile3 = new ItemAmountPanel(
+      this.screenEntity,
+      Vector3.create(-0.59, -0.4, 0),
+      '#333333',
+      '#229944',
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.Empty,
+      1.5,
+      true
+    )
+    // itemTile3.showText("10");
+
+    const itemTile4 = new ItemAmountPanel(
+      this.screenEntity,
+      Vector3.create(-0.22, -0.08, 0),
+      '#333333',
+      '#229944',
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.Empty,
+      1.5,
+      true
+    )
+    // itemTile4.showText("15");
+
+    const itemTile5 = new ItemAmountPanel(
+      this.screenEntity,
+      Vector3.create(-0.22, -0.24, 0),
+      '#333333',
+      '#229944',
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.Empty,
+      1.5,
+      true
+    )
+    // itemTile5.showText("7");
+    // itemTile5.enable();
+
+    const itemTile6 = new ItemAmountPanel(
+      this.screenEntity,
+      Vector3.create(-0.22, -0.4, 0),
+      '#333333',
+      '#229944',
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.Empty,
+      1.5,
+      true
+    )
+    // itemTile6.showText("1");
+
+    const itemTile0 = new ItemAmountPanel(
+      this.screenEntity,
+      Vector3.create(-0.4, -0.54, 0),
+      '#333333',
+      '#229944',
+      this.textureFile,
+      8,
+      8,
+      ItemIcons.Empty,
+      1.0,
+      true,
+      true
+    )
+    // itemTile0.showText("10");
+
+    this.ingredientPanels = [itemTile0, itemTile1, itemTile2, itemTile3, itemTile4, itemTile5, itemTile6]
+
+    this.showInstructions()
+  }
+
+  addTextField(_data: UiTextData, _parent: Entity, _wrap: boolean = false): PBTextShape {
+    const ent = engine.addEntity()
+    TextShape.create(ent).text = ''
+    const ts: PBTextShape = TextShape.getMutable(ent)
+    if (_data.fontSize != null && _data.fontSize >= 1) {
+      ts.fontSize = _data.fontSize
+    }
+    if (_data.hexColor != null && _data.hexColor !== '') {
+      ts.textColor = Color4.fromHexString(_data.hexColor) // "#22BB44"
+    }
+    ts.width = Math.max(parseInt(_data.width), 10)
+    ts.height = Math.max(parseInt(_data.height), 10)
+
+    ts.textAlign = TextAlignMode.TAM_TOP_CENTER
+    ts.textWrapping = _wrap
+    if (_data.pos != null) {
+      Transform.create(ent, {
+        position: Vector3.create(..._data.pos),
+        scale: Vector3.create(0.25, 0.25, 0.25),
+        parent: _parent
+      })
+    }
+    return ts
+  }
+
+  nextRecipe(): void {
+    if (this.isBusy) return
+    const numRecipes = GameData.recipes.length
+    if (++this.recipeIndex > numRecipes) {
+      this.recipeIndex = 0
+    }
+    if (this.recipeIndex === numRecipes) {
+      this.showInstructions()
+    } else {
+      this.showRecipe(this.recipeIndex)
+    }
+  }
+
+  prevRecipe(): void {
+    if (this.isBusy) return
+    if (--this.recipeIndex < -1) {
+      this.recipeIndex = GameData.recipes.length - 1
+    }
+    if (this.recipeIndex === -1) {
+      this.showInstructions()
+    } else {
+      this.showRecipe(this.recipeIndex)
+    }
+  }
+
+  refreshRecipe(): void {
+    if (this.recipeIndex < 0) {
+      this.showInstructions()
+    } else {
+      this.showRecipe(this.recipeIndex)
+    }
+  }
+
+  showRecipe(recipeNum: number): void {}
+
+  clearRecipe(): void {
+    if (this.iconSprite != null) {
+      this.iconSprite.changeFrame(ItemIcons.Empty)
+    }
+
+    this.enableCrafting(false)
+
+    let tile
+    for (var i: number = 0; i < this.ingredientPanels.length; i++) {
+      tile = this.ingredientPanels[i]
+      tile.clear(ItemIcons.Empty)
+      tile.showText('')
+    }
+    if (this.levelMinTxt != null) {
+      this.levelMinTxt.text = ''
+    }
+  }
+
+  // --- DISPLAY ---
+
+  reset(reloadRecipe: boolean = true): void {
+    this.isBusy = false
+    this.setCooldownStatus()
+    if (reloadRecipe) {
+      this.showRecipe(this.recipeIndex)
+    } else {
+      this.showInstructions()
+    }
+    this.craftedVoucher = ''
+  }
+
+  showInstructions(): void {
+    this.pageIndex = 0
+    this.recipeIndex = -1
+
+    this.showName('Craft-O-Matic')
+    this.showDesc(
+      'Use the red arrows below to see the crafting recipes.\nWhen you have all the ingredients, the lever to the right\nwill glow. Click the lever to craft your item!'
+    )
+    this.showId('')
+
+    // clear the ingredients
+    this.clearRecipe()
+    if (this.readyTxt != null) {
+      this.readyTxt.textColor = Color4.fromHexString('#DDDDDD') // "#22BB44"
+    }
+    this.setCooldownStatus()
+  }
+
+  showName(msg: string): void {
+    if (this.nameTxt != null) {
+      this.nameTxt.text = msg
+    }
+  }
+
+  showDesc(msg: string): void {
+    if (this.descTxt != null) {
+      this.descTxt.text = msg
+    }
+  }
+
+  showId(msg: string): void {
+    if (this.idTxt != null) {
+      this.idTxt.text = msg
+    }
+  }
+
+  showIngredients(consumes: CraftMaterial[]): void {}
+
+  // --- COOLDOWN ---
+
+  setCooldownStatus(): void {}
+
+  showCooldownTime(millis: number): void {
+    // log("millis=" + millis);
+    if (this.recipeIndex === -1) {
+      // only show the time if the instructions page is showing
+
+      const remaining = millis // DclUser.cooldownTime - millis;
+
+      // Time calculations for days, hours, minutes and seconds
+      var hours = Math.floor(remaining / (1000 * 60 * 60))
+      var minutes = Math.floor((remaining % (1000 * 60 * 60)) / (1000 * 60))
+      var seconds = Math.floor((remaining % (1000 * 60)) / 1000)
+
+      this.showWearStatus('Ready in ' + hours + 'h ' + minutes + 'm ' + seconds + 's')
+    }
+  }
+
+  showWearStatus(status: string): void {
+    if (this.readyTxt != null) {
+      this.readyTxt.text = 'Wearables: ' + status
+    }
+  }
+
+  startCooldownTimer(): void {}
+
+  stopCooldownTimer(): void {}
+
+  enableCrafting(onOrOff: boolean = true): void {}
+
+  startCrafting(recipeNum: number): void {}
+
+  animateMachine(): void {}
+
+  showCraftedItem(): void {}
+}
