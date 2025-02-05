@@ -91,25 +91,26 @@ export class Leaderboard extends TextBoard {
             {
               eventType: PointerEventType.PET_DOWN,
               eventInfo: {
-                button: InputAction.IA_PRIMARY,
-                showFeedback: true,
-                hoverText: 'Next leaderboard',
-                maxDistance: 8
-              }
-            },
-            {
-              eventType: PointerEventType.PET_DOWN,
-              eventInfo: {
                 button: InputAction.IA_SECONDARY,
-                showFeedback: true,
-                hoverText: 'Next leaderboard',
+                showFeedback: false,
+                hoverText: '',
                 maxDistance: 8
               }
             },
             {
               eventType: PointerEventType.PET_DOWN,
               eventInfo: {
-                button: InputAction.IA_ANY,
+                button: InputAction.IA_PRIMARY,
+                showFeedback: false,
+                hoverText: '',
+                maxDistance: 8
+              }
+            },
+
+            {
+              eventType: PointerEventType.PET_DOWN,
+              eventInfo: {
+                button: InputAction.IA_POINTER,
                 showFeedback: true,
                 hoverText: 'Next leaderboard',
                 maxDistance: 8
@@ -120,13 +121,14 @@ export class Leaderboard extends TextBoard {
         engine.addSystem(() => {
           if (this.boardEntity != null) {
             if (inputSystem.isTriggered(InputAction.IA_PRIMARY, PointerEventType.PET_DOWN, this.boardEntity)) {
-              this.showNextBoard()
-            }
-            if (inputSystem.isTriggered(InputAction.IA_SECONDARY, PointerEventType.PET_DOWN, this.boardEntity)) {
               this.showPrevTen()
             }
-            if (inputSystem.isTriggered(InputAction.IA_ANY, PointerEventType.PET_DOWN, this.boardEntity)) {
-              this.showNextTen()
+            if (inputSystem.isTriggered(InputAction.IA_SECONDARY, PointerEventType.PET_DOWN, this.boardEntity)) {
+               this.showNextTen()
+            }
+            if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.boardEntity)) {
+              this.showNextBoard()
+             
             }
           }
         })
@@ -148,7 +150,7 @@ export class Leaderboard extends TextBoard {
   private getLeaderboardTitle(): string {
     let result: string = ''
     this.boards[this.currentBoardIndex].split(/(?=[A-Z])/).forEach((s) => (result += s + ' '))
-    console.log('result',result)
+    console.log('result', result)
     return result
   }
 
@@ -157,14 +159,10 @@ export class Leaderboard extends TextBoard {
     if (this.currentBoardIndex >= this.boards.length) this.currentBoardIndex = 0
 
     this.showMessage(this.getLeaderboardTitle())
-    if (this.playerListShape != null) {
-      this.playerListShape.text = ''
-      for (let i = 0; i <= 25; i++) this.playerListShape.text += i < 25 ? ' ' : 'Loading...'
-    }
 
-    if (this.scoreListShape != null) {
-      this.scoreListShape.text = ''
-    }
+    TextShape.getMutable(this.playerListEntity).text = ''
+    for (let i = 0; i <= 25; i++) TextShape.getMutable(this.playerListEntity).text += i < 25 ? ' ' : 'Loading...'
+    TextShape.getMutable(this.scoreListEntity).text = ''
 
     this.currentPage = 1
     this.getLeaderboardData()
