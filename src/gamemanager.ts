@@ -2,20 +2,22 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { som } from './som'
 import { ProjectLoader } from './projectloader'
-import { executeTask , AvatarModifierArea, AvatarModifierType, engine, Transform } from '@dcl/sdk/ecs'
+import { executeTask, AvatarModifierArea, AvatarModifierType, engine, Transform } from '@dcl/sdk/ecs'
 import { DclUser } from '../shared-dcl/src/playfab/dcluser'
 import { WondermineApi } from '../shared-dcl/src/playfab/wondermineapi'
 import { CoinShop } from './coinshop'
 import { CraftingMachine } from './craftingmachine'
 
 import { Vector3 } from '@dcl/sdk/math'
+import { Leaderboard } from './leaderboard'
 
 export class GameManager {
   public loader: ProjectLoader
-  public api: WondermineApi | undefined
+  public api: WondermineApi | null = null
   private readonly enableShared: boolean = true
   public shop: CoinShop | null = null
   public machine: CraftingMachine | null = null
+  private board: Leaderboard | null = null
   constructor(titleId: string) {
     this.loader = new ProjectLoader()
     this.api = new WondermineApi(titleId)
@@ -25,6 +27,7 @@ export class GameManager {
     this.loadScenery()
     this.loadShop()
     this.loadCrafting()
+    this.loadLeaderboard();
   }
 
   loadScenery(): void {
@@ -124,7 +127,9 @@ export class GameManager {
       })
       console.log(json, ' :Store Items')
       // Load the leaderboard stats
-      // this.board.loadDefaultBoard();
+      if (this.board != null) {
+        this.board.loadDefaultBoard()
+      }
 
       // log("Getting combined data...");
       await this.api?.GetPlayerCombinedInfoAsync(DclUser.playfabId)
@@ -167,8 +172,8 @@ export class GameManager {
   onGotStoreProducts(errorObj: any, jsonObj: any) {
     throw new Error('Method not implemented.')
   }
-  
-  loadShop():void {
+
+  loadShop(): void {
     // log("loadShop()");
     this.shop = new CoinShop(som.scene.cart, som.scene.cartSign)
     this.shop.loadProducts()
@@ -178,5 +183,14 @@ export class GameManager {
     //     log("event value:", value);
     //     this.doIt();
     //   });
+  }
+
+  // --- LEADERBOARD ---
+
+  loadLeaderboard(): void {
+    if (this.api != null) {
+      const leaderboard: Leaderboard = new Leaderboard(som.scene.leaderboard, this.api, null)
+      this.board = leaderboard
+    }
   }
 }
