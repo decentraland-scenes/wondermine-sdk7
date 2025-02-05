@@ -209,9 +209,7 @@ export class TextBoard {
 
   showMessage(textStr: string): void {
     if (this.textEntity != null) {
-      if (this.textShape != null) {
-        this.textShape.text = textStr
-      }
+      TextShape.getMutable(this.textEntity).text = textStr
     }
   }
 }

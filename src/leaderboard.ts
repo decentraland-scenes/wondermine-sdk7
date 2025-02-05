@@ -139,7 +139,6 @@ export class Leaderboard extends TextBoard {
     this.currentPage = 1
     if (this.playerListShape != null) {
       for (let i = 0; i <= 25; i++) TextShape.getMutable(this.playerListEntity).text += i < 25 ? ' ' : 'Loading...'
-      console.log('En el ciclo, texto actualizado: ', this.playerListShape.text)
     }
 
     this.showMessage(this.getLeaderboardTitle())
@@ -149,6 +148,7 @@ export class Leaderboard extends TextBoard {
   private getLeaderboardTitle(): string {
     let result: string = ''
     this.boards[this.currentBoardIndex].split(/(?=[A-Z])/).forEach((s) => (result += s + ' '))
+    console.log('result',result)
     return result
   }
 
@@ -225,11 +225,7 @@ export class Leaderboard extends TextBoard {
       }
     }
 
-    if (this.playerListShape != null) {
-      this.playerListShape.text = playersText
-    }
-    if (this.scoreListShape != null) {
-      this.scoreListShape.text = scoreText
-    }
+    TextShape.getMutable(this.playerListEntity).text = playersText
+    TextShape.getMutable(this.scoreListEntity).text = scoreText
   }
 }
