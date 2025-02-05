@@ -124,11 +124,10 @@ export class Leaderboard extends TextBoard {
               this.showPrevTen()
             }
             if (inputSystem.isTriggered(InputAction.IA_SECONDARY, PointerEventType.PET_DOWN, this.boardEntity)) {
-               this.showNextTen()
+              this.showNextTen()
             }
             if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.boardEntity)) {
               this.showNextBoard()
-             
             }
           }
         })
