@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import {
   Animator,
   engine,
@@ -9,7 +10,8 @@ import {
   PointerEventType,
   TextAlignMode,
   TextShape,
-  Transform} from '@dcl/sdk/ecs'
+  Transform
+} from '@dcl/sdk/ecs'
 import { ItemIcons, WearablesState } from './enums'
 import { type CraftMaterial, UiTextData, type Recipe } from './projectdata'
 import { ItemAmountPanel } from './ui/itemamountpanel'
@@ -65,7 +67,6 @@ export class CraftingMachine {
 
   public screenEntity: Entity = engine.addEntity()
 
-  public nameTextEntity: Entity = engine.addEntity()
   public nameTxt: PBTextShape | null = null
   public descTxt: PBTextShape | null = null
   public idTxt: PBTextShape | null = null
@@ -92,6 +93,14 @@ export class CraftingMachine {
 
   public onCraftingCompleteCallback: ((lootEnt: LootItem) => void) | undefined
 
+  public nameTxt_entity = engine.addEntity()
+  public descTxt_entity = engine.addEntity()
+  public idTxt_entity = engine.addEntity()
+  public levelMinTxt_entity = engine.addEntity()
+  public readyTxt_entity = engine.addEntity()
+  public youNeed_entity = engine.addEntity()
+  public toMake_entity = engine.addEntity()
+
   // public onCraftingCompleteCallback: (lootEnt:LootItem) => void;
   constructor(_selectorData: SelectorData, _machineData: MachineData, _arrowButtonData: Data, _leverData: Data) {
     this.entity = engine.addEntity()
@@ -115,7 +124,7 @@ export class CraftingMachine {
       ]
     })
     // add sounds
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     SoundManager.attachSoundFile(this.machineModelEntity, 'CraftingMachine', som.scene.crafter.soundFile)
     // the platform rotates all by itself, to stay flat
     this.selectorModelEntity = this.loadModel(_selectorData, [0, 0, 0], [0, 0, 0])
@@ -200,7 +209,7 @@ export class CraftingMachine {
         void openExternalUrl({ url: 'https://wondermine.wonderzone.io/claimItem' })
       }
     })
-    engine.removeEntity(this.greenLever);
+    engine.removeEntity(this.greenLever)
 
     // 2DO: store filePrefix centrally
     this.textureFile = this.filePrefix + som.ui.resourceIcons.atlasFile
@@ -246,37 +255,38 @@ export class CraftingMachine {
     Transform.getMutable(colorPlane1.entity).parent = this.screenEntity
 
     // recipe name
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     let obj: UiTextData = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.name)
-    this.nameTxt = this.addTextField(obj, this.screenEntity)
+
+    this.nameTxt = this.addTextField(obj, this.screenEntity, this.nameTxt_entity)
 
     // recipe description
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.desc)
-    this.descTxt = this.addTextField(obj, this.screenEntity, false)
+    this.descTxt = this.addTextField(obj, this.screenEntity, this.descTxt_entity, false)
 
     // recipe id
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.id)
-    this.idTxt = this.addTextField(obj, this.screenEntity)
+    this.idTxt = this.addTextField(obj, this.screenEntity, this.idTxt_entity)
 
     // level minimum
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.levelMin)
-    this.levelMinTxt = this.addTextField(obj, this.screenEntity)
+    this.levelMinTxt = this.addTextField(obj, this.screenEntity, this.levelMinTxt_entity)
 
     // instructions
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.youNeed)
-    const youNeed = this.addTextField(obj, this.screenEntity)
+    const youNeed = this.addTextField(obj, this.screenEntity, this.youNeed_entity)
     youNeed.text = 'YOU NEED'
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.toMake)
-    const toMake = this.addTextField(obj, this.screenEntity)
+    const toMake = this.addTextField(obj, this.screenEntity, this.toMake_entity)
     toMake.text = 'TO MAKE'
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.ready)
-    this.readyTxt = this.addTextField(obj, this.screenEntity)
+    this.readyTxt = this.addTextField(obj, this.screenEntity, this.readyTxt_entity)
 
     // item to create
     this.iconSprite = new SpritePlane(
@@ -408,10 +418,9 @@ export class CraftingMachine {
     this.showInstructions()
   }
 
-  addTextField(_data: UiTextData, _parent: Entity, _wrap: boolean = false): PBTextShape {
-    const ent = engine.addEntity()
-    TextShape.create(ent).text = ''
-    const ts: PBTextShape = TextShape.getMutable(ent)
+  addTextField(_data: UiTextData, _parent: Entity, entity: Entity, _wrap: boolean = false): PBTextShape {
+    TextShape.create(entity).text = ''
+    const ts: PBTextShape = TextShape.getMutable(entity)
     if (_data.fontSize != null && _data.fontSize >= 1) {
       ts.fontSize = _data.fontSize
     }
@@ -424,7 +433,7 @@ export class CraftingMachine {
     ts.textAlign = TextAlignMode.TAM_TOP_CENTER
     ts.textWrapping = _wrap
     if (_data.pos != null) {
-      Transform.create(ent, {
+      Transform.create(entity, {
         position: Vector3.create(..._data.pos),
         scale: Vector3.create(0.25, 0.25, 0.25),
         parent: _parent
@@ -605,6 +614,7 @@ export class CraftingMachine {
     // clear the ingredients
     this.clearRecipe()
     if (this.readyTxt != null) {
+      TextShape.getMutable(this.readyTxt_entity).textColor = Color4.fromHexString('#DDDDDD') // "#22BB44"
       this.readyTxt.textColor = Color4.fromHexString('#DDDDDD') // "#22BB44"
     }
     this.setCooldownStatus()
@@ -612,19 +622,23 @@ export class CraftingMachine {
 
   showName(msg: string): void {
     if (this.nameTxt != null) {
+      TextShape.getMutable(this.nameTxt_entity).text = msg
       this.nameTxt.text = msg
     }
   }
 
   showDesc(msg: string): void {
     if (this.descTxt != null) {
+      TextShape.getMutable(this.descTxt_entity).text = msg
       this.descTxt.text = msg
     }
   }
 
   showId(msg: string): void {
     if (this.idTxt != null) {
+      TextShape.getMutable(this.idTxt_entity).text = msg
       this.idTxt.text = msg
+      console.log('check',TextShape.get(this.idTxt_entity).text, this.idTxt.text)
     }
   }
 
@@ -714,7 +728,8 @@ export class CraftingMachine {
 
   showWearStatus(status: string): void {
     if (this.readyTxt != null) {
-      this.readyTxt.text = 'Wearables: ' + status
+      TextShape.getMutable(this.readyTxt_entity).text = 'Wearables: ' + status
+      // this.readyTxt.text = 'Wearables: ' + status
     }
   }
 
@@ -742,6 +757,8 @@ export class CraftingMachine {
         this.arrowSprite.changeFrame(ItemIcons.ArrowGreen)
       }
       if (this.readyTxt !== null) {
+        TextShape.getMutable(this.readyTxt_entity).textColor = Color4.fromHexString('#22BB44')
+        TextShape.getMutable(this.readyTxt_entity).text = 'READY! Push the lever to craft your item >>>'
         this.readyTxt.textColor = Color4.fromHexString('#22BB44')
         this.readyTxt.text = 'READY! Push the lever to craft your item >>>'
       }
@@ -753,10 +770,11 @@ export class CraftingMachine {
       }
       if (this.readyTxt !== null) {
         this.readyTxt.text = ''
+        TextShape.getMutable(this.readyTxt_entity).text = ''
       }
       // remove lever highlight
-      if (engine.getEntityState(this.greenLever) !== null ){
-        engine.removeEntity(this.greenLever);
+      if (engine.getEntityState(this.greenLever) !== null) {
+        engine.removeEntity(this.greenLever)
       }
     }
   }
