@@ -97,11 +97,11 @@ export class CraftingMachine {
 
   public nameTxt_entity = engine.addEntity()
   public descTxt_entity = engine.addEntity()
-  public idTxt_entity = engine.addEntity()
   public levelMinTxt_entity = engine.addEntity()
   public readyTxt_entity = engine.addEntity()
   public youNeed_entity = engine.addEntity()
   public toMake_entity = engine.addEntity()
+  public idTxt_entity = engine.addEntity()
 
   // public onCraftingCompleteCallback: (lootEnt:LootItem) => void;
   constructor(_selectorData: SelectorData, _machineData: MachineData, _arrowButtonData: Data, _leverData: Data) {
@@ -300,8 +300,8 @@ export class CraftingMachine {
       8,
       8,
       ItemIcons.Empty,
-      Vector3.create(0.4, -0.3, -0.05),
-      Vector3.create(0.5, 0.5, 0.5),
+      Vector3.create(0.5, -0.3, -0.05),
+      Vector3.create(0.46, 0.46, 0.46),
       Vector3.create(0, 0, 0)
     )
     Transform.getMutable(this.iconSprite.entity).parent = this.screenEntity
@@ -444,6 +444,7 @@ export class CraftingMachine {
         scale: Vector3.create(0.25, 0.25, 0.25),
         parent: _parent
       })
+      Transform.getMutable(entity).position.z = -0.01
     }
     return ts
   }
@@ -493,7 +494,6 @@ export class CraftingMachine {
       // show ingredient icons and values
       let hasAll: boolean = this.showIngredients(recipe.consumes)
       const wearCount: number = GameData.getWearableCount(recipe.wi)
-
       if (recipe.limitOne) {
         // log("LIMIT ONE RECIPE. itemId:", recipe.itemId);
         console.log('Player items:', DclUser.activeUser.limitOneItems)
@@ -546,21 +546,21 @@ export class CraftingMachine {
         if (DclUser.activeUser.level >= recipe.levelMin) {
           // show green
           if (this.levelMinTxt !== null) {
-            this.levelMinTxt.textColor = Color4.fromHexString('#33FF33')
+            TextShape.getMutable(this.levelMinTxt_entity).textColor =  Color4.fromHexString('#33FF33') 
           }
         } else {
           // show red
           if (this.levelMinTxt !== null) {
-            this.levelMinTxt.textColor = Color4.fromHexString('#FF6600')
+            TextShape.getMutable(this.levelMinTxt_entity).textColor = Color4.fromHexString('#FF6600')
           }
           hasAll = false
         }
         if (this.levelMinTxt !== null) {
-          this.levelMinTxt.text = 'MIN LEVEL: ' + recipe.levelMin
+          TextShape.getMutable(this.levelMinTxt_entity).text = 'MIN LEVEL: ' + recipe.levelMin
         }
       } else {
         if (this.levelMinTxt !== null) {
-          this.levelMinTxt.text = ''
+          TextShape.getMutable(this.levelMinTxt_entity).text = ''
         }
       }
 
@@ -590,7 +590,7 @@ export class CraftingMachine {
       tile.showText('')
     }
     if (this.levelMinTxt != null) {
-      this.levelMinTxt.text = ''
+      TextShape.getMutable(this.levelMinTxt_entity).text = ''
     }
   }
 
