@@ -173,7 +173,12 @@ export class TextBoard {
     ts.height = Math.max(_h, 10)
 
     ts.textAlign = TextAlignMode.TAM_TOP_CENTER
-    // ts.fontWeight = "bold";
+    if (_hTextAlign === 'right') {
+      ts.textAlign = TextAlignMode.TAM_TOP_RIGHT
+    }
+    if (_hTextAlign === 'left') {
+      ts.textAlign = TextAlignMode.TAM_TOP_LEFT
+    }
 
     // ts.outlineColor = Color3.Yellow();
     // ts.outlineWidth = 1;
