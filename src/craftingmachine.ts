@@ -546,7 +546,7 @@ export class CraftingMachine {
         if (DclUser.activeUser.level >= recipe.levelMin) {
           // show green
           if (this.levelMinTxt !== null) {
-            TextShape.getMutable(this.levelMinTxt_entity).textColor =  Color4.fromHexString('#33FF33') 
+            TextShape.getMutable(this.levelMinTxt_entity).textColor = Color4.fromHexString('#33FF33')
           }
         } else {
           // show red
