@@ -22,30 +22,29 @@ export class UserInfo {
   public level: number = 0
   public xp: number = 0
 
-  public levelXpLow: number | undefined
-  public levelXpHigh: number | undefined
+  public levelXpLow: number | null = null
+  public levelXpHigh: number | null = null
 
   public wearables: string[] = []
 
-  public heldItem:
-    | ItemInfo
-    // ItemInstanceId of the selected pickaxe
-    // public heldItemId:string;
-    // ItemInstanceId of the selected pickaxe
-    // public heldItemId:string;
-    // ItemInstanceId of the selected pickaxe
-    // public heldItemId:string;
-    // ItemInstanceId of the selected pickaxe
-    // public heldItemId:string;
-    // ItemInstanceId of the selected pickaxe
-    // public heldItemId:string;
-    // ItemInstanceId of the selected pickaxe
-    // public heldItemId:string;
-    // ItemInstanceId of the selected pickaxe
-    // public heldItemId:string;
-    // ItemInstanceId of the selected pickaxe
-    // public heldItemId:string;
-    | undefined
+  public heldItem: ItemInfo | null = null
+  // ItemInstanceId of the selected pickaxe
+  // public heldItemId:string;
+  // ItemInstanceId of the selected pickaxe
+  // public heldItemId:string;
+  // ItemInstanceId of the selected pickaxe
+  // public heldItemId:string;
+  // ItemInstanceId of the selected pickaxe
+  // public heldItemId:string;
+  // ItemInstanceId of the selected pickaxe
+  // public heldItemId:string;
+  // ItemInstanceId of the selected pickaxe
+  // public heldItemId:string;
+  // ItemInstanceId of the selected pickaxe
+  // public heldItemId:string;
+  // ItemInstanceId of the selected pickaxe
+  // public heldItemId:string;
+
   // ItemInstanceId of the selected pickaxe
   // public heldItemId:string;
   // ItemInstanceId of the selected pickaxe
@@ -131,7 +130,9 @@ export class UserInfo {
     this.itemBonus = this.getItemBonus()
 
     if (toolChanged) {
-      Eventful.instance.fireEvent(new ChangeToolEvent(this.heldItem, updateServer))
+      if (this.heldItem != null) {
+        Eventful.instance.fireEvent(new ChangeToolEvent(this.heldItem, updateServer))
+      }
     }
   }
 

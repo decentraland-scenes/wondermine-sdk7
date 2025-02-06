@@ -1,4 +1,4 @@
-import { engine, type Entity, TextAlignMode, TextShape, Transform } from '@dcl/sdk/ecs'
+import { engine, type Entity, type PBTextShape, TextAlignMode, TextShape, Transform } from '@dcl/sdk/ecs'
 import { Vector3, Color3, Color4, Quaternion } from '@dcl/sdk/math'
 import { ColorPlane } from './colorplane'
 import { SpritePlane } from './spriteplane'
@@ -12,8 +12,8 @@ export class ItemAmountPanel {
   public bgPlane: ColorPlane
   public icon: SpritePlane
   public textEntity: Entity
-  public textField: string = ''
-
+  public textField: PBTextShape = { text: '' }
+  public ent: Entity = engine.addEntity()
   public enabledColor: Color3
   public enabledHexColor: string = '#449955'
   public disabledColor: Color3
@@ -65,7 +65,7 @@ export class ItemAmountPanel {
       _frameNum,
       Vector3.create(_pos.x - 0.09, _pos.y, _pos.z - 0.02),
       Vector3.create(iconScale, iconScale, 0.1),
-      Vector3.create(0, 0, -90)
+      Vector3.create(0, 0, 0)
     )
     Transform.getMutable(this.icon.entity).parent = _parent
 
@@ -82,11 +82,11 @@ export class ItemAmountPanel {
 
   addTextField(_fontSize: number, _pos: Vector3, _parent: Entity): Entity {
     // create text shape
-    const ent: Entity = engine.addEntity()
-    TextShape.create(ent, {
-      text: this.textField,
+
+    TextShape.create(this.ent, {
+      text: this.textField.text,
       textColor: Color4.White(),
-      fontSize: _fontSize,
+      fontSize: _fontSize - 0.4,
       width: 80,
       height: 40,
       textAlign: TextAlignMode.TAM_TOP_LEFT,
@@ -95,13 +95,13 @@ export class ItemAmountPanel {
 
     // log("created textShape");
     // ts.fontWeight = "bold";
-    Transform.create(ent, {
+    Transform.create(this.ent, {
       position: _pos,
       scale: Vector3.create(1, 1, 1),
       rotation: Quaternion.fromEulerDegrees(0, 0, 0),
       parent: _parent
     })
-    return ent
+    return this.ent
   }
 
   show(_frameNum: number, _value: number, _numOwned: number = 0): void {
@@ -134,7 +134,8 @@ export class ItemAmountPanel {
 
   clear(_clearFrameNum: number = 0): void {
     this.disable()
-    this.textField = ''
+    TextShape.getMutable(this.ent).text = ''
+    this.textField.text = ''
     this.hideIcon(_clearFrameNum)
   }
 

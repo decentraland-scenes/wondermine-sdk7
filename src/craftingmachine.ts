@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import {
   Animator,
   engine,
   type Entity,
   InputAction,
   inputSystem,
+  MeshCollider,
   type PBTextShape,
   PointerEvents,
   PointerEventType,
@@ -22,6 +24,11 @@ import { SoundManager } from '../shared-dcl/src/sound/soundmanager'
 import { openExternalUrl } from '~system/RestrictedActions'
 import { GameData } from './gamedata'
 import { ColorPlane } from './ui/colorplane'
+import { DclUser } from 'shared-dcl/src/playfab/dcluser'
+import { type ItemInfo } from 'shared-dcl/src/playfab/iteminfo'
+import * as utils from '@dcl-sdk/utils'
+import { CraftItemEvent, Eventful } from './events'
+import { type LootItem } from './wondermine/lootitem'
 
 export type MachineData = {
   filename: string
@@ -55,13 +62,13 @@ export class CraftingMachine {
   public nextButton: Entity = engine.addEntity()
   public linkButton: Entity = engine.addEntity()
   public greenLever: Entity = engine.addEntity()
+  public greenLever_collider: Entity = engine.addEntity()
 
   public idleClip: string = ''
   public craftingClip: string = 'machine'
 
   public screenEntity: Entity = engine.addEntity()
 
-  public nameTextEntity: Entity = engine.addEntity()
   public nameTxt: PBTextShape | null = null
   public descTxt: PBTextShape | null = null
   public idTxt: PBTextShape | null = null
@@ -86,6 +93,16 @@ export class CraftingMachine {
   public wearablesState: WearablesState = WearablesState.Inactive
   public timer: number = 0
 
+  public onCraftingCompleteCallback: ((lootEnt: LootItem) => void) | undefined
+
+  public nameTxt_entity = engine.addEntity()
+  public descTxt_entity = engine.addEntity()
+  public levelMinTxt_entity = engine.addEntity()
+  public readyTxt_entity = engine.addEntity()
+  public youNeed_entity = engine.addEntity()
+  public toMake_entity = engine.addEntity()
+  public idTxt_entity = engine.addEntity()
+
   // public onCraftingCompleteCallback: (lootEnt:LootItem) => void;
   constructor(_selectorData: SelectorData, _machineData: MachineData, _arrowButtonData: Data, _leverData: Data) {
     this.entity = engine.addEntity()
@@ -109,7 +126,7 @@ export class CraftingMachine {
       ]
     })
     // add sounds
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     SoundManager.attachSoundFile(this.machineModelEntity, 'CraftingMachine', som.scene.crafter.soundFile)
     // the platform rotates all by itself, to stay flat
     this.selectorModelEntity = this.loadModel(_selectorData, [0, 0, 0], [0, 0, 0])
@@ -148,8 +165,12 @@ export class CraftingMachine {
     })
 
     this.greenLever = this.loadModel(_leverData, [-0.1, 0.01, -2.7], [0, 18, 0])
-    Transform.getOrCreateMutable(this.greenLever).parent = this.entity
-    PointerEvents.createOrReplace(this.greenLever, {
+    Transform.getMutable(this.greenLever).parent = this.entity
+    Transform.create(this.greenLever_collider, Transform.get(this.greenLever))
+    Transform.getMutable(this.greenLever_collider).position = Vector3.create(-0.6, 0.8, -1.3)
+    Transform.getMutable(this.greenLever_collider).scale = Vector3.create(0.3, 0.2, 0.4)
+    MeshCollider.setBox(this.greenLever_collider)
+    PointerEvents.createOrReplace(this.greenLever_collider, {
       pointerEvents: [
         {
           eventType: PointerEventType.PET_DOWN,
@@ -186,7 +207,7 @@ export class CraftingMachine {
       if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.nextButton)) {
         this.nextRecipe()
       }
-      if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.greenLever)) {
+      if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.greenLever_collider)) {
         this.startCrafting(this.recipeIndex)
         this.enableCrafting(false)
       }
@@ -194,12 +215,11 @@ export class CraftingMachine {
         void openExternalUrl({ url: 'https://wondermine.wonderzone.io/claimItem' })
       }
     })
-    // engine.removeEntity(this.greenLever);
-
+    Transform.getMutable(this.greenLever).scale = Vector3.create(0, 0, 0)
+    Transform.getMutable(this.greenLever_collider).scale = Vector3.create(0, 0, 0)
     // 2DO: store filePrefix centrally
     this.textureFile = this.filePrefix + som.ui.resourceIcons.atlasFile
     this.loadScreen()
-
     // this.setupStateMachine();
   }
 
@@ -241,37 +261,38 @@ export class CraftingMachine {
     Transform.getMutable(colorPlane1.entity).parent = this.screenEntity
 
     // recipe name
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     let obj: UiTextData = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.name)
-    this.nameTxt = this.addTextField(obj, this.screenEntity)
+
+    this.nameTxt = this.addTextField(obj, this.screenEntity, this.nameTxt_entity)
 
     // recipe description
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.desc)
-    this.descTxt = this.addTextField(obj, this.screenEntity, false)
+    this.descTxt = this.addTextField(obj, this.screenEntity, this.descTxt_entity, false)
 
     // recipe id
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.id)
-    this.idTxt = this.addTextField(obj, this.screenEntity)
+    this.idTxt = this.addTextField(obj, this.screenEntity, this.idTxt_entity)
 
     // level minimum
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.levelMin)
-    this.levelMinTxt = this.addTextField(obj, this.screenEntity)
+    this.levelMinTxt = this.addTextField(obj, this.screenEntity, this.levelMinTxt_entity)
 
     // instructions
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.youNeed)
-    const youNeed = this.addTextField(obj, this.screenEntity)
+    const youNeed = this.addTextField(obj, this.screenEntity, this.youNeed_entity)
     youNeed.text = 'YOU NEED'
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.toMake)
-    const toMake = this.addTextField(obj, this.screenEntity)
+    const toMake = this.addTextField(obj, this.screenEntity, this.toMake_entity)
     toMake.text = 'TO MAKE'
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+
     obj = ProjectLoader.instance.populate(new UiTextData(), som.ui.crafterScreen.textField.ready)
-    this.readyTxt = this.addTextField(obj, this.screenEntity)
+    this.readyTxt = this.addTextField(obj, this.screenEntity, this.readyTxt_entity)
 
     // item to create
     this.iconSprite = new SpritePlane(
@@ -279,9 +300,9 @@ export class CraftingMachine {
       8,
       8,
       ItemIcons.Empty,
-      Vector3.create(0.4, -0.3, -0.05),
-      Vector3.create(0.5, 0.5, 0.5),
-      Vector3.create(0, 0, -90)
+      Vector3.create(0.5, -0.3, -0.05),
+      Vector3.create(0.46, 0.46, 0.46),
+      Vector3.create(0, 0, 0)
     )
     Transform.getMutable(this.iconSprite.entity).parent = this.screenEntity
 
@@ -403,10 +424,9 @@ export class CraftingMachine {
     this.showInstructions()
   }
 
-  addTextField(_data: UiTextData, _parent: Entity, _wrap: boolean = false): PBTextShape {
-    const ent = engine.addEntity()
-    TextShape.create(ent).text = ''
-    const ts: PBTextShape = TextShape.getMutable(ent)
+  addTextField(_data: UiTextData, _parent: Entity, entity: Entity, _wrap: boolean = false): PBTextShape {
+    TextShape.create(entity).text = ''
+    const ts: PBTextShape = TextShape.getMutable(entity)
     if (_data.fontSize != null && _data.fontSize >= 1) {
       ts.fontSize = _data.fontSize
     }
@@ -419,11 +439,12 @@ export class CraftingMachine {
     ts.textAlign = TextAlignMode.TAM_TOP_CENTER
     ts.textWrapping = _wrap
     if (_data.pos != null) {
-      Transform.create(ent, {
+      Transform.create(entity, {
         position: Vector3.create(..._data.pos),
         scale: Vector3.create(0.25, 0.25, 0.25),
         parent: _parent
       })
+      Transform.getMutable(entity).position.z = -0.01
     }
     return ts
   }
@@ -461,7 +482,99 @@ export class CraftingMachine {
     }
   }
 
-  showRecipe(recipeNum: number): void {}
+  showRecipe(recipeNum: number): void {
+    this.pageIndex = recipeNum + 1
+    const recipe: Recipe | null = GameData.getRecipeNum(recipeNum)
+
+    if (recipe != null) {
+      // show the details: title, description
+      this.showName(recipe.name)
+      this.showDesc(recipe.desc)
+
+      // show ingredient icons and values
+      let hasAll: boolean = this.showIngredients(recipe.consumes)
+      const wearCount: number = GameData.getWearableCount(recipe.wi)
+      if (recipe.limitOne) {
+        // log("LIMIT ONE RECIPE. itemId:", recipe.itemId);
+        console.log('Player items:', DclUser.activeUser.limitOneItems)
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+        if (DclUser.activeUser.hasAlreadyCrafted(recipe.itemId)) {
+          // TODO add an indicator when someone has already crafted it
+          hasAll = false
+          console.log('PLAYER ALREADY CRAFTED ', recipe.itemId)
+        }
+      }
+      console.log('itemId: ' + recipe.itemId + ', isActive: ' + recipe.isActive)
+      // 2DO: Clean this up - for wearables only
+      if (recipe.itemClass === 'wearable') {
+        if (recipe.isActive) {
+          // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+          if (DclUser.weLive || DclUser.activeUser.isT) {
+            // testers can try to craft experimental stuff
+            this.showId(wearCount + ' AVAILABLE')
+            if (wearCount <= 0 || this.wearablesState !== WearablesState.Active) {
+              hasAll = false
+            }
+          } else {
+            hasAll = false
+            this.showId('INACTIVE')
+          }
+        } else {
+          // log("isActive", recipe.isActive);
+          hasAll = false
+          this.showId('0 AVAILABLE')
+        }
+      } else if (recipe.itemClass === 'pickaxe') {
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+        if (recipe.isActive || DclUser.activeUser.isT) {
+          if (recipe.limitOne) {
+            this.showId('LIMITED')
+          } else {
+            this.showId('UNLIMITED')
+          }
+        } else {
+          hasAll = false
+          this.showId('INACTIVE')
+        }
+      } else {
+        this.showId('UNLIMITED')
+      }
+
+      // check player level
+      if (recipe.levelMin != null && recipe.levelMin > 1) {
+        // show level requirement
+        if (DclUser.activeUser.level >= recipe.levelMin) {
+          // show green
+          if (this.levelMinTxt !== null) {
+            TextShape.getMutable(this.levelMinTxt_entity).textColor = Color4.fromHexString('#33FF33')
+          }
+        } else {
+          // show red
+          if (this.levelMinTxt !== null) {
+            TextShape.getMutable(this.levelMinTxt_entity).textColor = Color4.fromHexString('#FF6600')
+          }
+          hasAll = false
+        }
+        if (this.levelMinTxt !== null) {
+          TextShape.getMutable(this.levelMinTxt_entity).text = 'MIN LEVEL: ' + recipe.levelMin
+        }
+      } else {
+        if (this.levelMinTxt !== null) {
+          TextShape.getMutable(this.levelMinTxt_entity).text = ''
+        }
+      }
+
+      // show the item to be crafted
+      const iconNum: number = ItemIcons[recipe.itemId as keyof typeof ItemIcons]
+      // log("iconNum=" + iconNum);
+      if (this.iconSprite !== null) {
+        this.iconSprite.changeFrame(iconNum)
+      }
+
+      console.log('hasAll', hasAll)
+      this.enableCrafting(hasAll)
+    }
+  }
 
   clearRecipe(): void {
     if (this.iconSprite != null) {
@@ -477,7 +590,7 @@ export class CraftingMachine {
       tile.showText('')
     }
     if (this.levelMinTxt != null) {
-      this.levelMinTxt.text = ''
+      TextShape.getMutable(this.levelMinTxt_entity).text = ''
     }
   }
 
@@ -507,6 +620,7 @@ export class CraftingMachine {
     // clear the ingredients
     this.clearRecipe()
     if (this.readyTxt != null) {
+      TextShape.getMutable(this.readyTxt_entity).textColor = Color4.fromHexString('#DDDDDD') // "#22BB44"
       this.readyTxt.textColor = Color4.fromHexString('#DDDDDD') // "#22BB44"
     }
     this.setCooldownStatus()
@@ -514,27 +628,93 @@ export class CraftingMachine {
 
   showName(msg: string): void {
     if (this.nameTxt != null) {
+      TextShape.getMutable(this.nameTxt_entity).text = msg
       this.nameTxt.text = msg
     }
   }
 
   showDesc(msg: string): void {
     if (this.descTxt != null) {
+      TextShape.getMutable(this.descTxt_entity).text = msg
       this.descTxt.text = msg
     }
   }
 
   showId(msg: string): void {
     if (this.idTxt != null) {
+      TextShape.getMutable(this.idTxt_entity).text = msg
       this.idTxt.text = msg
+      console.log('check', TextShape.get(this.idTxt_entity).text, this.idTxt.text)
     }
   }
 
-  showIngredients(consumes: CraftMaterial[]): void {}
+  showIngredients(consumes: CraftMaterial[]): boolean {
+    // console.log(DclUser.activeUser.inventoryArray);
+    let hasAll: boolean = true
+    let tile: ItemAmountPanel
+    let item: CraftMaterial
+    let invItem: ItemInfo | null
+    for (var i: number = 0; i < this.ingredientPanels.length; i++) {
+      tile = this.ingredientPanels[i]
+      try {
+        if (i < consumes.length) {
+          // there is a recipe item for this
+          item = consumes[i]
+          invItem = DclUser.activeUser.getItem(item.itemId)
+
+          let qtyOwned: number = 0
+          if (item.itemId === 'WC') {
+            qtyOwned = DclUser.activeUser.coins
+          } else if (item.itemId === 'WG') {
+            qtyOwned = DclUser.activeUser.gems
+          } else if (invItem != null) {
+            qtyOwned = invItem.RemainingUses
+          }
+          // console.log("got itemId: " + item.itemId + ", code: " + ItemIcons[item.itemId] + ", uses: " + qtyOwned); //
+          // console.log(invItem);
+          tile.show(ItemIcons[item.itemId as keyof typeof ItemIcons] ?? ItemIcons.Empty, item.qty, qtyOwned)
+          if (qtyOwned < item.qty) {
+            hasAll = false
+          }
+        } else {
+          // this panel will be blank
+          tile.clear(ItemIcons.Empty)
+        }
+      } catch {
+        tile.clear(ItemIcons.Empty)
+        tile.showText('?')
+      }
+    }
+    return hasAll
+  }
 
   // --- COOLDOWN ---
 
-  setCooldownStatus(): void {}
+  setCooldownStatus(): void {
+    // console.log("temp=", (DclUser.activeUser && DclUser.activeUser.isT));
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions, @typescript-eslint/prefer-optional-chain
+    if (DclUser.weLive || (DclUser.activeUser && DclUser.activeUser.isT)) {
+      const cooldownRemaining: number = DclUser.cooldownSeconds()
+      console.log('cooldown=', cooldownRemaining)
+      if (cooldownRemaining === 0) {
+        this.wearablesState = WearablesState.Active
+        this.showWearStatus('Active')
+        console.log('cooldown=active')
+      } else if (cooldownRemaining < 0) {
+        // -1 error condition
+        this.wearablesState = WearablesState.Inactive
+        this.showWearStatus('Inactive')
+      } else {
+        this.wearablesState = WearablesState.Cooldown
+        this.showCooldownTime(cooldownRemaining)
+        if (this.timer == null) {
+          this.startCooldownTimer()
+        }
+      }
+    } else {
+      this.showWearStatus('Inactive')
+    }
+  }
 
   showCooldownTime(millis: number): void {
     // log("millis=" + millis);
@@ -554,19 +734,105 @@ export class CraftingMachine {
 
   showWearStatus(status: string): void {
     if (this.readyTxt != null) {
-      this.readyTxt.text = 'Wearables: ' + status
+      TextShape.getMutable(this.readyTxt_entity).text = 'Wearables: ' + status
+      // this.readyTxt.text = 'Wearables: ' + status
     }
   }
 
-  startCooldownTimer(): void {}
+  startCooldownTimer(): void {
+    this.timer = utils.timers.setInterval(() => {
+      const millis: number = DclUser.cooldownSeconds()
+      if (millis > 0) {
+        // in cooldown period
+        this.showCooldownTime(millis)
+      } else {
+        this.stopCooldownTimer()
+      }
+    }, 1000)
+  }
 
-  stopCooldownTimer(): void {}
+  stopCooldownTimer(): void {
+    utils.timers.clearInterval(this.timer)
+    this.timer = 0
+    this.setCooldownStatus()
+  }
 
-  enableCrafting(onOrOff: boolean = true): void {}
+  enableCrafting(onOrOff: boolean = true): void {
+    if (onOrOff) {
+      if (this.arrowSprite !== null) {
+        this.arrowSprite.changeFrame(ItemIcons.ArrowGreen)
+      }
+      if (this.readyTxt !== null) {
+        TextShape.getMutable(this.readyTxt_entity).textColor = Color4.fromHexString('#22BB44')
+        TextShape.getMutable(this.readyTxt_entity).text = 'READY! Push the lever to craft your item >>>'
+        this.readyTxt.textColor = Color4.fromHexString('#22BB44')
+        this.readyTxt.text = 'READY! Push the lever to craft your item >>>'
+      }
+      Transform.getMutable(this.greenLever).scale = Vector3.create(1, 1, 1)
+      Transform.getMutable(this.greenLever_collider).scale = Vector3.create(0.3, 0.2, 0.4)
+      // this.greenLever = engine.addEntity()
+      // make the lever green
+    } else {
+      if (this.arrowSprite !== null) {
+        this.arrowSprite.changeFrame(ItemIcons.ArrowGray)
+      }
+      if (this.readyTxt !== null) {
+        this.readyTxt.text = ''
+        TextShape.getMutable(this.readyTxt_entity).text = ''
+      }
+      // remove lever highlight
+      Transform.getMutable(this.greenLever).scale = Vector3.create(0, 0, 0)
+      Transform.getMutable(this.greenLever_collider).scale = Vector3.create(0, 0, 0)
+    }
+  }
 
-  startCrafting(recipeNum: number): void {}
+  startCrafting(recipeNum: number): void {
+    this.craftedRecipe = GameData.getRecipeNum(recipeNum)
+    this.isBusy = true
+    this.enableCrafting(false)
+    // make the server call
+    if (this.craftedRecipe != null) {
+      Eventful.instance.fireEvent(
+        new CraftItemEvent(this.craftedRecipe.id, this.craftedRecipe.wi, this.craftedRecipe.itemClass)
+      )
+    }
+    // GameManager.instance.craftItem(this.craftedRecipe.id, this.craftedRecipe.wi);
+  }
 
-  animateMachine(): void {}
+  animateMachine(itemEnt: LootItem, isRepair: boolean = false): void {
+    console.log('animateMachine()')
+    Animator.getClip(this.machineModelEntity, this.craftingClip).playing = false
+    Animator.playSingleAnimation(this.machineModelEntity, this.craftingClip)
 
-  showCraftedItem(): void {}
+    SoundManager.playOnce(this.machineModelEntity, 0.8)
+
+    // after a delay, show the item
+    utils.timers.setTimeout(() => {
+      this.showCraftedItem(itemEnt)
+      if (isRepair) {
+        // GameUi.instance.showTimedMessage("Your pickaxe is fixed!", 7000);
+      }
+    }, 7200)
+  }
+
+  showCraftedItem(itemEnt: LootItem): void {
+    console.log('CRAFTED ' + itemEnt.instanceData?.itemId + '!')
+
+    if (itemEnt?.instanceData != null) {
+      // Obtener la posición actual del objeto
+      const pos = Transform.get(this.entity).position
+
+      // Sumar los valores (-2.5, 0.2, -2.5) y reasignar a pos
+      const newPos = Vector3.add(pos, Vector3.create(-2.5, 0.2, -2.5))
+
+      // Mostrar el objeto en la nueva posición
+      itemEnt.showAt(newPos)
+    }
+
+    this.reset()
+
+    if (this.onCraftingCompleteCallback != null) {
+      this.onCraftingCompleteCallback(itemEnt)
+    }
+  }
 }
