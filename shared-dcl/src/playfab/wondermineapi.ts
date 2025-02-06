@@ -66,13 +66,13 @@ export class WondermineApi extends PlayFabApi {
       const req2 = {
         DisplayName: avatarName /* this.savedUserName */
       }
-      const formattedReq2 = {
-        Body: req2
-      }
+      // const formattedReq2 = {
+      //   Body: req2
+      // }
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const responseJson2 = await super.SendAsyncRequest(
         '/Client/UpdateUserTitleDisplayName',
-        formattedReq2,
+        req2,
         null,
         AuthType.Session
       )
@@ -99,12 +99,12 @@ export class WondermineApi extends PlayFabApi {
           Type: 'title_player_account'
         }
       }
-      const formattedReq1 = {
-        Body: req1
-      }
+      // const formattedReq1 = {
+      //   Body: req1
+      // }
 
       // Obtener los objetos
-      const responseJson = await super.SendAsyncRequest('/Object/GetObjects', formattedReq1, null, AuthType.Entity)
+      const responseJson = await super.SendAsyncRequest('/Object/GetObjects', req1, null, AuthType.Entity)
 
       // Verificar que 'data' y 'Objects' existen
       const resp = responseJson.data?.Objects
@@ -135,11 +135,11 @@ export class WondermineApi extends PlayFabApi {
           },
           Objects: [obj]
         }
-        const formattedReq2 = {
-          Body: req2
-        }
+        // const formattedReq2 = {
+        //   Body: req2
+        // }
 
-        await super.SendAsyncRequest('/Object/SetObjects', formattedReq2, null, AuthType.Entity)
+        await super.SendAsyncRequest('/Object/SetObjects', req2, null, AuthType.Entity)
       } else {
         console.log('No Objects found in response')
       }
@@ -156,12 +156,12 @@ export class WondermineApi extends PlayFabApi {
           Type: 'title_player_account'
         }
       }
-      const formattedReq1 = {
-        Body: req1
-      }
+      // const formattedReq1 = {
+      //   Body: req1
+      // }
 
       // Obtener los objetos
-      const responseJson = await super.SendAsyncRequest('/Object/GetObjects', formattedReq1, null, AuthType.Entity)
+      const responseJson = await super.SendAsyncRequest('/Object/GetObjects', req1, null, AuthType.Entity)
 
       // Verificar que 'data' y 'Objects' existen
       const resp = responseJson.data?.Objects
@@ -194,11 +194,11 @@ export class WondermineApi extends PlayFabApi {
           },
           Objects: [obj]
         }
-        const formattedReq2 = {
-          Body: req2
-        }
+        // const formattedReq2 = {
+        //   Body: req2
+        // }
 
-        await super.SendAsyncRequest('/Object/SetObjects', formattedReq2, null, AuthType.Entity)
+        await super.SendAsyncRequest('/Object/SetObjects', req2, null, AuthType.Entity)
       } else {
         console.log('No Objects found in response')
       }
@@ -214,16 +214,11 @@ export class WondermineApi extends PlayFabApi {
     const req = {
       StatisticNames: statisticNames
     }
-    const formattedReq = {
-      Body: req
-    }
+    // const formattedReq = {
+    //   Body: req
+    // }
 
-    const responseJson = await super.SendAsyncRequest(
-      '/Client/GetPlayerStatistics',
-      formattedReq,
-      null,
-      AuthType.Session
-    )
+    const responseJson = await super.SendAsyncRequest('/Client/GetPlayerStatistics', req, null, AuthType.Session)
     // log(responseJson);
     return responseJson
   }
@@ -243,17 +238,12 @@ export class WondermineApi extends PlayFabApi {
       Statistics: [highScoreStat]
     }
     // log(req);
-    const formattedReq = {
-      Body: req
-    }
+    // const formattedReq = {
+    //   Body: req
+    // }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const responseJson = await super.SendAsyncRequest(
-      '/Client/UpdatePlayerStatistics',
-      formattedReq,
-      null,
-      AuthType.Session
-    )
+    const responseJson = await super.SendAsyncRequest('/Client/UpdatePlayerStatistics', req, null, AuthType.Session)
     // log(responseJson);
   }
 
@@ -267,10 +257,10 @@ export class WondermineApi extends PlayFabApi {
       StartPosition: startPosition,
       MaxResultsCount: count
     }
-    const formattedReq = {
-      Body: req
-    }
-    const responseJson = await super.SendAsyncRequest('/Client/GetLeaderboard', formattedReq, null, AuthType.Session)
+    // const formattedReq = {
+    //   Body: req
+    // }
+    const responseJson = await super.SendAsyncRequest('/Client/GetLeaderboard', req, null, AuthType.Session)
     // log(responseJson);
     return responseJson
   }
@@ -285,11 +275,11 @@ export class WondermineApi extends PlayFabApi {
       PlayFabId: playFabId
     }
 
-    const formattedReq = {
-      Body: req
-    }
+    // const formattedReq = {
+    //   Body: req
+    // }
 
-    const responseJson = await super.SendAsyncRequest('/Client/GetUserInventory', formattedReq, null, AuthType.Session)
+    const responseJson = await super.SendAsyncRequest('/Client/GetUserInventory', req, null, AuthType.Session)
     console.log('getPlayerInventory: ', responseJson)
 
     // Verificar si 'data' está presente en la respuesta
@@ -335,16 +325,11 @@ export class WondermineApi extends PlayFabApi {
       InfoRequestParameters: params,
       PlayFabId: playFabId
     }
-    const formattedReq = {
-      Body: req
-    }
+    // const formattedReq = {
+    //   Body: req
+    // }
 
-    const responseJson = await super.SendAsyncRequest(
-      '/Client/GetPlayerCombinedInfo',
-      formattedReq,
-      null,
-      AuthType.Session
-    )
+    const responseJson = await super.SendAsyncRequest('/Client/GetPlayerCombinedInfo', req, null, AuthType.Session)
     // log(responseJson);
 
     // Verificar si 'data' está presente en la respuesta
@@ -502,10 +487,10 @@ export class WondermineApi extends PlayFabApi {
     }
 
     console.log(req)
-    const formattedReq = {
-      Body: req
-    }
-    const responseJson = await super.SendAsyncRequest('/Client/GetStoreItems', formattedReq, callback, AuthType.Session)
+    // const formattedReq = {
+    //   Body: req
+    // }
+    const responseJson = await super.SendAsyncRequest('/Client/GetStoreItems', req, callback, AuthType.Session)
 
     console.log(responseJson)
 
