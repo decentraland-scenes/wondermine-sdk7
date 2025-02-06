@@ -86,7 +86,7 @@ export class ItemAmountPanel {
     TextShape.create(ent, {
       text: this.textField,
       textColor: Color4.White(),
-      fontSize: _fontSize,
+      fontSize: _fontSize - 0.4,
       width: 80,
       height: 40,
       textAlign: TextAlignMode.TAM_TOP_LEFT,
