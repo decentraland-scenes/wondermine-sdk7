@@ -5,6 +5,7 @@ import {
   type Entity,
   InputAction,
   inputSystem,
+  MeshCollider,
   type PBTextShape,
   PointerEvents,
   PointerEventType,
@@ -61,6 +62,7 @@ export class CraftingMachine {
   public nextButton: Entity = engine.addEntity()
   public linkButton: Entity = engine.addEntity()
   public greenLever: Entity = engine.addEntity()
+  public greenLever_collider: Entity = engine.addEntity()
 
   public idleClip: string = ''
   public craftingClip: string = 'machine'
@@ -163,8 +165,12 @@ export class CraftingMachine {
     })
 
     this.greenLever = this.loadModel(_leverData, [-0.1, 0.01, -2.7], [0, 18, 0])
-    Transform.getOrCreateMutable(this.greenLever).parent = this.entity
-    PointerEvents.createOrReplace(this.greenLever, {
+    Transform.getMutable(this.greenLever).parent = this.entity
+    Transform.create(this.greenLever_collider, Transform.get(this.greenLever))
+    Transform.getMutable(this.greenLever_collider).position = Vector3.create(-0.6, 0.8, -1.3)
+    Transform.getMutable(this.greenLever_collider).scale = Vector3.create(0.3, 0.2, 0.4)
+    MeshCollider.setBox(this.greenLever_collider)
+    PointerEvents.createOrReplace(this.greenLever_collider, {
       pointerEvents: [
         {
           eventType: PointerEventType.PET_DOWN,
@@ -201,7 +207,7 @@ export class CraftingMachine {
       if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.nextButton)) {
         this.nextRecipe()
       }
-      if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.greenLever)) {
+      if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.greenLever_collider)) {
         this.startCrafting(this.recipeIndex)
         this.enableCrafting(false)
       }
@@ -209,8 +215,8 @@ export class CraftingMachine {
         void openExternalUrl({ url: 'https://wondermine.wonderzone.io/claimItem' })
       }
     })
-    engine.removeEntity(this.greenLever)
-
+    Transform.getMutable(this.greenLever).scale = Vector3.create(0, 0, 0)
+    Transform.getMutable(this.greenLever_collider).scale = Vector3.create(0, 0, 0)
     // 2DO: store filePrefix centrally
     this.textureFile = this.filePrefix + som.ui.resourceIcons.atlasFile
     this.loadScreen()
@@ -638,7 +644,7 @@ export class CraftingMachine {
     if (this.idTxt != null) {
       TextShape.getMutable(this.idTxt_entity).text = msg
       this.idTxt.text = msg
-      console.log('check',TextShape.get(this.idTxt_entity).text, this.idTxt.text)
+      console.log('check', TextShape.get(this.idTxt_entity).text, this.idTxt.text)
     }
   }
 
@@ -762,7 +768,9 @@ export class CraftingMachine {
         this.readyTxt.textColor = Color4.fromHexString('#22BB44')
         this.readyTxt.text = 'READY! Push the lever to craft your item >>>'
       }
-      this.greenLever = engine.addEntity()
+      Transform.getMutable(this.greenLever).scale = Vector3.create(1, 1, 1)
+      Transform.getMutable(this.greenLever_collider).scale = Vector3.create(0.3, 0.2, 0.4)
+      // this.greenLever = engine.addEntity()
       // make the lever green
     } else {
       if (this.arrowSprite !== null) {
@@ -773,9 +781,8 @@ export class CraftingMachine {
         TextShape.getMutable(this.readyTxt_entity).text = ''
       }
       // remove lever highlight
-      if (engine.getEntityState(this.greenLever) !== null) {
-        engine.removeEntity(this.greenLever)
-      }
+      Transform.getMutable(this.greenLever).scale = Vector3.create(0, 0, 0)
+      Transform.getMutable(this.greenLever_collider).scale = Vector3.create(0, 0, 0)
     }
   }
 

@@ -65,7 +65,7 @@ export class ItemAmountPanel {
       _frameNum,
       Vector3.create(_pos.x - 0.09, _pos.y, _pos.z - 0.02),
       Vector3.create(iconScale, iconScale, 0.1),
-      Vector3.create(0, 0, -90)
+      Vector3.create(0, 0, 0)
     )
     Transform.getMutable(this.icon.entity).parent = _parent
 
