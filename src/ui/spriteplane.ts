@@ -9,7 +9,6 @@ export class SpritePlane {
   public static cache: object = {} // simple object-based texture dictionary
 
   public entity = engine.addEntity()
-  // public shape: PlaneShape;
   // public material: Material;
   public fileName: string = ''
   public framesX: number = 0
@@ -124,5 +123,6 @@ export class SpritePlane {
   changeFrame(_frameNum: number): void {
     this.frameNum = _frameNum
     this.uvs = this.getUVs(_frameNum, this.framesX, this.framesY)
+    MeshRenderer.setPlane(this.entity, this.uvs)
   }
 }

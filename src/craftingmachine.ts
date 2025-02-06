@@ -296,7 +296,7 @@ export class CraftingMachine {
       ItemIcons.Empty,
       Vector3.create(0.4, -0.3, -0.05),
       Vector3.create(0.5, 0.5, 0.5),
-      Vector3.create(0, 0, -90)
+      Vector3.create(0, 0, 0)
     )
     Transform.getMutable(this.iconSprite.entity).parent = this.screenEntity
 
