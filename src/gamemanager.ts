@@ -12,6 +12,7 @@ import { Vector3 } from '@dcl/sdk/math'
 import { Eventful, CraftItemEvent, BenchmarkEvent } from './events'
 import { svr } from './svr'
 import { type EventManager } from './eventManager'
+import { Leaderboard } from './leaderboard'
 
 export class GameManager {
   static instance: GameManager | null = null
@@ -29,6 +30,7 @@ export class GameManager {
   private readonly enableShared: boolean = true
   public shop: CoinShop | null = null
   public machine: CraftingMachine | null = null
+  private board: Leaderboard | null = null
   constructor(titleId: string) {
     this.api = new WondermineApi(titleId)
   }
@@ -62,6 +64,7 @@ export class GameManager {
     this.loadScenery()
     this.loadShop()
     this.loadCrafting()
+    this.loadLeaderboard()
   }
 
   loadScenery(): void {
@@ -162,7 +165,9 @@ export class GameManager {
       })
       console.log(json, ' :Store Items')
       // Load the leaderboard stats
-      // this.board.loadDefaultBoard();
+      if (this.board != null) {
+        this.board.loadDefaultBoard()
+      }
 
       // log("Getting combined data...");
       await this.api?.GetPlayerCombinedInfoAsync(DclUser.playfabId)
@@ -270,5 +275,14 @@ export class GameManager {
         this.machine.refreshRecipe()
       }
     })
+  }
+
+  // --- LEADERBOARD ---
+
+  loadLeaderboard(): void {
+    if (this.api != null) {
+      const leaderboard: Leaderboard = new Leaderboard(som.scene.leaderboard, this.api, null)
+      this.board = leaderboard
+    }
   }
 }
