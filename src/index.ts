@@ -3,6 +3,7 @@ import { DclUser } from '../shared-dcl/src/playfab/dcluser'
 import { GameManager } from './gamemanager'
 import { som } from './som'
 import { svr } from './svr'
+import { UIController } from './ui/uicontroller'
 
 export async function main(): Promise<void> {
   /**
@@ -14,6 +15,8 @@ export async function main(): Promise<void> {
   console.log('HERE', response)
   const gameManager = new GameManager(svr.t)
   void gameManager.init()
+  const uiController = new UIController()
+  uiController.init()
   await gameManager.getCurrentUser()
   if (response.data != null) {
     if (response.data.publicKey != null) {
