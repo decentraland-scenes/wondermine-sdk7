@@ -45,7 +45,7 @@ export class UIContainerStack {
               positionType: 'relative',
               width: this._width,
               height: this._height,
-              alignItems: this._vAlign
+              alignItems: this._vAlign  
             }}
             uiBackground={{
                 textureMode: 'stretch',
