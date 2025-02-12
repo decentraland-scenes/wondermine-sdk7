@@ -3,6 +3,7 @@ import { DclUser } from '../shared-dcl/src/playfab/dcluser'
 import { GameManager } from './gamemanager'
 import { som } from './som'
 import { svr } from './svr'
+import { UIController } from './ui/controller/uicontroller'
 
 export async function main(): Promise<void> {
   /**
@@ -20,5 +21,7 @@ export async function main(): Promise<void> {
       DclUser.setUserInfo(response.data.userId, response.data.displayName, response.data.publicKey)
     }
   }
+  const uicontroller = new UIController()
+  uicontroller.init()
 }
 // function getUserData(Request: any): Promise<Response>
