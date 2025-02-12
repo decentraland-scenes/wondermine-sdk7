@@ -16,10 +16,8 @@ export class GameUi implements IGameUi {
     this.closeAlert = () => {}
     this.closePopup = () => {}
     this.getInstance = () => this
-    this.setLevel = (_level: number, _xp: number) => {}
     this.showAlert = (_type: PopupWindowType) => {}
     this.showBalances = (_coins: number, _gems: number) => {}
-    this.showInventoryPopup = () => {}
     this.showBonus = () => {}
     this.showTimedMessage = (_text: string, _millis?: number) => {}
     this.updateInventory = () => {}
@@ -28,7 +26,7 @@ export class GameUi implements IGameUi {
 
   static create(): GameUi {
     if (GameUi.instance == null) {
-      GameUi.instance = new GameUi()
+      GameUi.instance = new GameUi() 
     }
     return GameUi.instance
   }
@@ -42,15 +40,27 @@ export class GameUi implements IGameUi {
     )
   }
 
+  showInventoryPopup(): void {
+    this.bottomBarPanel.toggleInventory()
+  }
+
+  setLevel(level:number, xp:number):void
+  {
+      this.bottomBarPanel.setLevel(level, xp);
+  }
+
+  showLevel(level:number, pct:number):void
+  {
+      this.bottomBarPanel.showLevel(level, pct);
+  }
+
   init: () => void
   changeAxeIcon: (ItemInfo: any) => void
   closeAlert: () => void
   closePopup: () => void
   getInstance: () => IGameUi
-  setLevel: (level: number, xp: number) => void
   showAlert: (_type: PopupWindowType) => void
   showBalances: (coins: number, gems: number) => void
-  showInventoryPopup: () => void
   showBonus: () => void
   showTimedMessage: (_text: string, _millis?: number) => void
   updateInventory: () => void

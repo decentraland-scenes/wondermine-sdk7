@@ -13,6 +13,7 @@ import { DclUser } from 'shared-dcl/src/playfab/dcluser'
 import { type ItemInfo } from 'shared-dcl/src/playfab/iteminfo'
 import { Eventful, ShowErrorEvent, ChangeToolEvent } from 'src/events'
 import { type IGameUi } from './igameui'
+import { GameData } from 'src/gamedata'
 
 /**
  * A UI layer with a bottom bar display and inventory popup menu
@@ -20,6 +21,8 @@ import { type IGameUi } from './igameui'
 export class UiBottomBarPanel {
   public parentUi: IGameUi
   mainPanel_visible: boolean = false
+  public progressValue: number = 0
+  public progBar_positionX: number = 0
   barLeft: number[] = []
   barCenter: number[] = []
   barRight: number[] = []
@@ -29,9 +32,14 @@ export class UiBottomBarPanel {
   coinIcon: number[] = []
   gemIcon: number[] = []
   inventoryBtn: number[] = []
+  progBarBg: number[] = []
+  progBar: number[] = []
+  levelCircle: number[] = []
+  inventoryBg: number[] = []
   coinsTxt: string = ''
   gemsTxt: string = ''
   toolTxt: string = 'Crescent Lava Pickaxe #333\nRemaining: 400'
+  levelTxt: string = '1'
   public isToolTxtVisible: boolean = false
   inventoryPopup_visible: boolean = false
   constructor(ui: IGameUi) {
@@ -43,6 +51,8 @@ export class UiBottomBarPanel {
     this.addBottomBar()
     this.addDisplayRow()
     this.showBalances(0, 0)
+    this.addInventoryPopup()
+    this.toggleInventory()
   }
 
   addBottomBar(): void {
@@ -54,6 +64,10 @@ export class UiBottomBarPanel {
     this.toolBtn = getUvs(som.ui.bottomBarPanel.image.toolBtn, { x: 1024, y: 1024 })
   }
 
+  showToolText(showIt: boolean): void {
+    this.isToolTxtVisible = showIt
+  }
+
   addDisplayRow(): void {
     this.coinIcon = getUvs(som.ui.resourceIcons.image.WC, { x: 1024, y: 1024 })
     this.gemIcon = getUvs(som.ui.resourceIcons.image.WG, { x: 1024, y: 1024 })
@@ -61,7 +75,71 @@ export class UiBottomBarPanel {
     this.addLevelBar()
   }
 
-  addLevelBar(): void {}
+  addLevelBar(): void {
+    this.progBarBg = getUvs(som.ui.bottomBarPanel.image.progBarBg, { x: 1024, y: 1024 })
+    this.progBar = getUvs(som.ui.bottomBarPanel.image.progBar, { x: 1024, y: 1024 })
+    this.levelCircle = getUvs(som.ui.bottomBarPanel.image.levelCircle, { x: 1024, y: 1024 })
+  }
+
+  setLevel(currentLevel: number, xp: number): void {
+    // log("setLevel(" + currentLevel + ", " + xp + ")");
+    const levelIdx = currentLevel - 1
+
+    const xpStart = GameData.thresholds[levelIdx]
+    const xpEnd = GameData.thresholds[levelIdx + 1]
+    const xpRange = Math.max(1, xpEnd - xpStart)
+    const xpProgress = Math.max(0, xp - xpStart)
+
+    // log("xpStart=" + xpStart + ", xpEnd=" + xpEnd);
+    this.showLevel(currentLevel, xpProgress / xpRange)
+  }
+
+  showLevel(level: number, pct: number): void {
+    // log("showLevel(" + level + ", " + pct + ")");
+    // change progress by moving the prog bar x value
+    // scaling did not work
+    // range is 0% =-72, 100% = -36
+    if (pct < 0) pct = 0
+    if (pct > 1) pct = 1
+    this.progressValue = pct
+
+    const xOffset = Math.floor(pct * 36)
+    const newX = xOffset - 72
+    this.progBar_positionX = newX
+
+    this.levelTxt = level.toString()
+  }
+
+  addInventoryPopup(): void {
+    this.inventoryBg = getUvs(som.ui.bottomBarPanel.image.inventoryBg, { x: 1024, y: 1024 })
+  }
+
+  showBalances(coins: number, gems: number): void {
+    this.coinsTxt = coins.toString()
+    this.gemsTxt = gems.toString()
+  }
+
+  hide(): void {
+    if (this.mainPanel_visible == null) return
+    this.mainPanel_visible = false
+  }
+
+  show(): void {
+    if (this.mainPanel_visible == null) return
+    this.mainPanel_visible = true
+  }
+
+  toggleInventory(): void {
+    // this.isInventoryShown = !this.isInventoryShown;
+    if (!this.inventoryPopup_visible) {
+      this.updateInventory()
+    }
+    this.inventoryPopup_visible = !this.inventoryPopup_visible
+  }
+
+  updateInventory(): void {
+    console.log('updateInventory()')
+  }
 
   renderUI(): ReactEcs.JSX.Element {
     const canvasInfo = UiCanvasInformation.get(engine.RootEntity)
@@ -267,6 +345,7 @@ export class UiBottomBarPanel {
         {/* Bar Right */}
         <UiEntity
           uiTransform={{
+            flexDirection: 'row',
             positionType: 'relative',
             width: som.ui.bottomBarPanel.image.barRight.width,
             height: som.ui.bottomBarPanel.image.barRight.height
@@ -291,43 +370,68 @@ export class UiBottomBarPanel {
               texture: { src: 'assets/models/textures/new_ui_1024.png' }
             }}
             onMouseDown={() => {
-              // this.parentUi.showInventoryPopup();
-              this.toggleInventory()
+              this.parentUi.showInventoryPopup()
             }}
           />
+          {/* Progress Bar BG */}
+          <UiEntity
+            uiTransform={{
+              position: { bottom: '20%', right: '10%' },
+              positionType: 'absolute',
+              width: som.ui.bottomBarPanel.image.progBarBg.width,
+              height: som.ui.bottomBarPanel.image.progBarBg.height
+            }}
+            uiBackground={{
+              textureMode: 'stretch',
+              uvs: this.progBarBg,
+              texture: { src: 'assets/models/textures/new_ui_1024.png' }
+            }}
+          >
+            {/* Progress Bar */}
+            <UiEntity
+              uiTransform={{
+                position: { top: '22%', left: '7%' },
+                positionType: 'absolute',
+                width: som.ui.bottomBarPanel.image.progBar.width,
+                height: som.ui.bottomBarPanel.image.progBar.height
+              }}
+              uiBackground={{
+                textureMode: 'stretch',
+                uvs: this.progBar,
+                texture: { src: 'assets/models/textures/new_ui_1024.png' }
+              }}
+            />
+          </UiEntity>
+          {/* Level Circle */}
+          <UiEntity
+            uiTransform={{
+              position: { bottom: '5%', left: '40%' },
+              positionType: 'absolute',
+              width: som.ui.bottomBarPanel.image.levelCircle.width,
+              height: som.ui.bottomBarPanel.image.levelCircle.height
+            }}
+            uiBackground={{
+              textureMode: 'stretch',
+              uvs: this.levelCircle,
+              texture: { src: 'assets/models/textures/new_ui_1024.png' }
+            }}
+          >
+            <Label
+              uiTransform={{
+                position: { top: '10%', left: '8%' },
+                positionType: 'absolute',
+                width: som.ui.bottomBarPanel.textField.levelTxt.width,
+                height: som.ui.bottomBarPanel.textField.levelTxt.height
+              }}
+              value={`<b>${this.levelTxt}</b>`}
+              fontSize={som.ui.bottomBarPanel.textField.levelTxt.fontSize}
+              textAlign="middle-center"
+              font="sans-serif"
+              color={Color4.fromHexString(som.ui.bottomBarPanel.textField.levelTxt.hexColor)}
+            />
+          </UiEntity>
         </UiEntity>
       </UiEntity>
     )
-  }
-
-  showBalances(coins: number, gems: number): void {
-    this.coinsTxt = coins.toString()
-    this.gemsTxt = gems.toString()
-  }
-
-  showToolText(showIt: boolean): void {
-    this.isToolTxtVisible = showIt
-  }
-
-  hide(): void {
-    if (this.mainPanel_visible == null) return
-    this.mainPanel_visible = false
-  }
-
-  show(): void {
-    if (this.mainPanel_visible == null) return
-    this.mainPanel_visible = true
-  }
-
-  toggleInventory(): void {
-    // this.isInventoryShown = !this.isInventoryShown;
-    if (!this.inventoryPopup_visible) {
-      this.updateInventory()
-    }
-    this.inventoryPopup_visible = !this.inventoryPopup_visible
-  }
-
-  updateInventory(): void {
-    console.log('updateInventory()')
   }
 }
