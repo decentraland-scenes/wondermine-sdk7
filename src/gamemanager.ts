@@ -13,6 +13,7 @@ import { Eventful, CraftItemEvent, BenchmarkEvent } from './events'
 import { svr } from './svr'
 import { type EventManager } from './eventManager'
 import { Leaderboard } from './leaderboard'
+import { GameUi } from './ui/gameui'
 
 export class GameManager {
   static instance: GameManager | null = null
@@ -50,8 +51,10 @@ export class GameManager {
     // TimerSystem.createAndAddToEngine()
     this.loader = new ProjectLoader()
 
-    // let ui:GameUi = GameUi.create();
-    // GameUi.instance.init();
+    const ui: GameUi = GameUi.create()
+    if (GameUi.instance != null) {
+      GameUi.instance.init()
+    }
 
     // this.setUpMeteors();
     // this.setUpPickaxes();

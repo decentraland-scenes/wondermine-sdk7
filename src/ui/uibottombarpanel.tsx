@@ -12,11 +12,13 @@ import { Color4 } from '@dcl/sdk/math'
 import { DclUser } from 'shared-dcl/src/playfab/dcluser'
 import { type ItemInfo } from 'shared-dcl/src/playfab/iteminfo'
 import { Eventful, ShowErrorEvent, ChangeToolEvent } from 'src/events'
+import { type IGameUi } from './igameui'
 
 /**
  * A UI layer with a bottom bar display and inventory popup menu
  */
 export class UiBottomBarPanel {
+  public parentUi: IGameUi
   mainPanel_visible: boolean = false
   barLeft: number[] = []
   barCenter: number[] = []
@@ -32,7 +34,8 @@ export class UiBottomBarPanel {
   toolTxt: string = 'Crescent Lava Pickaxe #333\nRemaining: 400'
   public isToolTxtVisible: boolean = false
   inventoryPopup_visible: boolean = false
-  constructor() {
+  constructor(ui: IGameUi) {
+    this.parentUi = ui
     this.init()
   }
 
