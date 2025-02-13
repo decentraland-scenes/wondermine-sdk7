@@ -26,7 +26,7 @@ export class GameUi implements IGameUi {
 
   static create(): GameUi {
     if (GameUi.instance == null) {
-      GameUi.instance = new GameUi() 
+      GameUi.instance = new GameUi()
     }
     return GameUi.instance
   }
@@ -44,14 +44,17 @@ export class GameUi implements IGameUi {
     this.bottomBarPanel.toggleInventory()
   }
 
-  setLevel(level:number, xp:number):void
-  {
-      this.bottomBarPanel.setLevel(level, xp);
+  setLevel(level: number, xp: number): void {
+    this.bottomBarPanel.setLevel(level, xp)
   }
 
-  showLevel(level:number, pct:number):void
-  {
-      this.bottomBarPanel.showLevel(level, pct);
+  showLevel(level: number, pct: number): void {
+    this.bottomBarPanel.showLevel(level, pct)
+  }
+
+  // --- BOTTOM BAR ---
+  showBalances(coins: number, gems: number):void {
+    this.bottomBarPanel.showBalances(coins, gems)
   }
 
   init: () => void
@@ -60,7 +63,6 @@ export class GameUi implements IGameUi {
   closePopup: () => void
   getInstance: () => IGameUi
   showAlert: (_type: PopupWindowType) => void
-  showBalances: (coins: number, gems: number) => void
   showBonus: () => void
   showTimedMessage: (_text: string, _millis?: number) => void
   updateInventory: () => void

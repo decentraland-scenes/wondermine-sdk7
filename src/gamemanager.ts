@@ -189,7 +189,7 @@ export class GameManager {
         this.api?.CallCloudScript('grantFirstTool', {}, this.onGrantFirstToolComplete, false)
       }
 
-      // 2DO: Why don't Cloudscript Azure Functions work from Javascript? 
+      // 2DO: Why don't Cloudscript Azure Functions work from Javascript?
       // await this.api.GetCraftingRecipes();
       if (GameUi.instance != null) {
         GameUi.instance.showBalances(DclUser.activeUser.coins, DclUser.activeUser.gems)
@@ -276,8 +276,11 @@ export class GameManager {
           }, 5000)
         }
       }
-      // GameUi.instance.showBalances(DclUser.activeUser.coins, DclUser.activeUser.gems)
-      // GameUi.instance.updateInventory()
+      if (GameUi.instance != null) {
+        GameUi.instance.showBalances(DclUser.activeUser.coins, DclUser.activeUser.gems)
+        GameUi.instance.updateInventory()
+      }
+
       if (this.machine != null) {
         this.machine.refreshRecipe()
       }

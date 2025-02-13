@@ -40,6 +40,7 @@ export class UiBottomBarPanel {
   gemsTxt: string = ''
   toolTxt: string = 'Crescent Lava Pickaxe #333\nRemaining: 400'
   levelTxt: string = '1'
+  iconImages: Record<string, number[]> = {}
   public isToolTxtVisible: boolean = false
   inventoryPopup_visible: boolean = false
   constructor(ui: IGameUi) {
@@ -112,6 +113,22 @@ export class UiBottomBarPanel {
 
   addInventoryPopup(): void {
     this.inventoryBg = getUvs(som.ui.bottomBarPanel.image.inventoryBg, { x: 1024, y: 1024 })
+    this.iconImages.GemDiamond = getUvs(som.ui.resourceIcons.image.GemDiamond, { x: 1024, y: 1024 })
+    this.iconImages.GemRuby = getUvs(som.ui.resourceIcons.image.GemRuby, { x: 1024, y: 1024 })
+    this.iconImages.GemEmerald = getUvs(som.ui.resourceIcons.image.GemEmerald, { x: 1024, y: 1024 })
+    this.iconImages.GemSapphire = getUvs(som.ui.resourceIcons.image.GemSapphire, { x: 1024, y: 1024 })
+    this.iconImages.AxeStone = getUvs(som.ui.resourceIcons.image.AxeStone, { x: 1024, y: 1024 })
+
+    this.iconImages.MetalPlatinum = getUvs(som.ui.resourceIcons.image.MetalPlatinum, { x: 1024, y: 1024 })
+    this.iconImages.MetalGold = getUvs(som.ui.resourceIcons.image.MetalGold, { x: 1024, y: 1024 })
+    this.iconImages.MetalTitanium = getUvs(som.ui.resourceIcons.image.MetalTitanium, { x: 1024, y: 1024 })
+    this.iconImages.MetalIron = getUvs(som.ui.resourceIcons.image.MetalIron, { x: 1024, y: 1024 })
+    this.iconImages.MetalCopper = getUvs(som.ui.resourceIcons.image.MetalCopper, { x: 1024, y: 1024 })
+
+    this.iconImages.BlueFabric = getUvs(som.ui.resourceIcons.image.BlueFabric, { x: 1024, y: 1024 })
+    this.iconImages.Glowmetal = getUvs(som.ui.resourceIcons.image.Glowmetal, { x: 1024, y: 1024 })
+    this.iconImages.WearablesToken = getUvs(som.ui.resourceIcons.image.WearablesToken, { x: 1024, y: 1024 })
+    this.iconImages.GiftBox = getUvs(som.ui.resourceIcons.image.GiftBox, { x: 1024, y: 1024 })
   }
 
   showBalances(coins: number, gems: number): void {
@@ -155,9 +172,6 @@ export class UiBottomBarPanel {
           positionType: 'absolute',
           position: { bottom: '0%', right: '0%' }
         }}
-        // uiBackground={{
-        //   color: { r: 1, g: 1, b: 1, a: 1 }
-        // }}
       >
         <UiEntity
           uiTransform={{
@@ -169,9 +183,6 @@ export class UiBottomBarPanel {
             positionType: 'relative',
             position: { top: '2%', right: '0%' }
           }}
-          // uiBackground={{
-          //   color: { r: 0, g: 100, b: 0, a: 1 }
-          // }}
         >
           {/* Inventory BG */}
           <UiEntity
@@ -181,14 +192,105 @@ export class UiBottomBarPanel {
               position: { top: '0%', right: '1%' },
               width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.inventoryBg.width) * uiScaleFactor,
               height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.inventoryBg.height) * uiScaleFactor,
-              display: this.inventoryPopup_visible ? 'flex' : 'none'
+              display: this.inventoryPopup_visible ? 'flex' : 'none',
+              justifyContent: 'space-between'
             }}
             uiBackground={{
               textureMode: 'stretch',
               uvs: this.inventoryBg,
               texture: { src: 'assets/models/textures/new_ui_1024.png' }
             }}
-          />
+          >
+            {/* Inventory - First Column */}
+            <UiEntity
+              uiTransform={{
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                width: '33%',
+                padding: '6px',
+                margin: { top: '25px', left: '5px' }
+              }}
+            >
+              {Object.entries(this.iconImages)
+                .slice(0, 5)
+                .map(([key, uvs], index) => (
+                  <UiEntity
+                    key={key}
+                    uiTransform={{
+                      width: this.getSizeAsNumber(som.ui.resourceIcons.image[key].width) * uiScaleFactor,
+                      height: this.getSizeAsNumber(som.ui.resourceIcons.image[key].height) * uiScaleFactor,
+                      margin: { bottom: '2px' }
+                    }}
+                    uiBackground={{
+                      textureMode: 'stretch',
+                      uvs,
+                      texture: { src: 'assets/models/textures/resources_atlas_1024.png' }
+                    }}
+                  />
+                ))}
+            </UiEntity>
+
+            {/* Inventory - Second Column */}
+            <UiEntity
+              uiTransform={{
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                width: '20%',
+                padding: '6px',
+                margin: { top: '25px', right: '10px' }
+              }}
+            >
+              {Object.entries(this.iconImages)
+                .slice(5, 10)
+                .map(([key, uvs], index) => (
+                  <UiEntity
+                    key={key}
+                    uiTransform={{
+                      width: this.getSizeAsNumber(som.ui.resourceIcons.image[key].width) * uiScaleFactor,
+                      height: this.getSizeAsNumber(som.ui.resourceIcons.image[key].height) * uiScaleFactor,
+                      margin: { bottom: '2px' }
+                    }}
+                    uiBackground={{
+                      textureMode: 'stretch',
+                      uvs,
+                      texture: { src: 'assets/models/textures/resources_atlas_1024.png' }
+                    }}
+                  />
+                ))}
+            </UiEntity>
+
+            {/* Inventory - Third Column */}
+            <UiEntity
+              uiTransform={{
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                width: '33%',
+                padding: '6px',
+                margin: { top: '25px', right: '40px' }
+              }}
+            >
+              {Object.entries(this.iconImages)
+                .slice(10, 14)
+                .map(([key, uvs], index) => (
+                  <UiEntity
+                    key={key}
+                    uiTransform={{
+                      width: this.getSizeAsNumber(som.ui.resourceIcons.image[key].width) * uiScaleFactor,
+                      height: this.getSizeAsNumber(som.ui.resourceIcons.image[key].height) * uiScaleFactor,
+                      margin: { bottom: '2px' }
+                    }}
+                    uiBackground={{
+                      textureMode: 'stretch',
+                      uvs,
+                      texture: { src: 'assets/models/textures/resources_atlas_1024.png' }
+                    }}
+                  />
+                ))}
+            </UiEntity>
+          </UiEntity>
         </UiEntity>
         <UiEntity
           uiTransform={{
@@ -200,9 +302,6 @@ export class UiBottomBarPanel {
             positionType: 'absolute',
             position: { bottom: '0%', right: '0%' }
           }}
-          // uiBackground={{
-          //   color: { r: 100, g: 0, b: 0, a: 1 }
-          // }}
         >
           {/* Tool Text */}
           <UiEntity
