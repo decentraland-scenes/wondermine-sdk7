@@ -143,12 +143,13 @@ export class UiBottomBarPanel {
 
   renderUI(): ReactEcs.JSX.Element {
     const canvasInfo = UiCanvasInformation.get(engine.RootEntity)
+    const uiScaleFactor = (Math.min(canvasInfo.width, canvasInfo.height) / 1080) * 1.2;
     return (
       <UiEntity
         uiTransform={{
           flexDirection: 'row',
-          width: canvasInfo.height * 0.9,
-          height: canvasInfo.height * 0.5,
+          width: canvasInfo.height * 0.9 ,
+          height: canvasInfo.height * 0.5 ,
           alignItems: 'flex-end',
           justifyContent: 'flex-end',
           positionType: 'absolute',
@@ -162,19 +163,19 @@ export class UiBottomBarPanel {
         <UiEntity
           uiTransform={{
             position: { bottom: '2%', right: '0%' },
-            width: som.ui.bottomBarPanel.textField.toolTxt.width,
-            height: som.ui.bottomBarPanel.textField.toolTxt.height,
+            width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.width) * uiScaleFactor,
+            height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.height) * uiScaleFactor,
             positionType: 'relative',
             display: this.isToolTxtVisible ? 'flex' : 'none'
           }}
         >
           <Label
             uiTransform={{
-              width: som.ui.bottomBarPanel.textField.toolTxt.width,
-              height: som.ui.bottomBarPanel.textField.toolTxt.height
+              width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.width)* uiScaleFactor,
+              height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.height)* uiScaleFactor
             }}
             value={`<b>${this.toolTxt}</b>`}
-            fontSize={som.ui.bottomBarPanel.textField.toolTxt.fontSize}
+            fontSize={this.getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.fontSize) * uiScaleFactor}
             textAlign="middle-right"
             font="sans-serif"
             color={Color4.fromHexString(som.ui.bottomBarPanel.textField.toolTxt.hexColor)}
@@ -186,8 +187,8 @@ export class UiBottomBarPanel {
             flexDirection: 'row',
             position: { top: '1%', right: '0%' },
             positionType: 'relative',
-            width: som.ui.bottomBarPanel.image.barTools.width,
-            height: som.ui.bottomBarPanel.image.barTools.height
+            width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.barTools.width)* uiScaleFactor,
+            height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.barTools.height)* uiScaleFactor
           }}
           uiBackground={{
             textureMode: 'stretch',
@@ -204,8 +205,8 @@ export class UiBottomBarPanel {
             uiTransform={{
               position: { top: '7%', left: '5%' },
               positionType: 'absolute',
-              width: som.ui.resourceIcons.image.ToolIcon.width,
-              height: som.ui.resourceIcons.image.ToolIcon.height
+              width:  this.getSizeAsNumber(som.ui.resourceIcons.image.ToolIcon.width)* uiScaleFactor,
+              height:  this.getSizeAsNumber(som.ui.resourceIcons.image.ToolIcon.height)* uiScaleFactor
             }}
             uiBackground={{
               textureMode: 'stretch',
@@ -218,8 +219,8 @@ export class UiBottomBarPanel {
             uiTransform={{
               position: { top: '0%', right: '3%' },
               positionType: 'absolute',
-              width: som.ui.bottomBarPanel.image.toolBtn.width,
-              height: som.ui.bottomBarPanel.image.toolBtn.height
+              width:  this.getSizeAsNumber(som.ui.bottomBarPanel.image.toolBtn.width)* uiScaleFactor,
+              height:  this.getSizeAsNumber(som.ui.bottomBarPanel.image.toolBtn.height)* uiScaleFactor
             }}
             uiBackground={{
               textureMode: 'stretch',
@@ -248,8 +249,8 @@ export class UiBottomBarPanel {
           uiTransform={{
             flexDirection: 'row',
             positionType: 'relative',
-            width: som.ui.bottomBarPanel.image.barLeft.width,
-            height: som.ui.bottomBarPanel.image.barLeft.height
+            width:  this.getSizeAsNumber(som.ui.bottomBarPanel.image.barLeft.width)* uiScaleFactor,
+            height:  this.getSizeAsNumber(som.ui.bottomBarPanel.image.barLeft.height)* uiScaleFactor
           }}
           uiBackground={{
             textureMode: 'stretch',
@@ -262,8 +263,8 @@ export class UiBottomBarPanel {
             uiTransform={{
               position: { bottom: '12%', left: '14%' },
               positionType: 'absolute',
-              width: som.ui.resourceIcons.image.WC.width,
-              height: som.ui.resourceIcons.image.WC.height
+              width:  this.getSizeAsNumber(som.ui.resourceIcons.image.WC.width)* uiScaleFactor,
+              height:  this.getSizeAsNumber(som.ui.resourceIcons.image.WC.height)* uiScaleFactor
             }}
             uiBackground={{
               textureMode: 'stretch',
@@ -276,17 +277,17 @@ export class UiBottomBarPanel {
             uiTransform={{
               position: { bottom: '14%', left: '43%' },
               positionType: 'absolute',
-              width: som.ui.bottomBarPanel.textField.coinsTxt.width,
-              height: som.ui.bottomBarPanel.textField.coinsTxt.height
+              width:  this.getSizeAsNumber(som.ui.bottomBarPanel.textField.coinsTxt.width)* uiScaleFactor,
+              height:  this.getSizeAsNumber(som.ui.bottomBarPanel.textField.coinsTxt.height)* uiScaleFactor
             }}
           >
             <Label
               uiTransform={{
-                width: som.ui.bottomBarPanel.textField.coinsTxt.width,
-                height: som.ui.bottomBarPanel.textField.coinsTxt.height
+                width:  this.getSizeAsNumber(som.ui.bottomBarPanel.textField.coinsTxt.width)* uiScaleFactor,
+                height:  this.getSizeAsNumber(som.ui.bottomBarPanel.textField.coinsTxt.height)* uiScaleFactor
               }}
               value={`<b>${this.coinsTxt}</b>`}
-              fontSize={som.ui.bottomBarPanel.textField.coinsTxt.fontSize}
+              fontSize={this.getSizeAsNumber(som.ui.bottomBarPanel.textField.coinsTxt.fontSize) * uiScaleFactor}
               textAlign="middle-left"
               font="sans-serif"
               color={Color4.fromHexString(som.ui.bottomBarPanel.textField.coinsTxt.hexColor)}
@@ -297,8 +298,8 @@ export class UiBottomBarPanel {
         <UiEntity
           uiTransform={{
             positionType: 'relative',
-            width: som.ui.bottomBarPanel.image.barCenter.width,
-            height: som.ui.bottomBarPanel.image.barCenter.height
+            width:  this.getSizeAsNumber(som.ui.bottomBarPanel.image.barCenter.width)* uiScaleFactor,
+            height:  this.getSizeAsNumber(som.ui.bottomBarPanel.image.barCenter.height)* uiScaleFactor
           }}
           uiBackground={{
             textureMode: 'stretch',
@@ -311,8 +312,8 @@ export class UiBottomBarPanel {
             uiTransform={{
               position: { bottom: '12%', left: '0%' },
               positionType: 'absolute',
-              width: som.ui.resourceIcons.image.WG.width,
-              height: som.ui.resourceIcons.image.WG.height
+              width: this.getSizeAsNumber(som.ui.resourceIcons.image.WG.width)* uiScaleFactor,
+              height: this.getSizeAsNumber(som.ui.resourceIcons.image.WG.height)* uiScaleFactor
             }}
             uiBackground={{
               textureMode: 'stretch',
@@ -325,17 +326,17 @@ export class UiBottomBarPanel {
             uiTransform={{
               position: { bottom: '14%', left: '35%' },
               positionType: 'absolute',
-              width: som.ui.bottomBarPanel.textField.gemsTxt.width,
-              height: som.ui.bottomBarPanel.textField.gemsTxt.height
+              width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.gemsTxt.width)* uiScaleFactor,
+              height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.gemsTxt.height)* uiScaleFactor
             }}
           >
             <Label
               uiTransform={{
-                width: som.ui.bottomBarPanel.textField.gemsTxt.width,
-                height: som.ui.bottomBarPanel.textField.gemsTxt.height
+                width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.gemsTxt.width)* uiScaleFactor,
+                height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.gemsTxt.height)* uiScaleFactor
               }}
               value={`<b>${this.gemsTxt}</b>`}
-              fontSize={som.ui.bottomBarPanel.textField.gemsTxt.fontSize}
+              fontSize={this.getSizeAsNumber(som.ui.bottomBarPanel.textField.gemsTxt.fontSize) * uiScaleFactor}
               textAlign="middle-left"
               font="sans-serif"
               color={Color4.fromHexString(som.ui.bottomBarPanel.textField.gemsTxt.hexColor)}
@@ -347,8 +348,8 @@ export class UiBottomBarPanel {
           uiTransform={{
             flexDirection: 'row',
             positionType: 'relative',
-            width: som.ui.bottomBarPanel.image.barRight.width,
-            height: som.ui.bottomBarPanel.image.barRight.height
+            width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.barRight.width)* uiScaleFactor,
+            height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.barRight.height)* uiScaleFactor
           }}
           uiBackground={{
             textureMode: 'stretch',
@@ -361,8 +362,8 @@ export class UiBottomBarPanel {
             uiTransform={{
               position: { bottom: '0%', left: '0%' },
               positionType: 'absolute',
-              width: som.ui.bottomBarPanel.image.inventoryBtn.width,
-              height: som.ui.bottomBarPanel.image.inventoryBtn.height
+              width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.inventoryBtn.width)* uiScaleFactor,
+              height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.inventoryBtn.height)* uiScaleFactor
             }}
             uiBackground={{
               textureMode: 'stretch',
@@ -378,8 +379,8 @@ export class UiBottomBarPanel {
             uiTransform={{
               position: { bottom: '20%', right: '10%' },
               positionType: 'absolute',
-              width: som.ui.bottomBarPanel.image.progBarBg.width,
-              height: som.ui.bottomBarPanel.image.progBarBg.height
+              width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.progBarBg.width)* uiScaleFactor,
+              height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.progBarBg.height)* uiScaleFactor
             }}
             uiBackground={{
               textureMode: 'stretch',
@@ -392,8 +393,8 @@ export class UiBottomBarPanel {
               uiTransform={{
                 position: { top: '22%', left: '7%' },
                 positionType: 'absolute',
-                width: som.ui.bottomBarPanel.image.progBar.width,
-                height: som.ui.bottomBarPanel.image.progBar.height
+                width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.progBar.width)* uiScaleFactor,
+                height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.progBar.height)* uiScaleFactor
               }}
               uiBackground={{
                 textureMode: 'stretch',
@@ -407,8 +408,8 @@ export class UiBottomBarPanel {
             uiTransform={{
               position: { bottom: '5%', left: '40%' },
               positionType: 'absolute',
-              width: som.ui.bottomBarPanel.image.levelCircle.width,
-              height: som.ui.bottomBarPanel.image.levelCircle.height
+              width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.levelCircle.width)* uiScaleFactor,
+              height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.levelCircle.height)* uiScaleFactor
             }}
             uiBackground={{
               textureMode: 'stretch',
@@ -420,11 +421,11 @@ export class UiBottomBarPanel {
               uiTransform={{
                 position: { top: '10%', left: '8%' },
                 positionType: 'absolute',
-                width: som.ui.bottomBarPanel.textField.levelTxt.width,
-                height: som.ui.bottomBarPanel.textField.levelTxt.height
+                width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.levelTxt.width)* uiScaleFactor,
+                height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.levelTxt.height)* uiScaleFactor
               }}
               value={`<b>${this.levelTxt}</b>`}
-              fontSize={som.ui.bottomBarPanel.textField.levelTxt.fontSize}
+              fontSize={this.getSizeAsNumber(som.ui.bottomBarPanel.textField.levelTxt.fontSize) * uiScaleFactor}
               textAlign="middle-center"
               font="sans-serif"
               color={Color4.fromHexString(som.ui.bottomBarPanel.textField.levelTxt.hexColor)}
@@ -433,5 +434,9 @@ export class UiBottomBarPanel {
         </UiEntity>
       </UiEntity>
     )
+  }
+
+  getSizeAsNumber(size: string | undefined): number {
+    return size != null ? parseInt(size, 10) : 0
   }
 }
