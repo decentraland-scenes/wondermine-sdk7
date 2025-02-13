@@ -143,293 +143,338 @@ export class UiBottomBarPanel {
 
   renderUI(): ReactEcs.JSX.Element {
     const canvasInfo = UiCanvasInformation.get(engine.RootEntity)
-    const uiScaleFactor = (Math.min(canvasInfo.width, canvasInfo.height) / 1080) * 1.2;
+    const uiScaleFactor = (Math.min(canvasInfo.width, canvasInfo.height) / 1080) * 1.2
     return (
       <UiEntity
         uiTransform={{
-          flexDirection: 'row',
-          width: canvasInfo.height * 0.9 ,
-          height: canvasInfo.height * 0.5 ,
-          alignItems: 'flex-end',
-          justifyContent: 'flex-end',
+          flexDirection: 'column',
+          width: canvasInfo.height * 0.9,
+          height: canvasInfo.height * 0.5,
+          alignItems: 'center',
+          justifyContent: 'center',
           positionType: 'absolute',
           position: { bottom: '0%', right: '0%' }
         }}
         // uiBackground={{
-        //   color: {r:1,g:1,b:1,a:1}
+        //   color: { r: 1, g: 1, b: 1, a: 1 }
         // }}
       >
-        {/* Tool Text */}
-        <UiEntity
-          uiTransform={{
-            position: { bottom: '2%', right: '0%' },
-            width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.width) * uiScaleFactor,
-            height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.height) * uiScaleFactor,
-            positionType: 'relative',
-            display: this.isToolTxtVisible ? 'flex' : 'none'
-          }}
-        >
-          <Label
-            uiTransform={{
-              width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.width)* uiScaleFactor,
-              height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.height)* uiScaleFactor
-            }}
-            value={`<b>${this.toolTxt}</b>`}
-            fontSize={this.getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.fontSize) * uiScaleFactor}
-            textAlign="middle-right"
-            font="sans-serif"
-            color={Color4.fromHexString(som.ui.bottomBarPanel.textField.toolTxt.hexColor)}
-          />
-        </UiEntity>
-        {/* Bar Tools */}
         <UiEntity
           uiTransform={{
             flexDirection: 'row',
-            position: { top: '1%', right: '0%' },
+            width: canvasInfo.height * 0.9,
+            height: canvasInfo.height * 0.34,
+            alignItems: 'flex-end',
+            justifyContent: 'flex-end',
             positionType: 'relative',
-            width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.barTools.width)* uiScaleFactor,
-            height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.barTools.height)* uiScaleFactor
+            position: { top: '2%', right: '0%' }
           }}
-          uiBackground={{
-            textureMode: 'stretch',
-            uvs: this.barTools,
-            texture: { src: 'assets/models/textures/new_ui_1024.png' }
-          }}
-          onMouseDown={() => {
-            console.log('clicked on Tools bar')
-            this.showToolText(!this.isToolTxtVisible)
-          }}
+          // uiBackground={{
+          //   color: { r: 0, g: 100, b: 0, a: 1 }
+          // }}
         >
-          {/* Tool Icon */}
+          {/* Bar Right */}
           <UiEntity
             uiTransform={{
-              position: { top: '7%', left: '5%' },
-              positionType: 'absolute',
-              width:  this.getSizeAsNumber(som.ui.resourceIcons.image.ToolIcon.width)* uiScaleFactor,
-              height:  this.getSizeAsNumber(som.ui.resourceIcons.image.ToolIcon.height)* uiScaleFactor
+              flexDirection: 'row',
+              positionType: 'relative',
+              position: { top: '0%', right: '1%' },
+              width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.inventoryBg.width) * uiScaleFactor,
+              height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.inventoryBg.height) * uiScaleFactor
             }}
             uiBackground={{
               textureMode: 'stretch',
-              uvs: this.toolIcon,
-              texture: { src: 'assets/models/textures/resources_atlas_1024.png' }
-            }}
-          />
-          {/* Tool Button */}
-          <UiEntity
-            uiTransform={{
-              position: { top: '0%', right: '3%' },
-              positionType: 'absolute',
-              width:  this.getSizeAsNumber(som.ui.bottomBarPanel.image.toolBtn.width)* uiScaleFactor,
-              height:  this.getSizeAsNumber(som.ui.bottomBarPanel.image.toolBtn.height)* uiScaleFactor
-            }}
-            uiBackground={{
-              textureMode: 'stretch',
-              uvs: this.toolBtn,
+              uvs: this.inventoryBg,
               texture: { src: 'assets/models/textures/new_ui_1024.png' }
             }}
-            onMouseDown={() => {
-              console.log('clicked on Tools button')
-
-              if (DclUser.activeUser.isAxeBusy) {
-                Eventful.instance.fireEvent(new ShowErrorEvent('Please wait until your axe is finished mining!'))
-              } else {
-                // get the next pickaxe
-                const nextTool: ItemInfo | null = DclUser.activeUser.getNextTool()
-                // DONE: only update server later when they mine with this axe?
-                this.showToolText(true)
-                if (nextTool != null) {
-                  Eventful.instance.fireEvent(new ChangeToolEvent(nextTool, false))
-                }
-              }
-            }}
           />
         </UiEntity>
-        {/* Bar Left */}
         <UiEntity
           uiTransform={{
             flexDirection: 'row',
-            positionType: 'relative',
-            width:  this.getSizeAsNumber(som.ui.bottomBarPanel.image.barLeft.width)* uiScaleFactor,
-            height:  this.getSizeAsNumber(som.ui.bottomBarPanel.image.barLeft.height)* uiScaleFactor
+            width: canvasInfo.height * 0.9,
+            height: canvasInfo.height * 0.08,
+            alignItems: 'flex-end',
+            justifyContent: 'flex-end',
+            positionType: 'absolute',
+            position: { bottom: '0%', right: '0%' }
           }}
-          uiBackground={{
-            textureMode: 'stretch',
-            uvs: this.barLeft,
-            texture: { src: 'assets/models/textures/new_ui_1024.png' }
-          }}
+          // uiBackground={{
+          //   color: { r: 100, g: 0, b: 0, a: 1 }
+          // }}
         >
-          {/* Coin Icon */}
+          {/* Tool Text */}
           <UiEntity
             uiTransform={{
-              position: { bottom: '12%', left: '14%' },
-              positionType: 'absolute',
-              width:  this.getSizeAsNumber(som.ui.resourceIcons.image.WC.width)* uiScaleFactor,
-              height:  this.getSizeAsNumber(som.ui.resourceIcons.image.WC.height)* uiScaleFactor
-            }}
-            uiBackground={{
-              textureMode: 'stretch',
-              uvs: this.coinIcon,
-              texture: { src: 'assets/models/textures/resources_atlas_1024.png' }
-            }}
-          />
-          {/* Coin Text */}
-          <UiEntity
-            uiTransform={{
-              position: { bottom: '14%', left: '43%' },
-              positionType: 'absolute',
-              width:  this.getSizeAsNumber(som.ui.bottomBarPanel.textField.coinsTxt.width)* uiScaleFactor,
-              height:  this.getSizeAsNumber(som.ui.bottomBarPanel.textField.coinsTxt.height)* uiScaleFactor
+              position: { bottom: '10%', right: '0%' },
+              width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.width) * uiScaleFactor,
+              height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.height) * uiScaleFactor,
+              positionType: 'relative',
+              display: this.isToolTxtVisible ? 'flex' : 'none'
             }}
           >
             <Label
               uiTransform={{
-                width:  this.getSizeAsNumber(som.ui.bottomBarPanel.textField.coinsTxt.width)* uiScaleFactor,
-                height:  this.getSizeAsNumber(som.ui.bottomBarPanel.textField.coinsTxt.height)* uiScaleFactor
+                width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.width) * uiScaleFactor,
+                height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.height) * uiScaleFactor
               }}
-              value={`<b>${this.coinsTxt}</b>`}
-              fontSize={this.getSizeAsNumber(som.ui.bottomBarPanel.textField.coinsTxt.fontSize) * uiScaleFactor}
-              textAlign="middle-left"
+              value={`<b>${this.toolTxt}</b>`}
+              fontSize={this.getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.fontSize) * uiScaleFactor}
+              textAlign="middle-right"
               font="sans-serif"
-              color={Color4.fromHexString(som.ui.bottomBarPanel.textField.coinsTxt.hexColor)}
+              color={Color4.fromHexString(som.ui.bottomBarPanel.textField.toolTxt.hexColor)}
             />
           </UiEntity>
-        </UiEntity>
-        {/* Bar Center */}
-        <UiEntity
-          uiTransform={{
-            positionType: 'relative',
-            width:  this.getSizeAsNumber(som.ui.bottomBarPanel.image.barCenter.width)* uiScaleFactor,
-            height:  this.getSizeAsNumber(som.ui.bottomBarPanel.image.barCenter.height)* uiScaleFactor
-          }}
-          uiBackground={{
-            textureMode: 'stretch',
-            uvs: this.barCenter,
-            texture: { src: 'assets/models/textures/new_ui_1024.png' }
-          }}
-        >
-          {/* Gem Icon */}
+          {/* Bar Tools */}
           <UiEntity
             uiTransform={{
-              position: { bottom: '12%', left: '0%' },
-              positionType: 'absolute',
-              width: this.getSizeAsNumber(som.ui.resourceIcons.image.WG.width)* uiScaleFactor,
-              height: this.getSizeAsNumber(som.ui.resourceIcons.image.WG.height)* uiScaleFactor
+              flexDirection: 'row',
+              position: { top: '5%', right: '0%' },
+              positionType: 'relative',
+              width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.barTools.width) * uiScaleFactor,
+              height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.barTools.height) * uiScaleFactor
             }}
             uiBackground={{
               textureMode: 'stretch',
-              uvs: this.gemIcon,
-              texture: { src: 'assets/models/textures/resources_atlas_1024.png' }
-            }}
-          />
-          {/* Gem Text */}
-          <UiEntity
-            uiTransform={{
-              position: { bottom: '14%', left: '35%' },
-              positionType: 'absolute',
-              width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.gemsTxt.width)* uiScaleFactor,
-              height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.gemsTxt.height)* uiScaleFactor
-            }}
-          >
-            <Label
-              uiTransform={{
-                width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.gemsTxt.width)* uiScaleFactor,
-                height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.gemsTxt.height)* uiScaleFactor
-              }}
-              value={`<b>${this.gemsTxt}</b>`}
-              fontSize={this.getSizeAsNumber(som.ui.bottomBarPanel.textField.gemsTxt.fontSize) * uiScaleFactor}
-              textAlign="middle-left"
-              font="sans-serif"
-              color={Color4.fromHexString(som.ui.bottomBarPanel.textField.gemsTxt.hexColor)}
-            />
-          </UiEntity>
-        </UiEntity>
-        {/* Bar Right */}
-        <UiEntity
-          uiTransform={{
-            flexDirection: 'row',
-            positionType: 'relative',
-            width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.barRight.width)* uiScaleFactor,
-            height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.barRight.height)* uiScaleFactor
-          }}
-          uiBackground={{
-            textureMode: 'stretch',
-            uvs: this.barRight,
-            texture: { src: 'assets/models/textures/new_ui_1024.png' }
-          }}
-        >
-          {/* Inventory */}
-          <UiEntity
-            uiTransform={{
-              position: { bottom: '0%', left: '0%' },
-              positionType: 'absolute',
-              width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.inventoryBtn.width)* uiScaleFactor,
-              height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.inventoryBtn.height)* uiScaleFactor
-            }}
-            uiBackground={{
-              textureMode: 'stretch',
-              uvs: this.inventoryBtn,
+              uvs: this.barTools,
               texture: { src: 'assets/models/textures/new_ui_1024.png' }
             }}
             onMouseDown={() => {
-              this.parentUi.showInventoryPopup()
-            }}
-          />
-          {/* Progress Bar BG */}
-          <UiEntity
-            uiTransform={{
-              position: { bottom: '20%', right: '10%' },
-              positionType: 'absolute',
-              width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.progBarBg.width)* uiScaleFactor,
-              height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.progBarBg.height)* uiScaleFactor
-            }}
-            uiBackground={{
-              textureMode: 'stretch',
-              uvs: this.progBarBg,
-              texture: { src: 'assets/models/textures/new_ui_1024.png' }
+              console.log('clicked on Tools bar')
+              this.showToolText(!this.isToolTxtVisible)
             }}
           >
-            {/* Progress Bar */}
+            {/* Tool Icon */}
             <UiEntity
               uiTransform={{
-                position: { top: '22%', left: '7%' },
+                position: { top: '7%', left: '5%' },
                 positionType: 'absolute',
-                width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.progBar.width)* uiScaleFactor,
-                height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.progBar.height)* uiScaleFactor
+                width: this.getSizeAsNumber(som.ui.resourceIcons.image.ToolIcon.width) * uiScaleFactor,
+                height: this.getSizeAsNumber(som.ui.resourceIcons.image.ToolIcon.height) * uiScaleFactor
               }}
               uiBackground={{
                 textureMode: 'stretch',
-                uvs: this.progBar,
+                uvs: this.toolIcon,
+                texture: { src: 'assets/models/textures/resources_atlas_1024.png' }
+              }}
+            />
+            {/* Tool Button */}
+            <UiEntity
+              uiTransform={{
+                position: { top: '0%', right: '3%' },
+                positionType: 'absolute',
+                width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.toolBtn.width) * uiScaleFactor,
+                height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.toolBtn.height) * uiScaleFactor
+              }}
+              uiBackground={{
+                textureMode: 'stretch',
+                uvs: this.toolBtn,
                 texture: { src: 'assets/models/textures/new_ui_1024.png' }
+              }}
+              onMouseDown={() => {
+                console.log('clicked on Tools button')
+
+                if (DclUser.activeUser.isAxeBusy) {
+                  Eventful.instance.fireEvent(new ShowErrorEvent('Please wait until your axe is finished mining!'))
+                } else {
+                  // get the next pickaxe
+                  const nextTool: ItemInfo | null = DclUser.activeUser.getNextTool()
+                  // DONE: only update server later when they mine with this axe?
+                  this.showToolText(true)
+                  if (nextTool != null) {
+                    Eventful.instance.fireEvent(new ChangeToolEvent(nextTool, false))
+                  }
+                }
               }}
             />
           </UiEntity>
-          {/* Level Circle */}
+          {/* Bar Left */}
           <UiEntity
             uiTransform={{
-              position: { bottom: '5%', left: '40%' },
-              positionType: 'absolute',
-              width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.levelCircle.width)* uiScaleFactor,
-              height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.levelCircle.height)* uiScaleFactor
+              flexDirection: 'row',
+              positionType: 'relative',
+              width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.barLeft.width) * uiScaleFactor,
+              height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.barLeft.height) * uiScaleFactor
             }}
             uiBackground={{
               textureMode: 'stretch',
-              uvs: this.levelCircle,
+              uvs: this.barLeft,
               texture: { src: 'assets/models/textures/new_ui_1024.png' }
             }}
           >
-            <Label
+            {/* Coin Icon */}
+            <UiEntity
               uiTransform={{
-                position: { top: '10%', left: '8%' },
+                position: { bottom: '12%', left: '14%' },
                 positionType: 'absolute',
-                width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.levelTxt.width)* uiScaleFactor,
-                height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.levelTxt.height)* uiScaleFactor
+                width: this.getSizeAsNumber(som.ui.resourceIcons.image.WC.width) * uiScaleFactor,
+                height: this.getSizeAsNumber(som.ui.resourceIcons.image.WC.height) * uiScaleFactor
               }}
-              value={`<b>${this.levelTxt}</b>`}
-              fontSize={this.getSizeAsNumber(som.ui.bottomBarPanel.textField.levelTxt.fontSize) * uiScaleFactor}
-              textAlign="middle-center"
-              font="sans-serif"
-              color={Color4.fromHexString(som.ui.bottomBarPanel.textField.levelTxt.hexColor)}
+              uiBackground={{
+                textureMode: 'stretch',
+                uvs: this.coinIcon,
+                texture: { src: 'assets/models/textures/resources_atlas_1024.png' }
+              }}
             />
+            {/* Coin Text */}
+            <UiEntity
+              uiTransform={{
+                position: { bottom: '14%', left: '43%' },
+                positionType: 'absolute',
+                width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.coinsTxt.width) * uiScaleFactor,
+                height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.coinsTxt.height) * uiScaleFactor
+              }}
+            >
+              <Label
+                uiTransform={{
+                  width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.coinsTxt.width) * uiScaleFactor,
+                  height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.coinsTxt.height) * uiScaleFactor
+                }}
+                value={`<b>${this.coinsTxt}</b>`}
+                fontSize={this.getSizeAsNumber(som.ui.bottomBarPanel.textField.coinsTxt.fontSize) * uiScaleFactor}
+                textAlign="middle-left"
+                font="sans-serif"
+                color={Color4.fromHexString(som.ui.bottomBarPanel.textField.coinsTxt.hexColor)}
+              />
+            </UiEntity>
+          </UiEntity>
+          {/* Bar Center */}
+          <UiEntity
+            uiTransform={{
+              positionType: 'relative',
+              width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.barCenter.width) * uiScaleFactor,
+              height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.barCenter.height) * uiScaleFactor
+            }}
+            uiBackground={{
+              textureMode: 'stretch',
+              uvs: this.barCenter,
+              texture: { src: 'assets/models/textures/new_ui_1024.png' }
+            }}
+          >
+            {/* Gem Icon */}
+            <UiEntity
+              uiTransform={{
+                position: { bottom: '12%', left: '0%' },
+                positionType: 'absolute',
+                width: this.getSizeAsNumber(som.ui.resourceIcons.image.WG.width) * uiScaleFactor,
+                height: this.getSizeAsNumber(som.ui.resourceIcons.image.WG.height) * uiScaleFactor
+              }}
+              uiBackground={{
+                textureMode: 'stretch',
+                uvs: this.gemIcon,
+                texture: { src: 'assets/models/textures/resources_atlas_1024.png' }
+              }}
+            />
+            {/* Gem Text */}
+            <UiEntity
+              uiTransform={{
+                position: { bottom: '14%', left: '35%' },
+                positionType: 'absolute',
+                width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.gemsTxt.width) * uiScaleFactor,
+                height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.gemsTxt.height) * uiScaleFactor
+              }}
+            >
+              <Label
+                uiTransform={{
+                  width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.gemsTxt.width) * uiScaleFactor,
+                  height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.gemsTxt.height) * uiScaleFactor
+                }}
+                value={`<b>${this.gemsTxt}</b>`}
+                fontSize={this.getSizeAsNumber(som.ui.bottomBarPanel.textField.gemsTxt.fontSize) * uiScaleFactor}
+                textAlign="middle-left"
+                font="sans-serif"
+                color={Color4.fromHexString(som.ui.bottomBarPanel.textField.gemsTxt.hexColor)}
+              />
+            </UiEntity>
+          </UiEntity>
+          {/* Bar Right */}
+          <UiEntity
+            uiTransform={{
+              flexDirection: 'row',
+              positionType: 'relative',
+              width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.barRight.width) * uiScaleFactor,
+              height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.barRight.height) * uiScaleFactor
+            }}
+            uiBackground={{
+              textureMode: 'stretch',
+              uvs: this.barRight,
+              texture: { src: 'assets/models/textures/new_ui_1024.png' }
+            }}
+          >
+            {/* Inventory */}
+            <UiEntity
+              uiTransform={{
+                position: { bottom: '0%', left: '0%' },
+                positionType: 'absolute',
+                width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.inventoryBtn.width) * uiScaleFactor,
+                height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.inventoryBtn.height) * uiScaleFactor
+              }}
+              uiBackground={{
+                textureMode: 'stretch',
+                uvs: this.inventoryBtn,
+                texture: { src: 'assets/models/textures/new_ui_1024.png' }
+              }}
+              onMouseDown={() => {
+                this.parentUi.showInventoryPopup()
+              }}
+            />
+            {/* Progress Bar BG */}
+            <UiEntity
+              uiTransform={{
+                position: { bottom: '20%', right: '10%' },
+                positionType: 'absolute',
+                width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.progBarBg.width) * uiScaleFactor,
+                height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.progBarBg.height) * uiScaleFactor
+              }}
+              uiBackground={{
+                textureMode: 'stretch',
+                uvs: this.progBarBg,
+                texture: { src: 'assets/models/textures/new_ui_1024.png' }
+              }}
+            >
+              {/* Progress Bar */}
+              <UiEntity
+                uiTransform={{
+                  position: { top: '22%', left: '7%' },
+                  positionType: 'absolute',
+                  width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.progBar.width) * uiScaleFactor,
+                  height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.progBar.height) * uiScaleFactor
+                }}
+                uiBackground={{
+                  textureMode: 'stretch',
+                  uvs: this.progBar,
+                  texture: { src: 'assets/models/textures/new_ui_1024.png' }
+                }}
+              />
+            </UiEntity>
+            {/* Level Circle */}
+            <UiEntity
+              uiTransform={{
+                position: { bottom: '5%', left: '40%' },
+                positionType: 'absolute',
+                width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.levelCircle.width) * uiScaleFactor,
+                height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.levelCircle.height) * uiScaleFactor
+              }}
+              uiBackground={{
+                textureMode: 'stretch',
+                uvs: this.levelCircle,
+                texture: { src: 'assets/models/textures/new_ui_1024.png' }
+              }}
+            >
+              <Label
+                uiTransform={{
+                  position: { top: '10%', left: '8%' },
+                  positionType: 'absolute',
+                  width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.levelTxt.width) * uiScaleFactor,
+                  height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.levelTxt.height) * uiScaleFactor
+                }}
+                value={`<b>${this.levelTxt}</b>`}
+                fontSize={this.getSizeAsNumber(som.ui.bottomBarPanel.textField.levelTxt.fontSize) * uiScaleFactor}
+                textAlign="middle-center"
+                font="sans-serif"
+                color={Color4.fromHexString(som.ui.bottomBarPanel.textField.levelTxt.hexColor)}
+              />
+            </UiEntity>
           </UiEntity>
         </UiEntity>
       </UiEntity>
