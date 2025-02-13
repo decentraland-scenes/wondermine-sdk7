@@ -1,146 +1,116 @@
+import abi from '../abis/wearableClaimer'
+import { DclUser } from '../../shared-dcl/src/playfab/dcluser'
+import * as eth from 'eth-connect'
+import { createEthereumProvider } from '@dcl/sdk/ethereum-provider'
 
-import { ContractFactory, RequestManager } from 'eth-connect';
-import * as EthereumController from "@decentraland/EthereumController";
-import { getProvider } from "@decentraland/web3-provider";
-// import {
-//     connection,
-//     ConnectionResponse
-//   } from 'decentraland-connect';
+type WearableClaimerContractInterface = {
+  remainingSupply: (collIndex: number, wearableName: string) => Promise<string>
+  canMint: (collIndex: number, wearableName: string, quantity: number) => Promise<boolean>
+  checkSender: (
+    collIndex: number,
+    wearIndex: number,
+    claimNum: number,
+    sig: string,
+    flag: boolean,
+    options: { from: string }
+  ) => Promise<boolean>
+  claim: (
+    collIndex: number,
+    wearIndex: number,
+    claimNum: number,
+    signature: string,
+    options: { from: string }
+  ) => Promise<any>
+} & eth.Contract
 
-// import { connect } from "./connector";
+export class WearableClaimerContract {
+  public address: string
+  public requestMgr?: eth.RequestManager
+  public callback?: (funcName: string, returnVal: any) => void
+  public contract?: WearableClaimerContractInterface
+  public isLoaded: boolean = false
 
-import abi from "../abis/wearableClaimer"
-import { DclUser } from "../../shared-dcl/src/playfab/dcluser";
+  constructor(contractAddress: string, callback?: (funcName: string, returnVal: any) => void) {
+    this.address = contractAddress
+    this.callback = callback
+  }
 
-export class WearableClaimerContract 
-{
-    public address:string;
-    public requestMgr:RequestManager;
-    public callback:(funcName:string, returnVal:any) => void;
+  async loadContract(): Promise<void> {
+    try {
+      const provider = createEthereumProvider()
+      this.requestMgr = new eth.RequestManager(provider)
+      const factory = new eth.ContractFactory(this.requestMgr, abi)
 
-    public contract:any;
-    public isLoaded:boolean = false;
+      this.contract = (await factory.at(this.address)) as WearableClaimerContractInterface
 
-    constructor(contractAddress:string, callback:(funcName:string, returnVal:any) => void = null)
-    {
-        this.address = contractAddress;
-        this.callback = callback;
+      this.isLoaded = true
+      this.callback?.('loadContract', this.contract.address)
+
+      console.log('WearableClaimerContract provider=', provider)
+      console.log('WearableClaimerContract contract=', this.contract)
+    } catch (error) {
+      console.error('Error loading contract:', error)
+      this.callback?.('loadContractError', error)
     }
+  }
 
-    // testConnection()
-    // {
-    //     executeTask(async () => {
+  async getItemSupply(collIndex: number, wearableName: string): Promise<number | undefined> {
+    if (this.contract == null || !this.isLoaded) return
 
-    //         // create an instance of the web3 provider to interface with Metamask
-    //         const conn = await connect()
-    //         log("CONNECTED");
-    //     });
-    // }
-
-    loadContract()
-    {
-        executeTask(async () => {
-            // create an instance of the web3 provider to interface with Metamask
-            const provider = await getProvider()
-            // Create the object that will handle the sending and receiving of RPC messages
-            this.requestMgr = new RequestManager(provider)
-            // Create a factory object based on the abi
-            const factory = new ContractFactory(this.requestMgr, abi)
-            // Use the factory object to instance a `contract` object, referencing a specific contract
-            this.contract = (await factory.at(this.address)) as any;
-
-            this.isLoaded = true;
-            if (this.callback != null)
-            {
-                this.callback("loadContract", this.contract.address);
-            }
-
-            log("WearableClaimerContract provider=", provider);
-            log("WearableClaimerContract contract=", this.contract);
-        })
-    } 
-
-    getItemSupply(collIndex:number, wearableName:string):number
-    {
-        if (this.contract == null && !this.isLoaded) return;
-
-        executeTask(async () => {
-            const res = await this.contract.remainingSupply(collIndex, wearableName);
-            if (this.callback != null)
-            {
-                this.callback("getItemSupply", parseInt(res));
-            }
-        })
+    try {
+      const res = await this.contract.remainingSupply(collIndex, wearableName)
+      const supply = parseInt(res)
+      this.callback?.('getItemSupply', supply)
+      return supply
+    } catch (error) {
+      console.error('Error getting item supply:', error)
+      this.callback?.('getItemSupplyError', error)
     }
+  }
 
-    canMint(collIndex:number, wearableName:string)
-    {
-        if (this.contract == null && !this.isLoaded) return -1;
+  async canMint(collIndex: number, wearableName: string): Promise<boolean | undefined> {
+    if (this.contract == null || !this.isLoaded) return
 
-        executeTask(async () => 
-        {
-            const res = await this.contract.canMint(collIndex, wearableName, 1);
-            if (this.callback != null)
-            {
-                this.callback("canMint", res);
-            }
-        })
+    try {
+      const res = await this.contract.canMint(collIndex, wearableName, 1)
+      this.callback?.('canMint', res)
+      return res
+    } catch (error) {
+      console.error('Error checking mint:', error)
+      this.callback?.('canMintError', error)
     }
+  }
 
-    checkSender(collIndex:number, wearIndex:number, claimNum:number, sig:string)
-    {
-        log("checkSender()");
-        if (this.contract == null && !this.isLoaded) return -1;
+  async checkSender(collIndex: number, wearIndex: number, claimNum: number, sig: string): Promise<boolean | undefined> {
+    if (this.contract == null || !this.isLoaded) return
 
-        executeTask(async () => {
-
-            const res = await this.contract.checkSender(
-                collIndex, 
-                wearIndex,
-                claimNum, 
-                sig, 
-                true,  
-                {
-                    from: DclUser.activeUser.userId
-                }
-            );
-            log("res=" + res);
-            if (this.callback != null)
-            {
-                this.callback("checkSender", res);
-            }
-        })
+    try {
+      const res = await this.contract.checkSender(collIndex, wearIndex, claimNum, sig, true, {
+        from: DclUser.activeUser.userId
+      })
+      console.log('checkSender result =', res)
+      this.callback?.('checkSender', res)
+      return res
+    } catch (error) {
+      console.error('Error in checkSender:', error)
+      this.callback?.('checkSenderError', error)
     }
+  }
 
-    claim(collIndex:number, wearIndex:number, claimNum:number, signature:string)
-    {
-        //log("test=" + this.address);
+  async claim(collIndex: number, wearIndex: number, claimNum: number, signature: string): Promise<void> {
+    if (this.contract == null || !this.isLoaded) return
 
-        executeTask(async () => {
-            log("calling claim()");
+    try {
+      console.log('Calling claim() with signature:', signature)
 
-            try
-            {
-                log("sig=" + signature);
-                const res = await this.contract.claim(
-                    collIndex,
-                    wearIndex,
-                    claimNum,
-                    signature,
-                    {
-                        from: DclUser.activeUser.userId,
-                    }
-                );
-                if (this.callback != null)
-                {
-                    this.callback("minted", res);
-                }
-            }
-            catch (error) 
-            {
-                log(error.toString());
-                this.callback("claimError", error);
-            }
-        })
+      const res = await this.contract.claim(collIndex, wearIndex, claimNum, signature, {
+        from: DclUser.activeUser.userId
+      })
+
+      this.callback?.('minted', res)
+    } catch (error) {
+      console.error('Error claiming wearable:', error)
+      this.callback?.('claimError', error)
     }
+  }
 }
