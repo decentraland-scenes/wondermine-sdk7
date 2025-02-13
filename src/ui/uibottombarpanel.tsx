@@ -22,7 +22,7 @@ export class UiBottomBarPanel {
   public parentUi: IGameUi
   mainPanel_visible: boolean = false
   public progressValue: number = 0
-  public progBar_positionX: number = 0
+  public progBar_positionX: number = -26 // equals = 0
   barLeft: number[] = []
   barCenter: number[] = []
   barRight: number[] = []
@@ -52,7 +52,6 @@ export class UiBottomBarPanel {
     this.addDisplayRow()
     this.showBalances(0, 0)
     this.addInventoryPopup()
-    this.toggleInventory()
   }
 
   addBottomBar(): void {
@@ -98,14 +97,15 @@ export class UiBottomBarPanel {
     // log("showLevel(" + level + ", " + pct + ")");
     // change progress by moving the prog bar x value
     // scaling did not work
-    // range is 0% =-72, 100% = -36
+    // range is 0% =-26, 100% = 13
     if (pct < 0) pct = 0
     if (pct > 1) pct = 1
     this.progressValue = pct
 
-    const xOffset = Math.floor(pct * 36)
-    const newX = xOffset - 72
+    const xOffset = Math.floor(pct * 13)
+    const newX = xOffset - 26
     this.progBar_positionX = newX
+    console.log('progress bar', this.progBar_positionX)
 
     this.levelTxt = level.toString()
   }
@@ -173,14 +173,15 @@ export class UiBottomBarPanel {
           //   color: { r: 0, g: 100, b: 0, a: 1 }
           // }}
         >
-          {/* Bar Right */}
+          {/* Inventory BG */}
           <UiEntity
             uiTransform={{
               flexDirection: 'row',
               positionType: 'relative',
               position: { top: '0%', right: '1%' },
               width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.inventoryBg.width) * uiScaleFactor,
-              height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.inventoryBg.height) * uiScaleFactor
+              height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.inventoryBg.height) * uiScaleFactor,
+              display: this.inventoryPopup_visible ? 'flex' : 'none'
             }}
             uiBackground={{
               textureMode: 'stretch',
@@ -435,7 +436,7 @@ export class UiBottomBarPanel {
               {/* Progress Bar */}
               <UiEntity
                 uiTransform={{
-                  position: { top: '22%', left: '7%' },
+                  position: { top: '22%', left: this.progBar_positionX },
                   positionType: 'absolute',
                   width: this.getSizeAsNumber(som.ui.bottomBarPanel.image.progBar.width) * uiScaleFactor,
                   height: this.getSizeAsNumber(som.ui.bottomBarPanel.image.progBar.height) * uiScaleFactor
