@@ -13,6 +13,11 @@ import { Eventful, CraftItemEvent, BenchmarkEvent } from './events'
 import { svr } from './svr'
 import { type EventManager } from './eventManager'
 import { Leaderboard } from './leaderboard'
+import { WearableClaimerContract } from './contracts/wearableClaimerContract'
+import { ContractManager } from './contracts/contractManager'
+import { WzNftContract } from './contracts/wzNftContract'
+import { ChainId } from './enums'
+import { getProviderPromise } from './contracts/nftChecker'
 
 export class GameManager {
   static instance: GameManager | null = null
@@ -26,14 +31,40 @@ export class GameManager {
 
   public axeJustBroke: boolean = false
   public axeUses: number = 0
-
+  public wearClaimer: WearableClaimerContract | null = null
   private readonly enableShared: boolean = true
   public shop: CoinShop | null = null
   public machine: CraftingMachine | null = null
   private board: Leaderboard | null = null
   constructor(titleId: string) {
     this.api = new WondermineApi(titleId)
+    this.checkContracts()
   }
+
+  checkContracts(): void {
+    this.wearClaimer = new WearableClaimerContract(
+      '0x276b661495720ae4EE09118C48D1D4871116083f',
+      // eslint-disable-next-line @typescript-eslint/unbound-method
+      this.onClaimerContractCalled
+    ) // 0xADdFAC1B5D735Ca684caFF1b94D523e906155938
+    void this.wearClaimer.loadContract()
+
+    executeTask(async () => {
+      const providers = await getProviderPromise()
+      console.log('providers:', providers)
+
+      const contractMgr: ContractManager = ContractManager.create()
+
+      const [mana3, rm1] = await contractMgr.getContract('mana', ChainId.MATIC_MAINNET)
+      console.log('mana3', mana3)
+      const wzClass = new WzNftContract()
+      await wzClass.loadContract()
+      const bal = await wzClass.getPlayerBalance()
+      console.log('balance of wzNfts', bal)
+    })
+  }
+
+  onClaimerContractCalled(funcName: string, returnVal: any): void {}
 
   static createAndAddToEngine(titleId: string): GameManager {
     if (this.instance == null) {
