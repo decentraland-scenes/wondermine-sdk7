@@ -13,4 +13,6 @@ export type IGameUi = {
   showBonus: () => void
   showTimedMessage: (_text: string, _millis?: number) => void
   updateInventory: () => void
+  getResourceAtlas: () => string;
+  getUiAtlas: () => string;
 }

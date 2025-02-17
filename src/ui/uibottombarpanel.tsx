@@ -18,6 +18,13 @@ import { GameData } from 'src/gamedata'
 /**
  * A UI layer with a bottom bar display and inventory popup menu
  */
+
+type IconValue = {
+  value: string
+}
+
+type MyObject = Record<string, any>
+
 export class UiBottomBarPanel {
   public parentUi: IGameUi
   mainPanel_visible: boolean = false
@@ -41,18 +48,25 @@ export class UiBottomBarPanel {
   toolTxt: string = 'Crescent Lava Pickaxe #333\nRemaining: 400'
   levelTxt: string = '1'
   iconImages: Record<string, number[]> = {}
+  iconValues: Record<string, IconValue> = {}
+  public bonusPctTxt: string = ''
   public isToolTxtVisible: boolean = false
   inventoryPopup_visible: boolean = false
+  public atlas: string = ''
+  public resourceAtlas: string = ''
   constructor(ui: IGameUi) {
     this.parentUi = ui
     this.init()
   }
 
   init(): void {
+    this.atlas = this.parentUi.getUiAtlas()
+    this.resourceAtlas = this.parentUi.getResourceAtlas()
     this.addBottomBar()
     this.addDisplayRow()
     this.showBalances(0, 0)
     this.addInventoryPopup()
+    this.toggleInventory()
   }
 
   addBottomBar(): void {
@@ -119,16 +133,41 @@ export class UiBottomBarPanel {
     this.iconImages.GemSapphire = getUvs(som.ui.resourceIcons.image.GemSapphire, { x: 1024, y: 1024 })
     this.iconImages.AxeStone = getUvs(som.ui.resourceIcons.image.AxeStone, { x: 1024, y: 1024 })
 
+    this.iconValues.GemDiamond = som.ui.bottomBarPanel.textField.invItemTxt
+    this.iconValues.GemRuby = som.ui.bottomBarPanel.textField.invItemTxt
+    this.iconValues.GemEmerald = som.ui.bottomBarPanel.textField.invItemTxt
+    this.iconValues.GemSapphire = som.ui.bottomBarPanel.textField.invItemTxt
+    this.iconValues.AxeStone = som.ui.bottomBarPanel.textField.invItemTxt
+
     this.iconImages.MetalPlatinum = getUvs(som.ui.resourceIcons.image.MetalPlatinum, { x: 1024, y: 1024 })
     this.iconImages.MetalGold = getUvs(som.ui.resourceIcons.image.MetalGold, { x: 1024, y: 1024 })
     this.iconImages.MetalTitanium = getUvs(som.ui.resourceIcons.image.MetalTitanium, { x: 1024, y: 1024 })
     this.iconImages.MetalIron = getUvs(som.ui.resourceIcons.image.MetalIron, { x: 1024, y: 1024 })
     this.iconImages.MetalCopper = getUvs(som.ui.resourceIcons.image.MetalCopper, { x: 1024, y: 1024 })
 
+    this.iconValues.MetalPlatinum = som.ui.bottomBarPanel.textField.invItemTxt
+    this.iconValues.MetalGold = som.ui.bottomBarPanel.textField.invItemTxt
+    this.iconValues.MetalTitanium = som.ui.bottomBarPanel.textField.invItemTxt
+    this.iconValues.MetalIron = som.ui.bottomBarPanel.textField.invItemTxt
+    this.iconValues.MetalCopper = som.ui.bottomBarPanel.textField.invItemTxt
+
     this.iconImages.BlueFabric = getUvs(som.ui.resourceIcons.image.BlueFabric, { x: 1024, y: 1024 })
     this.iconImages.Glowmetal = getUvs(som.ui.resourceIcons.image.Glowmetal, { x: 1024, y: 1024 })
     this.iconImages.WearablesToken = getUvs(som.ui.resourceIcons.image.WearablesToken, { x: 1024, y: 1024 })
     this.iconImages.GiftBox = getUvs(som.ui.resourceIcons.image.GiftBox, { x: 1024, y: 1024 })
+
+    this.iconValues.BlueFabric = som.ui.bottomBarPanel.textField.invItemTxt
+    this.iconValues.Glowmetal = som.ui.bottomBarPanel.textField.invItemTxt
+    this.iconValues.WearablesToken = som.ui.bottomBarPanel.textField.invItemTxt
+    this.iconValues.GiftBox = som.ui.bottomBarPanel.textField.invItemTxt
+
+    const keys = Object.keys(this.iconValues)
+    for (var i: number = 0; i < keys.length; i++) {
+      if (this.iconValues[keys[i]] != null) {
+        this.iconValues[keys[i]].value = '0'
+        console.log('icon value array', this.iconValues[keys[i]].value)
+      }
+    }
   }
 
   showBalances(coins: number, gems: number): void {
@@ -156,6 +195,87 @@ export class UiBottomBarPanel {
 
   updateInventory(): void {
     console.log('updateInventory()')
+    if (DclUser.activeUser != null) {
+      const inv: ItemInfo[] = DclUser.activeUser.inventoryArray
+      if (inv != null) {
+        let id: string
+        let item: object | null
+        let qty: number = 0
+        let hasGift: boolean = false
+        // log(inv);
+
+        // set held axe info
+        const axe: ItemInfo | null = DclUser.activeUser.getHeldItem()
+        // log("heldItem", axe);
+
+        // we show axe uses at one less, so we can stop mining when there is just 1 use remaining
+        // (otherwise PlayFab removes their axe completely)
+        if (axe != null) {
+          const axeQty = axe.RemainingUses - 1
+          this.updateAxeQty(axeQty)
+        } else {
+          this.iconValues.AxeStone.value = '1'
+        }
+        for (var i: number = 0; i < inv.length; i++) {
+          id = inv[i].ItemId
+          qty = inv[i].RemainingUses
+
+          if (inv[i].ItemClass !== 'pickaxe' && this.iconValues[id] != null) {
+            // NOTE: GiftBox can't be set Stackable in PlayFab, or else this logic will fail
+            if (id === 'GiftBox' && qty == null) {
+              // log("GiftBox qty=" + qty);
+              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+              hasGift = true
+              this.iconValues[id].value = '1'
+            } else {
+              this.iconValues[id].value = qty.toString()
+            }
+          }
+        }
+        if (!hasGift) {
+          this.iconValues.GiftBox.value = '0'
+        }
+
+        // find if any values must be set to zero (no data from server for those items)
+
+        const textFieldNames: string[] = Object.keys(this.iconValues)
+        // log(textFieldNames);
+        textFieldNames.forEach((id: string, index: number, arr: string[]) => {
+          // why can't we use find() ?
+          // inv.find((item) => item.ItemId === id)
+          const prefix: string = id.substr(0, 3)
+          if (prefix !== 'Axe' && prefix !== 'Gif') {
+            item = this.findFirst(inv, 'ItemId', id)
+            if (item == null) {
+              this.iconValues[id].value = '0'
+            }
+          }
+        }, this)
+      }
+      this.showBonus()
+    }
+  }
+
+  findFirst(objArray: MyObject[], propName: string, matchVal: string): object | null {
+    for (var i = 0; i < objArray.length; i++) {
+      if (objArray[i][propName] === matchVal) {
+        return objArray[i]
+      }
+    }
+    return null
+  }
+
+  showBonus(): void {
+    this.bonusPctTxt = 'Mining Bonus: ' + DclUser.activeUser.getTotalBonus() + '%'
+  }
+
+  updateAxeQty(qty: number): void {
+    console.log('updateAxeQty(' + qty + ')')
+    const current: string = this.toolTxt
+    const idx: number = current.lastIndexOf(':')
+
+    this.toolTxt = current.substr(0, idx + 2) + qty
+    this.iconValues.AxeStone.value = qty.toString()
   }
 
   renderUI(): ReactEcs.JSX.Element {
@@ -198,7 +318,7 @@ export class UiBottomBarPanel {
             uiBackground={{
               textureMode: 'stretch',
               uvs: this.inventoryBg,
-              texture: { src: 'assets/models/textures/new_ui_1024.png' }
+              texture: { src: this.atlas }
             }}
           >
             {/* Inventory - First Column */}
@@ -216,18 +336,44 @@ export class UiBottomBarPanel {
                 .slice(0, 5)
                 .map(([key, uvs], index) => (
                   <UiEntity
-                    key={key}
                     uiTransform={{
-                      width: this.getSizeAsNumber(som.ui.resourceIcons.image[key].width) * uiScaleFactor,
-                      height: this.getSizeAsNumber(som.ui.resourceIcons.image[key].height) * uiScaleFactor,
-                      margin: { bottom: '2px' }
+                      flexDirection: 'row',
+                      justifyContent: 'flex-start',
+                      alignItems: 'center',
+                      padding: '0px',
+                      margin: { top: '0px', left: '40px' }
                     }}
-                    uiBackground={{
-                      textureMode: 'stretch',
-                      uvs,
-                      texture: { src: 'assets/models/textures/resources_atlas_1024.png' }
-                    }}
-                  />
+                  >
+                    <UiEntity
+                      key={key}
+                      uiTransform={{
+                        width: this.getSizeAsNumber(som.ui.resourceIcons.image[key].width) * uiScaleFactor,
+                        height: this.getSizeAsNumber(som.ui.resourceIcons.image[key].height) * uiScaleFactor,
+                        margin: { bottom: '0px' }
+                      }}
+                      uiBackground={{
+                        textureMode: 'stretch',
+                        uvs,
+                        texture: { src: this.resourceAtlas }
+                      }}
+                    />
+                    {/* Label */}
+                    <UiEntity
+                      uiTransform={{
+                        width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.width) * uiScaleFactor,
+                        height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.height) * uiScaleFactor
+                      }}
+                    >
+                      <Label
+                        value={this.iconValues[key].value}
+                        fontSize={
+                          this.getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.fontSize) * uiScaleFactor
+                        }
+                        color={Color4.fromHexString(som.ui.bottomBarPanel.textField.invItemTxt.hexColor)}
+                        font="sans-serif"
+                      />
+                    </UiEntity>
+                  </UiEntity>
                 ))}
             </UiEntity>
 
@@ -246,18 +392,44 @@ export class UiBottomBarPanel {
                 .slice(5, 10)
                 .map(([key, uvs], index) => (
                   <UiEntity
-                    key={key}
                     uiTransform={{
-                      width: this.getSizeAsNumber(som.ui.resourceIcons.image[key].width) * uiScaleFactor,
-                      height: this.getSizeAsNumber(som.ui.resourceIcons.image[key].height) * uiScaleFactor,
-                      margin: { bottom: '2px' }
+                      flexDirection: 'row',
+                      justifyContent: 'flex-start',
+                      alignItems: 'center',
+                      padding: '0px',
+                      margin: { top: '0px', left: '40px' }
                     }}
-                    uiBackground={{
-                      textureMode: 'stretch',
-                      uvs,
-                      texture: { src: 'assets/models/textures/resources_atlas_1024.png' }
-                    }}
-                  />
+                  >
+                    <UiEntity
+                      key={key}
+                      uiTransform={{
+                        width: this.getSizeAsNumber(som.ui.resourceIcons.image[key].width) * uiScaleFactor,
+                        height: this.getSizeAsNumber(som.ui.resourceIcons.image[key].height) * uiScaleFactor,
+                        margin: { bottom: '0px' }
+                      }}
+                      uiBackground={{
+                        textureMode: 'stretch',
+                        uvs,
+                        texture: { src: this.resourceAtlas }
+                      }}
+                    />
+                    {/* Label */}
+                    <UiEntity
+                      uiTransform={{
+                        width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.width) * uiScaleFactor,
+                        height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.height) * uiScaleFactor
+                      }}
+                    >
+                      <Label
+                        value={this.iconValues[key].value}
+                        fontSize={
+                          this.getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.fontSize) * uiScaleFactor
+                        }
+                        color={Color4.fromHexString(som.ui.bottomBarPanel.textField.invItemTxt.hexColor)}
+                        font="sans-serif"
+                      />
+                    </UiEntity>
+                  </UiEntity>
                 ))}
             </UiEntity>
 
@@ -276,18 +448,44 @@ export class UiBottomBarPanel {
                 .slice(10, 14)
                 .map(([key, uvs], index) => (
                   <UiEntity
-                    key={key}
                     uiTransform={{
-                      width: this.getSizeAsNumber(som.ui.resourceIcons.image[key].width) * uiScaleFactor,
-                      height: this.getSizeAsNumber(som.ui.resourceIcons.image[key].height) * uiScaleFactor,
-                      margin: { bottom: '2px' }
+                      flexDirection: 'row',
+                      justifyContent: 'flex-start',
+                      alignItems: 'center',
+                      padding: '0px',
+                      margin: { top: '0px', left: '40px' }
                     }}
-                    uiBackground={{
-                      textureMode: 'stretch',
-                      uvs,
-                      texture: { src: 'assets/models/textures/resources_atlas_1024.png' }
-                    }}
-                  />
+                  >
+                    <UiEntity
+                      key={key}
+                      uiTransform={{
+                        width: this.getSizeAsNumber(som.ui.resourceIcons.image[key].width) * uiScaleFactor,
+                        height: this.getSizeAsNumber(som.ui.resourceIcons.image[key].height) * uiScaleFactor,
+                        margin: { bottom: '0px' }
+                      }}
+                      uiBackground={{
+                        textureMode: 'stretch',
+                        uvs,
+                        texture: { src: this.resourceAtlas }
+                      }}
+                    />
+                    {/* Label */}
+                    <UiEntity
+                      uiTransform={{
+                        width: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.width) * uiScaleFactor,
+                        height: this.getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.height) * uiScaleFactor
+                      }}
+                    >
+                      <Label
+                        value={this.iconValues[key].value}
+                        fontSize={
+                          this.getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.fontSize) * uiScaleFactor
+                        }
+                        color={Color4.fromHexString(som.ui.bottomBarPanel.textField.invItemTxt.hexColor)}
+                        font="sans-serif"
+                      />
+                    </UiEntity>
+                  </UiEntity>
                 ))}
             </UiEntity>
           </UiEntity>
@@ -337,7 +535,7 @@ export class UiBottomBarPanel {
             uiBackground={{
               textureMode: 'stretch',
               uvs: this.barTools,
-              texture: { src: 'assets/models/textures/new_ui_1024.png' }
+              texture: { src: this.atlas }
             }}
             onMouseDown={() => {
               console.log('clicked on Tools bar')
@@ -355,7 +553,7 @@ export class UiBottomBarPanel {
               uiBackground={{
                 textureMode: 'stretch',
                 uvs: this.toolIcon,
-                texture: { src: 'assets/models/textures/resources_atlas_1024.png' }
+                texture: { src: this.resourceAtlas }
               }}
             />
             {/* Tool Button */}
@@ -369,7 +567,7 @@ export class UiBottomBarPanel {
               uiBackground={{
                 textureMode: 'stretch',
                 uvs: this.toolBtn,
-                texture: { src: 'assets/models/textures/new_ui_1024.png' }
+                texture: { src: this.atlas }
               }}
               onMouseDown={() => {
                 console.log('clicked on Tools button')
@@ -399,7 +597,7 @@ export class UiBottomBarPanel {
             uiBackground={{
               textureMode: 'stretch',
               uvs: this.barLeft,
-              texture: { src: 'assets/models/textures/new_ui_1024.png' }
+              texture: { src: this.atlas }
             }}
           >
             {/* Coin Icon */}
@@ -413,7 +611,7 @@ export class UiBottomBarPanel {
               uiBackground={{
                 textureMode: 'stretch',
                 uvs: this.coinIcon,
-                texture: { src: 'assets/models/textures/resources_atlas_1024.png' }
+                texture: { src: this.resourceAtlas }
               }}
             />
             {/* Coin Text */}
@@ -448,7 +646,7 @@ export class UiBottomBarPanel {
             uiBackground={{
               textureMode: 'stretch',
               uvs: this.barCenter,
-              texture: { src: 'assets/models/textures/new_ui_1024.png' }
+              texture: { src: this.atlas }
             }}
           >
             {/* Gem Icon */}
@@ -462,7 +660,7 @@ export class UiBottomBarPanel {
               uiBackground={{
                 textureMode: 'stretch',
                 uvs: this.gemIcon,
-                texture: { src: 'assets/models/textures/resources_atlas_1024.png' }
+                texture: { src: this.resourceAtlas }
               }}
             />
             {/* Gem Text */}
@@ -498,7 +696,7 @@ export class UiBottomBarPanel {
             uiBackground={{
               textureMode: 'stretch',
               uvs: this.barRight,
-              texture: { src: 'assets/models/textures/new_ui_1024.png' }
+              texture: { src: this.atlas }
             }}
           >
             {/* Inventory */}
@@ -512,7 +710,7 @@ export class UiBottomBarPanel {
               uiBackground={{
                 textureMode: 'stretch',
                 uvs: this.inventoryBtn,
-                texture: { src: 'assets/models/textures/new_ui_1024.png' }
+                texture: { src: this.atlas }
               }}
               onMouseDown={() => {
                 this.parentUi.showInventoryPopup()
@@ -529,7 +727,7 @@ export class UiBottomBarPanel {
               uiBackground={{
                 textureMode: 'stretch',
                 uvs: this.progBarBg,
-                texture: { src: 'assets/models/textures/new_ui_1024.png' }
+                texture: { src: this.atlas }
               }}
             >
               {/* Progress Bar */}
@@ -543,7 +741,7 @@ export class UiBottomBarPanel {
                 uiBackground={{
                   textureMode: 'stretch',
                   uvs: this.progBar,
-                  texture: { src: 'assets/models/textures/new_ui_1024.png' }
+                  texture: { src: this.atlas }
                 }}
               />
             </UiEntity>
@@ -558,7 +756,7 @@ export class UiBottomBarPanel {
               uiBackground={{
                 textureMode: 'stretch',
                 uvs: this.levelCircle,
-                texture: { src: 'assets/models/textures/new_ui_1024.png' }
+                texture: { src: this.atlas }
               }}
             >
               <Label
