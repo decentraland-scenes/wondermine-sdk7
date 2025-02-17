@@ -94,8 +94,7 @@ export class GameUi implements IGameUi {
     this.bottomBarPanel.updateInventory()
   }
 
-  closeInventoryPopup():void
-  {
-      this.bottomBarPanel.closeInventory();
+  closeInventoryPopup(): void {
+    this.bottomBarPanel.closeInventory()
   }
 }
