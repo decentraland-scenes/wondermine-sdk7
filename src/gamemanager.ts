@@ -13,6 +13,7 @@ import { Eventful, CraftItemEvent, BenchmarkEvent } from './events'
 import { svr } from './svr'
 import { type EventManager } from './eventManager'
 import { Leaderboard } from './leaderboard'
+import { GameUi } from './ui/gameui'
 import { WearableClaimerContract } from './contracts/wearableClaimerContract'
 import { ContractManager } from './contracts/contractManager'
 import { WzNftContract } from './contracts/wzNftContract'
@@ -81,8 +82,10 @@ export class GameManager {
     // TimerSystem.createAndAddToEngine()
     this.loader = new ProjectLoader()
 
-    // let ui:GameUi = GameUi.create();
-    // GameUi.instance.init();
+    const ui: GameUi = GameUi.create()
+    if (GameUi.instance != null) {
+      GameUi.instance.init()
+    }
 
     // this.setUpMeteors();
     // this.setUpPickaxes();
@@ -219,17 +222,21 @@ export class GameManager {
 
       // 2DO: Why don't Cloudscript Azure Functions work from Javascript?
       // await this.api.GetCraftingRecipes();
+      if (GameUi.instance != null) {
+        GameUi.instance.showBalances(DclUser.activeUser.coins, DclUser.activeUser.gems)
+        GameUi.instance.setLevel(DclUser.activeUser.level, DclUser.activeUser.xp)
+      }
 
-      // GameUi.instance.showBalances(DclUser.activeUser.coins, DclUser.activeUser.gems);
-      // GameUi.instance.setLevel(DclUser.activeUser.level, DclUser.activeUser.xp);
-
-      // await this.api.CountClaimableItems();
+      if (this.api != null) {
+        await this.api.CountClaimableItems()
+      }
 
       // this.checkContracts();
 
-      // DclUser.activeUser.checkT();
-      // this.machine.setCooldownStatus();
-      // this.checkWearables();
+      DclUser.activeUser.checkT()
+      if (this.machine != null) {
+        this.machine.setCooldownStatus()
+      }
     })
   }
 
@@ -300,8 +307,11 @@ export class GameManager {
           }, 5000)
         }
       }
-      // GameUi.instance.showBalances(DclUser.activeUser.coins, DclUser.activeUser.gems)
-      // GameUi.instance.updateInventory()
+      if (GameUi.instance != null) {
+        GameUi.instance.showBalances(DclUser.activeUser.coins, DclUser.activeUser.gems)
+        GameUi.instance.updateInventory()
+      }
+
       if (this.machine != null) {
         this.machine.refreshRecipe()
       }
