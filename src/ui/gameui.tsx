@@ -5,6 +5,7 @@ import { engine, UiCanvasInformation } from '@dcl/sdk/ecs'
 import { UiBottomBarPanel } from './uibottombarpanel'
 import Canvas from './canvas/Canvas'
 import { som } from 'src/som'
+import { type ItemInfo } from 'shared-dcl/src/playfab/iteminfo'
 
 export class GameUi implements IGameUi {
   static instance: GameUi | null = null
@@ -14,7 +15,6 @@ export class GameUi implements IGameUi {
   public resourceAtlas: string | null = null
   constructor() {
     this.init = () => {}
-    this.changeAxeIcon = (_ItemInfo: any) => {}
     this.closeAlert = () => {}
     this.closePopup = () => {}
     this.getInstance = () => this
@@ -77,7 +77,12 @@ export class GameUi implements IGameUi {
   }
 
   init: () => void
-  changeAxeIcon: (ItemInfo: any) => void
+  changeAxeIcon(itemData: ItemInfo): void {
+    if (this.bottomBarPanel != null) {
+      this.bottomBarPanel.changeAxeIcon(itemData)
+    }
+  }
+
   closeAlert: () => void
   closePopup: () => void
   getInstance: () => IGameUi
@@ -87,5 +92,10 @@ export class GameUi implements IGameUi {
 
   updateInventory(): void {
     this.bottomBarPanel.updateInventory()
+  }
+
+  closeInventoryPopup():void
+  {
+      this.bottomBarPanel.closeInventory();
   }
 }

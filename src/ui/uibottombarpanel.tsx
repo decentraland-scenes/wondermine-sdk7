@@ -54,6 +54,7 @@ export class UiBottomBarPanel {
   inventoryPopup_visible: boolean = false
   public atlas: string = ''
   public resourceAtlas: string = ''
+  public axeType: string = 'AxeStone'
   constructor(ui: IGameUi) {
     this.parentUi = ui
     this.init()
@@ -175,16 +176,6 @@ export class UiBottomBarPanel {
     this.gemsTxt = gems.toString()
   }
 
-  hide(): void {
-    if (this.mainPanel_visible == null) return
-    this.mainPanel_visible = false
-  }
-
-  show(): void {
-    if (this.mainPanel_visible == null) return
-    this.mainPanel_visible = true
-  }
-
   toggleInventory(): void {
     // this.isInventoryShown = !this.isInventoryShown;
     if (!this.inventoryPopup_visible) {
@@ -269,6 +260,23 @@ export class UiBottomBarPanel {
     this.bonusPctTxt = 'Mining Bonus: ' + DclUser.activeUser.getTotalBonus() + '%'
   }
 
+  closeInventory(): void {
+    this.inventoryPopup_visible = false
+  }
+
+  changeAxeIcon(itemData: ItemInfo): void {
+    const data = som.ui.resourceIcons.image[itemData.ItemId]
+    if (data != null) {
+      this.axeType = itemData.ItemId
+      // this.parentUi.loader.populate(img, data);
+
+      // show tool text
+      const qty: number = itemData.RemainingUses - 1
+      this.toolTxt = itemData.DisplayName + '\n' + 'Remaining: ' + qty
+      this.iconValues.AxeStone.value = qty.toString()
+    }
+  }
+
   updateAxeQty(qty: number): void {
     console.log('updateAxeQty(' + qty + ')')
     const current: string = this.toolTxt
@@ -276,6 +284,16 @@ export class UiBottomBarPanel {
 
     this.toolTxt = current.substr(0, idx + 2) + qty
     this.iconValues.AxeStone.value = qty.toString()
+  }
+
+  hide(): void {
+    if (this.mainPanel_visible == null) return
+    this.mainPanel_visible = false
+  }
+
+  show(): void {
+    if (this.mainPanel_visible == null) return
+    this.mainPanel_visible = true
   }
 
   renderUI(): ReactEcs.JSX.Element {
