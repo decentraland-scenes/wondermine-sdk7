@@ -34,3 +34,7 @@ export type PanelSprite = {
   sourceWidth: number
   sourceHeight: number
 }
+
+export function getSizeAsNumber(size: string | undefined): number {
+  return size != null ? parseInt(size, 10) : 0
+}

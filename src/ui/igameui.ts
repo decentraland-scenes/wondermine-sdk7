@@ -15,4 +15,5 @@ export type IGameUi = {
   updateInventory: () => void
   getResourceAtlas: () => string
   getUiAtlas: () => string
+  updateImageFromAtlas: (img: string, data: number[][]) => void
 }
