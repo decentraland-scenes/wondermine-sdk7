@@ -17,8 +17,9 @@ import { GameUi } from './ui/gameui'
 import { WearableClaimerContract } from './contracts/wearableClaimerContract'
 import { ContractManager } from './contracts/contractManager'
 import { WzNftContract } from './contracts/wzNftContract'
-import { ChainId } from './enums'
+import { ChainId, type PopupWindowType } from './enums'
 import { getProviderPromise } from './contracts/nftChecker'
+import { PopupQueue } from './ui/popupqueue'
 
 export class GameManager {
   static instance: GameManager | null = null
@@ -37,6 +38,7 @@ export class GameManager {
   public shop: CoinShop | null = null
   public machine: CraftingMachine | null = null
   private board: Leaderboard | null = null
+  public popupQueue: PopupQueue | null = null
   constructor(titleId: string) {
     this.api = new WondermineApi(titleId)
     this.checkContracts()
@@ -324,6 +326,26 @@ export class GameManager {
     if (this.api != null) {
       const leaderboard: Leaderboard = new Leaderboard(som.scene.leaderboard, this.api, null)
       this.board = leaderboard
+    }
+  }
+
+  // --- POPUPS ---
+
+  queuePopup(
+    _type: PopupWindowType,
+    _msg: string = '',
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    _rewards: Object[] | null = null,
+    _itemId: string | null = null,
+    _millis: number = 8000
+  ): void {
+    if (this.popupQueue == null) {
+      this.popupQueue = new PopupQueue()
+    }
+
+    // add will try to show the popup if it's the only one in the queue
+    if (_itemId !== null) {
+      this.popupQueue.addPopup(_type, _msg, _rewards, _itemId, _millis)
     }
   }
 }

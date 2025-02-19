@@ -33,6 +33,7 @@ export class UiPopupPanel {
   public arrowUpImage_visible: boolean = false
   public wearablesImage_visible: boolean = false
   public currentType: PopupWindowType = PopupWindowType.Mined
+  private readonly hiddenY: number = -980
   private readonly visibleY: number = 80
   constructor(ui: IGameUi) {
     this.parentUi = ui
@@ -44,6 +45,9 @@ export class UiPopupPanel {
   init(): void {
     this.atlas = this.parentUi.getUiAtlas()
     this.resourceAtlas = this.parentUi.getResourceAtlas()
+
+    this.mainPanel_visible = true
+
     this.addWindowBg()
     this.addTitles()
     this.addButtons()
@@ -181,9 +185,16 @@ export class UiPopupPanel {
     // }));
   }
 
+  hide(): void {
+    // log("PopupUI hide()");
+    this.mainPanel_visible = false
+    this.mainPanel_positionY = this.hiddenY
+    // log("blocker mainPanel=" + this.mainPanel.isPointerBlocker + ", canvas=" + this.canvas.isPointerBlocker);
+  }
+
   renderUI(): ReactEcs.JSX.Element {
-        const canvasInfo = UiCanvasInformation.get(engine.RootEntity)
-        const uiScaleFactor = (Math.min(canvasInfo.width, canvasInfo.height) / 1080) * 1.2
+    const canvasInfo = UiCanvasInformation.get(engine.RootEntity)
+    const uiScaleFactor = (Math.min(canvasInfo.width, canvasInfo.height) / 1080) * 1.2
     return (
       <UiEntity
         uiTransform={{
@@ -191,21 +202,94 @@ export class UiPopupPanel {
           width: canvasInfo.width,
           height: canvasInfo.height,
           justifyContent: 'center',
-          alignItems: 'center'
+          alignItems: 'center',
+          display: this.mainPanel_visible ? 'flex' : 'none'
         }}
       >
+        {/* Window Bg */}
         <UiEntity
           uiTransform={{
             positionType: 'absolute',
-            width: getSizeAsNumber(som.ui.popupPanel.image.windowBg.width)* uiScaleFactor,
-            height: getSizeAsNumber(som.ui.popupPanel.image.windowBg.height)* uiScaleFactor
+            width: getSizeAsNumber(som.ui.popupPanel.image.windowBg.width) * uiScaleFactor,
+            height: getSizeAsNumber(som.ui.popupPanel.image.windowBg.height) * uiScaleFactor
           }}
           uiBackground={{
             textureMode: 'stretch',
             uvs: this.windowBg,
             texture: { src: this.atlas }
           }}
-        ></UiEntity>
+        >
+          {/* Splash Image */}
+          <UiEntity
+            uiTransform={{
+              position: { top: '16%', left: '15%' },
+              positionType: 'absolute',
+              width: getSizeAsNumber(som.ui.popupPanel.image.splashImage.width) * uiScaleFactor,
+              height: getSizeAsNumber(som.ui.popupPanel.image.splashImage.height) * uiScaleFactor
+            }}
+            uiBackground={{
+              textureMode: 'stretch',
+              uvs: this.splashImage,
+              texture: { src: this.atlas }
+            }}
+          />
+          {/* Header Text Image */}
+          <UiEntity
+            uiTransform={{
+              position: { top: '11%', left: '18%' },
+              positionType: 'absolute',
+              width: getSizeAsNumber(som.ui.popupPanel.image.meteorMined.width) * uiScaleFactor,
+              height: getSizeAsNumber(som.ui.popupPanel.image.meteorMined.height) * uiScaleFactor
+            }}
+            uiBackground={{
+              textureMode: 'stretch',
+              uvs: this.headerTextImage,
+              texture: { src: this.atlas }
+            }}
+          />
+          {/* Header Text Image */}
+          <UiEntity
+            uiTransform={{
+              position: { top: '24%', left: '21%' },
+              positionType: 'absolute',
+              width: getSizeAsNumber(som.ui.popupPanel.image.youGotLoot.width) * uiScaleFactor,
+              height: getSizeAsNumber(som.ui.popupPanel.image.youGotLoot.height) * uiScaleFactor
+            }}
+            uiBackground={{
+              textureMode: 'stretch',
+              uvs: this.subheadTextImage,
+              texture: { src: this.atlas }
+            }}
+          />
+          {/* Close Button */}
+          <UiEntity
+            uiTransform={{
+              position: { top: '5%', right: '5%' },
+              positionType: 'absolute',
+              width: getSizeAsNumber(som.ui.popupPanel.image.closeBtn.width) * uiScaleFactor,
+              height: getSizeAsNumber(som.ui.popupPanel.image.closeBtn.height) * uiScaleFactor
+            }}
+            uiBackground={{
+              textureMode: 'stretch',
+              uvs: this.closeBtnImage,
+              texture: { src: this.atlas }
+            }}
+            onMouseDown={() => {
+              this.parentUi.closePopup()
+            }}
+          />
+          {/* invStack01 */}
+          <UiEntity
+            uiTransform={{
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              alignItems: 'center',
+              width: '33%',
+              padding: '6px',
+              margin: { bottom: '0px', left: '0px' }
+            }}
+          />
+        </UiEntity>
       </UiEntity>
     )
   }

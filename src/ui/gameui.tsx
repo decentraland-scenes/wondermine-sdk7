@@ -18,7 +18,7 @@ export class GameUi implements IGameUi {
   public resourceAtlas: string | null = null
   public popupPanel: UiPopupPanel = new UiPopupPanel(this)
   public loader: ProjectLoader
-  public onPopupClosedCallback: (() => void) | undefined
+  public onPopupClosedCallback: (() => void) | null = null
   public showingTimedPopup: boolean = false
   public showingTimedAlert: boolean = false
   constructor() {
@@ -29,7 +29,6 @@ export class GameUi implements IGameUi {
     }
     this.init = () => {}
     this.closeAlert = () => {}
-    this.closePopup = () => {}
     this.getInstance = () => this
     this.showAlert = (_type: PopupWindowType) => {}
     this.showBalances = (_coins: number, _gems: number) => {}
@@ -98,8 +97,18 @@ export class GameUi implements IGameUi {
   }
 
   closeAlert: () => void
-  closePopup: () => void
   getInstance: () => IGameUi
+  closePopup(): void {
+    if (this.popupPanel != null) {
+      this.popupPanel.hide()
+    }
+    this.showingTimedPopup = false
+    if (this.onPopupClosedCallback != null) {
+      this.onPopupClosedCallback()
+      this.onPopupClosedCallback = null
+    }
+  }
+
   showAlert: (_type: PopupWindowType) => void
   showBonus: () => void
   showTimedMessage: (_text: string, _millis?: number) => void
