@@ -8,7 +8,8 @@ import { som } from 'src/som'
 import { type ItemInfo } from 'shared-dcl/src/playfab/iteminfo'
 import { ProjectLoader } from 'src/projectloader'
 import * as utils from '@dcl-sdk/utils'
-import { UiPopupPanel } from './uipopuppanel'
+import { type Item, UiPopupPanel } from './uipopuppanel'
+import { type UiImageData } from 'src/projectdata'
 
 export class GameUi implements IGameUi {
   static instance: GameUi | null = null
@@ -113,7 +114,7 @@ export class GameUi implements IGameUi {
   showBonus: () => void
   showTimedMessage: (_text: string, _millis?: number) => void
 
-  updateImageFromAtlas(img: string, data: number[][]): void {
+  updateImageFromAtlas(img: UIImage, data: UiImageData): void {
     // this.loader.populate(img, data)
   }
 
@@ -130,7 +131,7 @@ export class GameUi implements IGameUi {
     _type: PopupWindowType,
     _msg: string = '',
     // eslint-disable-next-line @typescript-eslint/ban-types
-    _rewards: Object[] | null = null,
+    _rewards: Item[] | null = null,
     _itemId: string | null = null,
     _millis: number = 8000,
     _callback: () => void

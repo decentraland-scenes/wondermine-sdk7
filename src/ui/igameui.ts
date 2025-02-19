@@ -1,4 +1,5 @@
 import { type PopupWindowType } from 'src/enums'
+import { type UiImageData } from 'src/projectdata'
 
 export type UIImage = {
   uvs: number[],
@@ -27,6 +28,6 @@ export type IGameUi = {
   updateInventory: () => void
   getResourceAtlas: () => string
   getUiAtlas: () => string
-  updateImageFromAtlas: (img: string, data: number[][]) => void
+  updateImageFromAtlas: (img: UIImage, data: UiImageData) => void
   loadTextField: (som: any, value?: string) => UIText;
 }

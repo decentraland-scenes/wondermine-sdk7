@@ -6,10 +6,19 @@ import { som } from 'src/som'
 import { getSizeAsNumber, getUvs } from './utils/utils'
 import { PopupWindowType } from 'src/enums'
 import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
+import { DclUser } from 'shared-dcl/src/playfab/dcluser'
+import { type UiImageData } from 'src/projectdata'
 
 /**
  * A UI layer with a central popup window plus OK, Close and Cancel buttons.
  */
+
+export type Item = {
+  ItemId: string
+  ItemClass: string
+  DisplayName: string
+  IsBonus: boolean
+}
 
 export class UiPopupPanel {
   public mainPanel_visible: boolean = false
@@ -280,9 +289,121 @@ export class UiPopupPanel {
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
-  showRewards(itemArray: Object[]): void {}
+  showRewards(itemArray: Item[]): void {
+    // log("showRewards(" + itemArray.length + ")");
+    // log(itemArray);
+    if (itemArray != null) {
+      // this.clearRewards();
+      let itemId: string
+      let itemClass: string
+      let displayName: string
+      let isBonus: boolean = false
 
-  clearRewards(): void {}
+      let rewardIndex: number = -1
+      let uiImageObj: UiImageData
+      let prevBundleType: string
+      let showIt = true
+
+      const parentBundleIds: string[] = []
+      for (var i: number = 0; i < itemArray.length; i++) {
+        // item = this.loader.populate(new ItemInfo(), items[i]);
+        itemId = itemArray[i].ItemId
+        itemClass = itemArray[i].ItemClass
+        displayName = itemArray[i].DisplayName
+        isBonus = itemArray[i].IsBonus
+        showIt = true
+
+        if (itemClass !== 'meteor' && itemClass !== 'levelup' && rewardIndex < this.iconImages.length) {
+          ++rewardIndex
+          // log("ITEM " + i + ": " + itemArray[i]["DisplayName"] + " rewardIndex: " + rewardIndex);
+
+          if (itemClass === 'bundle') {
+            if (itemId.substring(0, 2) === 'WC') {
+              itemId = 'WC'
+            } else if (itemId.substring(0, 2) === 'WG') {
+              itemId = 'WG'
+            } else if (itemId.indexOf('Double') === 0) {
+              // assumes Double bundles are all named like DoubleGemDiamond
+              itemId = itemId.substring(6)
+            }
+            parentBundleIds.push(itemId)
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            prevBundleType = itemId
+          } else if (itemClass === 'currency') {
+            if (displayName.indexOf('Coin') > 0) {
+              itemId = 'WC'
+            } else if (displayName.includes('WonderGem')) {
+              itemId = 'WG'
+            }
+          } else if (itemClass === 'gem' || itemClass === 'metal' || itemClass === 'fabric') {
+            // if we just handled the bundle for this, don't include this in the list
+            // NOTE: this will cause a problem if we ever include a bundle and a single item of the same itemId
+            //  if (prevBundleType == itemId)
+            // log("itemId=" + itemId + ", itemClass=" + itemClass + ", indexOf=" + parentBundleIds.indexOf(itemId));
+            if (parentBundleIds.includes(itemId)) {
+              // should we clear out prevBundleType? That assumes only one kind of item per bundle
+              showIt = false
+              --rewardIndex
+            }
+          }
+
+          if (rewardIndex < this.iconImages.length && showIt) {
+            // log("rewardIndex=" + rewardIndex + ", itemId=" + itemId + ", itemClass=" + itemClass);
+            uiImageObj = som.ui.resourceIcons.image[itemId]
+            // remove adjustments, if any
+            if (itemId === 'WC' || itemId === 'WG') {
+              uiImageObj.positionX = 5
+              uiImageObj.positionY = 0
+            }
+            // log("itemId: " + itemId)
+            // log(uiImageObj);
+            this.parentUi.updateImageFromAtlas(this.iconImages[rewardIndex], uiImageObj)
+            this.iconValues[rewardIndex].value = itemArray[i].DisplayName
+            if (DclUser.activeUser.heldItem != null) {
+              if (isBonus && DclUser.activeUser.heldItem.ItemId.length > 0) {
+                // log("showing bonus icon", som.ui.resourceIcons.image[DclUser.activeUser.heldItem.ItemId]);
+                const toolBadge: UiImageData = {
+                  ...som.ui.resourceIcons.image[DclUser.activeUser.heldItem.ItemId], // Ensure all properties are included
+                  width: '32px',
+                  height: '32px'
+                }
+                this.parentUi.updateImageFromAtlas(this.iconBadges[rewardIndex], toolBadge)
+              } else {
+                this.parentUi.updateImageFromAtlas(this.iconBadges[rewardIndex], som.ui.resourceIcons.image.Empty)
+              }
+            }
+          }
+        }
+      }
+      // clear out unused items
+      for (let i: number = rewardIndex + 1; i < this.iconImages.length; i++) {
+        // log("unused " + i);
+        this.parentUi.updateImageFromAtlas(this.iconImages[i], som.ui.resourceIcons.image.Empty)
+        this.iconValues[i].value = ''
+        this.parentUi.updateImageFromAtlas(this.iconBadges[i], som.ui.resourceIcons.image.Empty)
+      }
+    }
+  }
+
+  clearRewards(): void {
+    for (var i: number = 0; i < this.iconImages.length; i++) {
+      this.parentUi.updateImageFromAtlas(this.iconImages[i], som.ui.resourceIcons.image.Empty)
+      this.iconValues[i].value = ''
+      this.parentUi.updateImageFromAtlas(this.iconBadges[i], som.ui.resourceIcons.image.Empty)
+    }
+  }
+
+  reset(): void {
+    this.clearRewards()
+    this.messageTxt = ''
+  }
+
+  hide(): void {
+    // log("PopupUI hide()");
+    this.mainPanel_visible = false
+    this.mainPanel_positionY = this.hiddenY
+    // log("blocker mainPanel=" + this.mainPanel.isPointerBlocker + ", canvas=" + this.canvas.isPointerBlocker);
+  }
 
   show(): void {
     this.mainPanel_visible = true
@@ -301,11 +422,13 @@ export class UiPopupPanel {
     // }));
   }
 
-  hide(): void {
-    // log("PopupUI hide()");
-    this.mainPanel_visible = false
-    this.mainPanel_positionY = this.hiddenY
-    // log("blocker mainPanel=" + this.mainPanel.isPointerBlocker + ", canvas=" + this.canvas.isPointerBlocker);
+  toggle(): void {
+    // log("PopupUI toggle()");
+    if (this.mainPanel_visible) {
+      this.hide()
+    } else {
+      this.show()
+    }
   }
 
   renderUI(): ReactEcs.JSX.Element {
