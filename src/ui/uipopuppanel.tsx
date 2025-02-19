@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { engine, UiCanvasInformation, type Entity } from '@dcl/sdk/ecs'
-import { type IGameUi } from './igameui'
+import { type UIImage, type IGameUi, type UIText } from './igameui'
 import { SoundManager } from 'shared-dcl/src/sound/soundmanager'
 import { som } from 'src/som'
 import { getSizeAsNumber, getUvs } from './utils/utils'
-import { type IconValue } from './uibottombarpanel'
 import { PopupWindowType } from 'src/enums'
 import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
 
 /**
  * A UI layer with a central popup window plus OK, Close and Cancel buttons.
  */
+
 export class UiPopupPanel {
   public mainPanel_visible: boolean = false
   public mainPanel_positionY: number = 0
@@ -18,18 +18,18 @@ export class UiPopupPanel {
   public entity: Entity | null = null
   public atlas: string = ''
   public resourceAtlas: string = ''
-  public windowBg: number[] = []
-  public splashImage: number[] = []
-  public arrowUpImage: number[] = []
-  public wearablesImage: number[] = []
-  public headerTextImage: number[] = []
-  public subheadTextImage: number[] = []
-  public closeBtnImage: number[] = []
+  public windowBg: UIImage = { uvs: [], som: null, atlas: '' }
+  public splashImage: UIImage = { uvs: [], som: null, atlas: '' }
+  public arrowUpImage: UIImage = { uvs: [], som: null, atlas: '' }
+  public wearablesImage: UIImage = { uvs: [], som: null, atlas: '' }
+  public headerTextImage: UIImage = { uvs: [], som: null, atlas: '' }
+  public subheadTextImage: UIImage = { uvs: [], som: null, atlas: '' }
+  public closeBtnImage: UIImage = { uvs: [], som: null, atlas: '' }
   public messageTxt: string = ''
-  public iconBadges: number[][] = []
-  public iconImages: number[][] = []
-  public iconValues: IconValue[] = []
-  public splashImage_visible: boolean = false
+  public iconBadges: UIImage[] = []
+  public iconImages: UIImage[] = []
+  public iconValues: UIText[] = []
+  public splashImage_visible: boolean = true
   public arrowUpImage_visible: boolean = false
   public wearablesImage_visible: boolean = false
   public currentType: PopupWindowType = PopupWindowType.Mined
@@ -56,36 +56,112 @@ export class UiPopupPanel {
   }
 
   addWindowBg(): void {
-    this.windowBg = getUvs(som.ui.popupPanel.image.windowBg, { x: 1024, y: 1024 })
-    this.splashImage = getUvs(som.ui.popupPanel.image.splashImage, { x: 1024, y: 1024 })
-    this.arrowUpImage = getUvs(som.ui.popupPanel.image.arrowUpImage, { x: 1024, y: 1024 })
-    this.wearablesImage = getUvs(som.ui.popupPanel.image.wearablesImage, { x: 1024, y: 1024 })
+    this.windowBg = this.parentUi.loadImageFromAtlas(
+      getUvs(som.ui.popupPanel.image.windowBg, { x: 1024, y: 1024 }),
+      som.ui.popupPanel.image.windowBg,
+      this.atlas
+    )
+    this.splashImage = this.parentUi.loadImageFromAtlas(
+      getUvs(som.ui.popupPanel.image.splashImage, { x: 1024, y: 1024 }),
+      som.ui.popupPanel.image.splashImage,
+      this.atlas
+    )
+    this.arrowUpImage = this.parentUi.loadImageFromAtlas(
+      getUvs(som.ui.popupPanel.image.arrowUpImage, { x: 1024, y: 1024 }),
+      som.ui.popupPanel.image.arrowUpImage,
+      this.atlas
+    )
+    this.wearablesImage = this.parentUi.loadImageFromAtlas(
+      getUvs(som.ui.popupPanel.image.wearablesImage, { x: 1024, y: 1024 }),
+      som.ui.popupPanel.image.wearablesImage,
+      this.atlas
+    )
   }
 
   addTitles(): void {
-    this.headerTextImage = getUvs(som.ui.popupPanel.image.meteorMined, { x: 1024, y: 1024 })
-    this.subheadTextImage = getUvs(som.ui.popupPanel.image.youGotLoot, { x: 1024, y: 1024 })
+    this.headerTextImage = this.parentUi.loadImageFromAtlas(
+      getUvs(som.ui.popupPanel.image.meteorMined, { x: 1024, y: 1024 }),
+      som.ui.popupPanel.image.meteorMined,
+      this.atlas
+    )
+    this.subheadTextImage = this.parentUi.loadImageFromAtlas(
+      getUvs(som.ui.popupPanel.image.youGotLoot, { x: 1024, y: 1024 }),
+      som.ui.popupPanel.image.youGotLoot,
+      this.atlas
+    )
   }
 
   addButtons(): void {
-    this.closeBtnImage = getUvs(som.ui.popupPanel.image.closeBtn, { x: 1024, y: 1024 })
+    this.closeBtnImage = this.parentUi.loadImageFromAtlas(
+      getUvs(som.ui.popupPanel.image.closeBtn, { x: 1024, y: 1024 }),
+      som.ui.popupPanel.image.closeBtn,
+      this.atlas
+    )
   }
 
   addPrizeList(): void {
-    this.iconBadges.push(getUvs(som.ui.resourceIcons.image.Empty, { x: 1024, y: 1024 }))
-    this.iconBadges.push(getUvs(som.ui.resourceIcons.image.Empty, { x: 1024, y: 1024 }))
-    this.iconBadges.push(getUvs(som.ui.resourceIcons.image.Empty, { x: 1024, y: 1024 }))
-    this.iconBadges.push(getUvs(som.ui.resourceIcons.image.Empty, { x: 1024, y: 1024 }))
+    this.iconBadges.push(
+      this.parentUi.loadImageFromAtlas(
+        getUvs(som.ui.resourceIcons.image.Empty, { x: 1024, y: 1024 }),
+        som.ui.resourceIcons.image.Empty,
+        this.resourceAtlas
+      )
+    )
+    this.iconBadges.push(
+      this.parentUi.loadImageFromAtlas(
+        getUvs(som.ui.resourceIcons.image.Empty, { x: 1024, y: 1024 }),
+        som.ui.resourceIcons.image.Empty,
+        this.resourceAtlas
+      )
+    )
+    this.iconBadges.push(
+      this.parentUi.loadImageFromAtlas(
+        getUvs(som.ui.resourceIcons.image.Empty, { x: 1024, y: 1024 }),
+        som.ui.resourceIcons.image.Empty,
+        this.resourceAtlas
+      )
+    )
+    this.iconBadges.push(
+      this.parentUi.loadImageFromAtlas(
+        getUvs(som.ui.resourceIcons.image.Empty, { x: 1024, y: 1024 }),
+        som.ui.resourceIcons.image.Empty,
+        this.resourceAtlas
+      )
+    )
 
-    this.iconImages.push(getUvs(som.ui.resourceIcons.image.Empty, { x: 1024, y: 1024 }))
-    this.iconImages.push(getUvs(som.ui.resourceIcons.image.Empty, { x: 1024, y: 1024 }))
-    this.iconImages.push(getUvs(som.ui.resourceIcons.image.Empty, { x: 1024, y: 1024 }))
-    this.iconImages.push(getUvs(som.ui.resourceIcons.image.Empty, { x: 1024, y: 1024 }))
+    this.iconImages.push(
+      this.parentUi.loadImageFromAtlas(
+        getUvs(som.ui.resourceIcons.image.Empty, { x: 1024, y: 1024 }),
+        som.ui.resourceIcons.image.Empty,
+        this.resourceAtlas
+      )
+    )
+    this.iconImages.push(
+      this.parentUi.loadImageFromAtlas(
+        getUvs(som.ui.resourceIcons.image.Empty, { x: 1024, y: 1024 }),
+        som.ui.resourceIcons.image.Empty,
+        this.resourceAtlas
+      )
+    )
+    this.iconImages.push(
+      this.parentUi.loadImageFromAtlas(
+        getUvs(som.ui.resourceIcons.image.Empty, { x: 1024, y: 1024 }),
+        som.ui.resourceIcons.image.Empty,
+        this.resourceAtlas
+      )
+    )
+    this.iconImages.push(
+      this.parentUi.loadImageFromAtlas(
+        getUvs(som.ui.resourceIcons.image.Empty, { x: 1024, y: 1024 }),
+        som.ui.resourceIcons.image.Empty,
+        this.resourceAtlas
+      )
+    )
 
-    this.iconValues.push(som.ui.bottomBarPanel.textField.invItemTxt)
-    this.iconValues.push(som.ui.bottomBarPanel.textField.invItemTxt)
-    this.iconValues.push(som.ui.bottomBarPanel.textField.invItemTxt)
-    this.iconValues.push(som.ui.bottomBarPanel.textField.invItemTxt)
+    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt))
+    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt))
+    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt))
+    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt))
   }
 
   setType(type: PopupWindowType, itemId: string | null = null): void {
@@ -96,8 +172,16 @@ export class UiPopupPanel {
         this.arrowUpImage_visible = true
         this.wearablesImage_visible = false
 
-        this.headerTextImage = getUvs(som.ui.popupPanel.image.levelUp, { x: 1024, y: 1024 })
-        this.subheadTextImage = getUvs(som.ui.popupPanel.image.youGotLoot, { x: 1024, y: 1024 })
+        this.headerTextImage = this.parentUi.loadImageFromAtlas(
+          getUvs(som.ui.popupPanel.image.levelUp, { x: 1024, y: 1024 }),
+          som.ui.popupPanel.image.levelUp,
+          this.atlas
+        )
+        this.subheadTextImage = this.parentUi.loadImageFromAtlas(
+          getUvs(som.ui.popupPanel.image.youGotLoot, { x: 1024, y: 1024 }),
+          som.ui.popupPanel.image.youGotLoot,
+          this.atlas
+        )
 
         if (this.entity != null) {
           SoundManager.playOnce(this.entity, 0.9)
@@ -110,8 +194,16 @@ export class UiPopupPanel {
         this.arrowUpImage_visible = false
         this.wearablesImage_visible = false
 
-        this.headerTextImage = getUvs(som.ui.popupPanel.image.meteorMined, { x: 1024, y: 1024 })
-        this.subheadTextImage = getUvs(som.ui.popupPanel.image.yourShare, { x: 1024, y: 1024 })
+        this.headerTextImage = this.parentUi.loadImageFromAtlas(
+          getUvs(som.ui.popupPanel.image.meteorMined, { x: 1024, y: 1024 }),
+          som.ui.popupPanel.image.meteorMined,
+          this.atlas
+        )
+        this.subheadTextImage = this.parentUi.loadImageFromAtlas(
+          getUvs(som.ui.popupPanel.image.yourShare, { x: 1024, y: 1024 }),
+          som.ui.popupPanel.image.yourShare,
+          this.atlas
+        )
         if (this.entity != null) {
           SoundManager.playOnce(this.entity, 0.8)
         }
@@ -123,8 +215,16 @@ export class UiPopupPanel {
         this.arrowUpImage_visible = false
         this.wearablesImage_visible = false
 
-        this.headerTextImage = getUvs(som.ui.popupPanel.image.meteorMined, { x: 1024, y: 1024 })
-        this.subheadTextImage = getUvs(som.ui.popupPanel.image.youGotLoot, { x: 1024, y: 1024 })
+        this.headerTextImage = this.parentUi.loadImageFromAtlas(
+          getUvs(som.ui.popupPanel.image.meteorMined, { x: 1024, y: 1024 }),
+          som.ui.popupPanel.image.meteorMined,
+          this.atlas
+        )
+        this.subheadTextImage = this.parentUi.loadImageFromAtlas(
+          getUvs(som.ui.popupPanel.image.youGotLoot, { x: 1024, y: 1024 }),
+          som.ui.popupPanel.image.youGotLoot,
+          this.atlas
+        )
         break
 
       case PopupWindowType.Crafted:
@@ -143,8 +243,16 @@ export class UiPopupPanel {
         //     this.parentUi.updateImageFromAtlas(this.wearablesImage, uiImageObj);
         // }
 
-        this.headerTextImage = getUvs(som.ui.popupPanel.image.crafted, { x: 1024, y: 1024 })
-        this.subheadTextImage = getUvs(som.ui.popupPanel.image.readyToMint, { x: 1024, y: 1024 })
+        this.headerTextImage = this.parentUi.loadImageFromAtlas(
+          getUvs(som.ui.popupPanel.image.crafted, { x: 1024, y: 1024 }),
+          som.ui.popupPanel.image.crafted,
+          this.atlas
+        )
+        this.subheadTextImage = this.parentUi.loadImageFromAtlas(
+          getUvs(som.ui.popupPanel.image.readyToMint, { x: 1024, y: 1024 }),
+          som.ui.popupPanel.image.readyToMint,
+          this.atlas
+        )
         break
 
       case PopupWindowType.CraftError:
@@ -152,8 +260,16 @@ export class UiPopupPanel {
         this.arrowUpImage_visible = false
         this.wearablesImage_visible = true
 
-        this.headerTextImage = getUvs(som.ui.popupPanel.image.crafted, { x: 1024, y: 1024 })
-        this.subheadTextImage = getUvs(som.ui.popupPanel.image.problem, { x: 1024, y: 1024 })
+        this.headerTextImage = this.parentUi.loadImageFromAtlas(
+          getUvs(som.ui.popupPanel.image.crafted, { x: 1024, y: 1024 }),
+          som.ui.popupPanel.image.crafted,
+          this.atlas
+        )
+        this.subheadTextImage = this.parentUi.loadImageFromAtlas(
+          getUvs(som.ui.popupPanel.image.problem, { x: 1024, y: 1024 }),
+          som.ui.popupPanel.image.problem,
+          this.atlas
+        )
         break
     }
     this.currentType = type
@@ -210,13 +326,13 @@ export class UiPopupPanel {
         <UiEntity
           uiTransform={{
             positionType: 'absolute',
-            width: getSizeAsNumber(som.ui.popupPanel.image.windowBg.width) * uiScaleFactor,
-            height: getSizeAsNumber(som.ui.popupPanel.image.windowBg.height) * uiScaleFactor
+            width: getSizeAsNumber(this.windowBg.som.width) * uiScaleFactor,
+            height: getSizeAsNumber(this.windowBg.som.height) * uiScaleFactor
           }}
           uiBackground={{
             textureMode: 'stretch',
-            uvs: this.windowBg,
-            texture: { src: this.atlas }
+            uvs: this.windowBg.uvs,
+            texture: { src: this.windowBg.atlas }
           }}
         >
           {/* Splash Image */}
@@ -224,13 +340,44 @@ export class UiPopupPanel {
             uiTransform={{
               position: { top: '16%', left: '15%' },
               positionType: 'absolute',
-              width: getSizeAsNumber(som.ui.popupPanel.image.splashImage.width) * uiScaleFactor,
-              height: getSizeAsNumber(som.ui.popupPanel.image.splashImage.height) * uiScaleFactor
+              width: getSizeAsNumber(this.splashImage.som.width) * uiScaleFactor,
+              height: getSizeAsNumber(this.splashImage.som.height) * uiScaleFactor,
+              display: this.splashImage_visible ? 'flex' : 'none'
             }}
             uiBackground={{
               textureMode: 'stretch',
-              uvs: this.splashImage,
-              texture: { src: this.atlas }
+              uvs: this.splashImage.uvs,
+              texture: { src: this.splashImage.atlas }
+            }}
+          />
+          {/* Wearables Image */}
+          <UiEntity
+            uiTransform={{
+              position: { top: '34%', left: '30%' },
+              positionType: 'absolute',
+              width: getSizeAsNumber(this.wearablesImage.som.width) * uiScaleFactor,
+              height: getSizeAsNumber(this.wearablesImage.som.height) * uiScaleFactor,
+              display: this.wearablesImage_visible ? 'flex' : 'none'
+            }}
+            uiBackground={{
+              textureMode: 'stretch',
+              uvs: this.wearablesImage.uvs,
+              texture: { src: this.wearablesImage.atlas }
+            }}
+          />
+          {/* Arrow Up Image */}
+          <UiEntity
+            uiTransform={{
+              position: { top: '34%', left: '30%' },
+              positionType: 'absolute',
+              width: getSizeAsNumber(this.arrowUpImage.som.width) * uiScaleFactor,
+              height: getSizeAsNumber(this.arrowUpImage.som.height) * uiScaleFactor,
+              display: this.arrowUpImage_visible ? 'flex' : 'none'
+            }}
+            uiBackground={{
+              textureMode: 'stretch',
+              uvs: this.arrowUpImage.uvs,
+              texture: { src: this.arrowUpImage.atlas }
             }}
           />
           {/* Header Text Image */}
@@ -238,27 +385,27 @@ export class UiPopupPanel {
             uiTransform={{
               position: { top: '11%', left: '18%' },
               positionType: 'absolute',
-              width: getSizeAsNumber(som.ui.popupPanel.image.meteorMined.width) * uiScaleFactor,
-              height: getSizeAsNumber(som.ui.popupPanel.image.meteorMined.height) * uiScaleFactor
+              width: getSizeAsNumber(this.headerTextImage.som.width) * uiScaleFactor,
+              height: getSizeAsNumber(this.headerTextImage.som.height) * uiScaleFactor
             }}
             uiBackground={{
               textureMode: 'stretch',
-              uvs: this.headerTextImage,
-              texture: { src: this.atlas }
+              uvs: this.headerTextImage.uvs,
+              texture: { src: this.headerTextImage.atlas }
             }}
           />
-          {/* Header Text Image */}
+          {/* Sub Head Text Image */}
           <UiEntity
             uiTransform={{
               position: { top: '24%', left: '21%' },
               positionType: 'absolute',
-              width: getSizeAsNumber(som.ui.popupPanel.image.youGotLoot.width) * uiScaleFactor,
-              height: getSizeAsNumber(som.ui.popupPanel.image.youGotLoot.height) * uiScaleFactor
+              width: getSizeAsNumber(this.subheadTextImage.som.width) * uiScaleFactor,
+              height: getSizeAsNumber(this.subheadTextImage.som.height) * uiScaleFactor
             }}
             uiBackground={{
               textureMode: 'stretch',
-              uvs: this.subheadTextImage,
-              texture: { src: this.atlas }
+              uvs: this.subheadTextImage.uvs,
+              texture: { src: this.subheadTextImage.atlas }
             }}
           />
           {/* Close Button */}
@@ -266,13 +413,13 @@ export class UiPopupPanel {
             uiTransform={{
               position: { top: '5%', right: '5%' },
               positionType: 'absolute',
-              width: getSizeAsNumber(som.ui.popupPanel.image.closeBtn.width) * uiScaleFactor,
-              height: getSizeAsNumber(som.ui.popupPanel.image.closeBtn.height) * uiScaleFactor
+              width: getSizeAsNumber(this.closeBtnImage.som.width) * uiScaleFactor,
+              height: getSizeAsNumber(this.closeBtnImage.som.height) * uiScaleFactor
             }}
             uiBackground={{
               textureMode: 'stretch',
-              uvs: this.closeBtnImage,
-              texture: { src: this.atlas }
+              uvs: this.closeBtnImage.uvs,
+              texture: { src: this.closeBtnImage.atlas }
             }}
             onMouseDown={() => {
               this.parentUi.closePopup()

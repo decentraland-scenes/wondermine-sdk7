@@ -1,14 +1,14 @@
 import { type PopupWindowType } from 'src/enums'
-import { type IGameUi } from './igameui'
+import { type UIImage, type IGameUi, type UIText } from './igameui'
 import ReactEcs, { ReactEcsRenderer, UiEntity } from '@dcl/sdk/react-ecs'
 import { engine, UiCanvasInformation } from '@dcl/sdk/ecs'
 import { UiBottomBarPanel } from './uibottombarpanel'
 import Canvas from './canvas/Canvas'
 import { som } from 'src/som'
 import { type ItemInfo } from 'shared-dcl/src/playfab/iteminfo'
-import { UiPopupPanel } from './uipopuppanel'
 import { ProjectLoader } from 'src/projectloader'
 import * as utils from '@dcl-sdk/utils'
+import { UiPopupPanel } from './uipopuppanel'
 
 export class GameUi implements IGameUi {
   static instance: GameUi | null = null
@@ -177,5 +177,15 @@ export class GameUi implements IGameUi {
     //     //     GameUi.instance.closePopup();
     //     // });
     // }));
+  }
+
+  loadImageFromAtlas(uvs: number[], som: any, atlas: string): UIImage {
+    const uiImage: UIImage = { uvs, som, atlas }
+    return uiImage
+  }
+
+  loadTextField(som: any, value?: string): UIText {
+    const uiText: UIText = { som, value }
+    return uiText
   }
 }
