@@ -38,7 +38,7 @@ export class UiPopupPanel {
   public iconBadges: UIImage[] = []
   public iconImages: UIImage[] = []
   public iconValues: UIText[] = []
-  public splashImage_visible: boolean = true
+  public splashImage_visible: boolean = false
   public arrowUpImage_visible: boolean = false
   public wearablesImage_visible: boolean = false
   public currentType: PopupWindowType = PopupWindowType.Mined
@@ -55,7 +55,7 @@ export class UiPopupPanel {
     this.atlas = this.parentUi.getUiAtlas()
     this.resourceAtlas = this.parentUi.getResourceAtlas()
 
-    this.mainPanel_visible = true
+    this.mainPanel_visible = false
 
     this.addWindowBg()
     this.addTitles()
