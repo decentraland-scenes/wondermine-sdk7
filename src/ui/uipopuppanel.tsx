@@ -551,7 +551,7 @@ export class UiPopupPanel {
           {/* invStack01 */}
           <UiEntity
             uiTransform={{
-              flexDirection: 'row',
+              flexDirection: 'column',
               justifyContent: 'flex-start',
               alignItems: 'center',
               width: '33%',
@@ -559,6 +559,7 @@ export class UiPopupPanel {
               margin: { bottom: '0px', left: '0px' }
             }}
           />
+          
         </UiEntity>
       </UiEntity>
     )
