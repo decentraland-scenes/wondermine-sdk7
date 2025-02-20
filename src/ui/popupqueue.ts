@@ -1,6 +1,7 @@
 import { type PopupWindowType } from '../enums'
 import { GameUi } from './gameui'
 import { PopupData } from './popupdata'
+import { type Item } from './uipopuppanel'
 
 export class PopupQueue {
   public queue: PopupData[] | null = []
@@ -14,7 +15,7 @@ export class PopupQueue {
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
-  public addPopup(type: PopupWindowType, msg: string, rewards: Object[] | null, itemId: string, millis: number): void {
+  public addPopup(type: PopupWindowType, msg: string, rewards: Item[] | null, itemId: string, millis: number): void {
     this.add(new PopupData(type, msg, rewards, itemId, millis))
   }
 

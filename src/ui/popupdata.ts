@@ -1,17 +1,18 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { type PopupWindowType } from '../enums'
+import { type Item } from './uipopuppanel'
 
 export class PopupData {
   public type: PopupWindowType
   public msg: string
-  public rewards: Object[] | null
+  public rewards: Item[] | null
   public itemId: string | null
   public millis: number
 
   constructor(
     _type: PopupWindowType,
     _msg: string = '',
-    _rewards: Object[] | null = null,
+    _rewards: Item[] | null = null,
     _itemId: string | null = null,
     _millis: number = 8000
   ) {

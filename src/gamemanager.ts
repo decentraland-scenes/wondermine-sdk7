@@ -17,9 +17,10 @@ import { GameUi } from './ui/gameui'
 import { WearableClaimerContract } from './contracts/wearableClaimerContract'
 import { ContractManager } from './contracts/contractManager'
 import { WzNftContract } from './contracts/wzNftContract'
-import { ChainId, type PopupWindowType } from './enums'
+import { ChainId, PopupWindowType } from './enums'
 import { getProviderPromise } from './contracts/nftChecker'
 import { PopupQueue } from './ui/popupqueue'
+import { type Item } from './ui/uipopuppanel'
 
 export class GameManager {
   static instance: GameManager | null = null
@@ -329,13 +330,58 @@ export class GameManager {
     }
   }
 
+  showRewards(itemArray: Item[], popupType: PopupWindowType, msg: string = ''): void {
+    console.log('showRewards() ' + popupType)
+    if (itemArray != null) {
+      for (var i: number = 0; i < itemArray.length; i++) {
+        if (itemArray[i].ItemId === 'MeteorLootBonus') {
+          // log("ITEM " + i + ": " + itemArray[i]["DisplayName"]);
+          // don't include parent bundle
+          msg = 'Bonus Drop!'
+          break
+        } else if (itemArray[i].ItemId === 'MeteorDoubleLoot') {
+          msg = 'Double Loot!'
+          break
+        } else if (itemArray[i].ItemId === 'MeteorDoubleBonus') {
+          msg = 'Double Bonus Drop!'
+          break
+        }
+      }
+
+      // HACK
+      if (popupType === PopupWindowType.MinedShared) {
+        msg = 'Large Meteor!'
+      } else if (popupType === PopupWindowType.SharedBonus) {
+        msg = 'Shared Bonus!'
+      }
+    }
+
+    const delayMillis = popupType === PopupWindowType.LevelUp ? 20000 : 8000
+
+    this.queuePopup(popupType, msg, itemArray, null, delayMillis)
+    if (GameManager.instance != null) {
+      GameManager.instance.getPlayerInventory()
+    }
+  }
+
+  showCraftingError(msg: string): void {
+    // GameUi.instance.showTimedPopup(PopupWindowType.CraftError, msg, null, GameManager.instance.machine.craftedRecipe.itemId, 120000, null);
+    if (GameManager.instance?.machine?.craftedRecipe != null) {
+      this.queuePopup(PopupWindowType.CraftError, msg, null, GameManager.instance.machine.craftedRecipe.itemId, 120000)
+    }
+
+    if (GameManager.instance?.machine != null) {
+      GameManager.instance.machine.reset(true)
+    }
+  }
+
   // --- POPUPS ---
 
   queuePopup(
     _type: PopupWindowType,
     _msg: string = '',
     // eslint-disable-next-line @typescript-eslint/ban-types
-    _rewards: Object[] | null = null,
+    _rewards: Item[] | null = null,
     _itemId: string | null = null,
     _millis: number = 8000
   ): void {
