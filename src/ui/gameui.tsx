@@ -1,11 +1,15 @@
 import { type PopupWindowType } from 'src/enums'
-import { type IGameUi } from './igameui'
+import { type UIImage, type IGameUi, type UIText } from './igameui'
 import ReactEcs, { ReactEcsRenderer, UiEntity } from '@dcl/sdk/react-ecs'
 import { engine, UiCanvasInformation } from '@dcl/sdk/ecs'
 import { UiBottomBarPanel } from './uibottombarpanel'
 import Canvas from './canvas/Canvas'
 import { som } from 'src/som'
 import { type ItemInfo } from 'shared-dcl/src/playfab/iteminfo'
+import { ProjectLoader } from 'src/projectloader'
+import * as utils from '@dcl-sdk/utils'
+import { type Item, UiPopupPanel } from './uipopuppanel'
+import { type UiImageData } from 'src/projectdata'
 
 export class GameUi implements IGameUi {
   static instance: GameUi | null = null
@@ -13,10 +17,19 @@ export class GameUi implements IGameUi {
   public bottomBarPanel: UiBottomBarPanel = new UiBottomBarPanel(this)
   public uiAtlas: string | null = null
   public resourceAtlas: string | null = null
+  public popupPanel: UiPopupPanel = new UiPopupPanel(this)
+  public loader: ProjectLoader
+  public onPopupClosedCallback: (() => void) | null = null
+  public showingTimedPopup: boolean = false
+  public showingTimedAlert: boolean = false
   constructor() {
+    if (ProjectLoader.instance == null) {
+      this.loader = new ProjectLoader()
+    } else {
+      this.loader = ProjectLoader.instance
+    }
     this.init = () => {}
     this.closeAlert = () => {}
-    this.closePopup = () => {}
     this.getInstance = () => this
     this.showAlert = (_type: PopupWindowType) => {}
     this.showBalances = (_coins: number, _gems: number) => {}
@@ -37,6 +50,7 @@ export class GameUi implements IGameUi {
     return (
       <UiEntity>
         <Canvas>{this.bottomBarPanel.renderUI()}</Canvas>
+        <Canvas>{this.popupPanel.renderUI()}</Canvas>
       </UiEntity>
     )
   }
@@ -84,11 +98,25 @@ export class GameUi implements IGameUi {
   }
 
   closeAlert: () => void
-  closePopup: () => void
   getInstance: () => IGameUi
+  closePopup(): void {
+    if (this.popupPanel != null) {
+      this.popupPanel.hide()
+    }
+    this.showingTimedPopup = false
+    if (this.onPopupClosedCallback != null) {
+      this.onPopupClosedCallback()
+      this.onPopupClosedCallback = null
+    }
+  }
+
   showAlert: (_type: PopupWindowType) => void
   showBonus: () => void
   showTimedMessage: (_text: string, _millis?: number) => void
+
+  updateImageFromAtlas(img: UIImage, data: UiImageData): void {
+    // this.loader.populate(img, data)
+  }
 
   updateInventory(): void {
     this.bottomBarPanel.updateInventory()
@@ -96,5 +124,69 @@ export class GameUi implements IGameUi {
 
   closeInventoryPopup(): void {
     this.bottomBarPanel.closeInventory()
+  }
+
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  showTimedPopup(
+    _type: PopupWindowType,
+    _msg: string = '',
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    _rewards: Item[] | null = null,
+    _itemId: string | null = null,
+    _millis: number = 8000,
+    _callback: () => void
+  ): void {
+    // log("showTimedPopup");
+    this.popupPanel.showText(_msg)
+    this.popupPanel.setType(_type, _itemId)
+
+    if (_rewards != null) {
+      this.popupPanel.showRewards(_rewards)
+    } else {
+      this.popupPanel.clearRewards()
+    }
+
+    this.popupPanel.show()
+
+    // 1DO: fix this -- if popups stack up too fast it could be chaos
+    this.onPopupClosedCallback = _callback
+
+    this.showingTimedPopup = true
+
+    // if (this.popupPanel.entity.hasComponent(Delay)) {
+    //   this.popupPanel.entity.removeComponent(Delay)
+    // }
+    // HACK: removed the delay to moveIntoView because it broke during the recent refactoring
+    if (GameUi.instance?.popupPanel != null) {
+      GameUi.instance.popupPanel.moveIntoView(_millis, () => {
+        // log("close popupPanel");
+        // GameUi.instance.closePopup();
+      })
+    }
+
+    // default 3-second delay for the popup to be built, then moved into view
+    utils.timers.setTimeout(() => {
+      if (GameUi.instance != null) {
+        GameUi.instance.closePopup()
+      }
+    }, _millis)
+    // this.popupPanel.entity.addComponentOrReplace(new Delay(_millis, () => {
+    //     GameUi.instance.closePopup();
+
+    //     // GameUi.instance.popupPanel.moveIntoView(_millis, () => {
+    //     //     log("close popupPanel");
+    //     //     GameUi.instance.closePopup();
+    //     // });
+    // }));
+  }
+
+  loadImageFromAtlas(uvs: number[], som: any, atlas: string): UIImage {
+    const uiImage: UIImage = { uvs, som, atlas }
+    return uiImage
+  }
+
+  loadTextField(som: any, value?: string): UIText {
+    const uiText: UIText = { som, value }
+    return uiText
   }
 }
