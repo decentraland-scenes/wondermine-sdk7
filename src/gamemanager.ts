@@ -9,7 +9,7 @@ import { CoinShop } from './coinshop'
 import { CraftingMachine } from './craftingmachine'
 import * as utils from '@dcl-sdk/utils'
 import { Vector3 } from '@dcl/sdk/math'
-import { Eventful, CraftItemEvent, BenchmarkEvent, ChangeToolEvent } from './events'
+import { Eventful, CraftItemEvent, BenchmarkEvent, HitMeteorEvent, ChangeToolEvent } from './events'
 import { svr } from './svr'
 import { type EventManager } from './eventManager'
 import { Leaderboard } from './leaderboard'
@@ -17,12 +17,19 @@ import { GameUi } from './ui/gameui'
 import { WearableClaimerContract } from './contracts/wearableClaimerContract'
 import { ContractManager } from './contracts/contractManager'
 import { WzNftContract } from './contracts/wzNftContract'
-import { ChainId, PopupWindowType } from './enums'
+
 import { getProviderPromise } from './contracts/nftChecker'
+
+// import { MeteorSpawner } from './wondermine/meteorspawner'
+import { MeteorTypeList } from './wondermine/meteortypelist'
+import { type MeteorSpawnerInstance } from './projectdata'
+import { MeteorSpawner } from './wondermine/meteorspawner'
+import { ChainId, MeteorTypeId, PopupWindowType } from './enums'
+
 import { Pickaxe } from './pickaxe'
 import { type ItemInfo } from 'shared-dcl/src/playfab/iteminfo'
 import { PickaxeInstance } from './projectdata'
-import { type Meteor } from './wondermine/meteor'
+import { Meteor } from './wondermine/meteor'
 import { PickaxeTypeList } from './pickaxetypelist'
 import { PopupQueue } from './ui/popupqueue'
 import { type Item } from './ui/uipopuppanel'
@@ -34,7 +41,9 @@ export class GameManager {
 
   public api: WondermineApi | null = null
   public loader: ProjectLoader | null = null
+  public meteors: Meteor[] = []
 
+  public spawner: MeteorSpawner | null = null
   public paused: boolean = false
 
   public axeJustBroke: boolean = false
@@ -78,6 +87,51 @@ export class GameManager {
 
   onClaimerContractCalled(funcName: string, returnVal: any): void {}
 
+  setUpMeteors(): void {
+    MeteorTypeList.loadTypes(som.meteorTypes)
+    if (this.loader !== null) {
+      const params: MeteorSpawnerInstance = this.loader.loadMeteorSpawner(som.scene.meteorSpawner)
+      this.spawner = new MeteorSpawner(
+        1.35,
+        params.left,
+        params.bottom,
+        params.right,
+        params.top,
+        params.floorHeight,
+        params.dropHeight
+      )
+      Eventful.instance.addListener(HitMeteorEvent, null, ({ meteor, hitPoint }) => {
+        console.log('hit meteor at:', hitPoint)
+        this.hitMeteor(hitPoint, meteor)
+      })
+    }
+    // log(params);
+    // HACK: temporary test
+    // params.left = 47;
+    // Meteor.onHitCallback = (hitPoint:Vector3, m:Meteor) => {
+    //   // log("onHitCallback in GameManager");
+    //   return this.hitMeteor(hitPoint, m);
+    // }
+  }
+
+  spawnMeteor(): void {
+    if (this.spawner !== null) {
+      const m: Meteor = this.spawner.spawn(MeteorTypeId[MeteorTypeId.Local]) // MeteorTypeId[MeteorTypeId.Medium]
+      // 1DO A1 Need to provide the right context here!
+      Meteor.onHitCallback = (hitPoint: Vector3, m: Meteor) => {
+        // log("onHitCallback in GameManager");
+
+        return this.hitMeteor(hitPoint, m)
+      }
+      // log("spawned meteor at" + m.entity.getComponent(Transform).position);
+      // log("model at " + m.modelEntity.getComponent(Transform).position);
+    }
+  }
+
+  hitMeteor(hitPoint: Vector3.MutableVector3, meteor: Meteor): boolean {
+    return true
+  }
+
   static createAndAddToEngine(titleId: string): GameManager {
     if (this.instance == null) {
       this.instance = new GameManager(titleId)
@@ -109,6 +163,7 @@ export class GameManager {
     this.loadShop()
     this.loadCrafting()
     this.loadLeaderboard()
+    this.setUpMeteors()
   }
 
   loadScenery(): void {
@@ -194,6 +249,9 @@ export class GameManager {
       if (this.enableShared) {
         console.log('enable true')
       }
+      utils.timers.setTimeout(() => {
+        this.spawnMeteor()
+      }, 5000)
     })
   }
 
@@ -437,7 +495,7 @@ export class GameManager {
   showRewards(itemArray: Item[], popupType: PopupWindowType, msg: string = ''): void {
     console.log('showRewards() ' + popupType)
     if (itemArray != null) {
-      for (var i: number = 0; i < itemArray.length; i++) {
+      for (let i: number = 0; i < itemArray.length; i++) {
         if (itemArray[i].ItemId === 'MeteorLootBonus') {
           // log("ITEM " + i + ": " + itemArray[i]["DisplayName"]);
           // don't include parent bundle

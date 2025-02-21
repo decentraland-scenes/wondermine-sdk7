@@ -90,7 +90,6 @@ export class MeteorSpawner {
     maxHits: number = 1,
     alreadyMined: boolean = false
   ): Meteor {
-    // Obtener el tipo de meteorito con verificación explícita
     let type: MeteorType
 
     if (typeName != null && typeName.length > 0) {
@@ -98,7 +97,6 @@ export class MeteorSpawner {
     } else {
       console.log('typeName is null or empty, using random type')
 
-      // Intentar obtener un tipo aleatorio, pero asegurarse de que no sea null
       type = MeteorTypeList.getRandomType() ?? MeteorTypeList.getType(Object.keys(MeteorTypeList.types)[0])
     }
 
