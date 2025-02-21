@@ -13,16 +13,19 @@ import { Eventful, CraftItemEvent, BenchmarkEvent, ChangeToolEvent } from './eve
 import { svr } from './svr'
 import { type EventManager } from './eventManager'
 import { Leaderboard } from './leaderboard'
+import { GameUi } from './ui/gameui'
 import { WearableClaimerContract } from './contracts/wearableClaimerContract'
 import { ContractManager } from './contracts/contractManager'
 import { WzNftContract } from './contracts/wzNftContract'
-import { ChainId } from './enums'
+import { ChainId, PopupWindowType } from './enums'
 import { getProviderPromise } from './contracts/nftChecker'
 import { Pickaxe } from './pickaxe'
 import { type ItemInfo } from 'shared-dcl/src/playfab/iteminfo'
 import { PickaxeInstance } from './projectdata'
 import { type Meteor } from './wondermine/meteor'
 import { PickaxeTypeList } from './pickaxetypelist'
+import { PopupQueue } from './ui/popupqueue'
+import { type Item } from './ui/uipopuppanel'
 
 export class GameManager {
   static instance: GameManager | null = null
@@ -44,6 +47,7 @@ export class GameManager {
 
   public axe: Pickaxe | null = null
   private readonly lootHomePos: number[] = [6.5, 0, 57]
+  public popupQueue: PopupQueue | null = null
   constructor(titleId: string) {
     this.api = new WondermineApi(titleId)
     this.checkContracts()
@@ -89,8 +93,10 @@ export class GameManager {
     // TimerSystem.createAndAddToEngine()
     this.loader = new ProjectLoader()
 
-    // let ui:GameUi = GameUi.create();
-    // GameUi.instance.init();
+    const ui: GameUi = GameUi.create()
+    if (GameUi.instance != null) {
+      GameUi.instance.init()
+    }
 
     // this.setUpMeteors();
     // this.setUpPickaxes();
@@ -227,17 +233,21 @@ export class GameManager {
 
       // 2DO: Why don't Cloudscript Azure Functions work from Javascript?
       // await this.api.GetCraftingRecipes();
+      if (GameUi.instance != null) {
+        GameUi.instance.showBalances(DclUser.activeUser.coins, DclUser.activeUser.gems)
+        GameUi.instance.setLevel(DclUser.activeUser.level, DclUser.activeUser.xp)
+      }
 
-      // GameUi.instance.showBalances(DclUser.activeUser.coins, DclUser.activeUser.gems);
-      // GameUi.instance.setLevel(DclUser.activeUser.level, DclUser.activeUser.xp);
-
-      // await this.api.CountClaimableItems();
+      if (this.api != null) {
+        await this.api.CountClaimableItems()
+      }
 
       // this.checkContracts();
 
-      // DclUser.activeUser.checkT();
-      // this.machine.setCooldownStatus();
-      // this.checkWearables();
+      DclUser.activeUser.checkT()
+      if (this.machine != null) {
+        this.machine.setCooldownStatus()
+      }
     })
   }
 
@@ -343,8 +353,11 @@ export class GameManager {
           }, 5000)
         }
       }
-      // GameUi.instance.showBalances(DclUser.activeUser.coins, DclUser.activeUser.gems)
-      // GameUi.instance.updateInventory()
+      if (GameUi.instance != null) {
+        GameUi.instance.showBalances(DclUser.activeUser.coins, DclUser.activeUser.gems)
+        GameUi.instance.updateInventory()
+      }
+
       if (this.machine != null) {
         this.machine.refreshRecipe()
       }
@@ -417,6 +430,71 @@ export class GameManager {
     if (this.api != null) {
       const leaderboard: Leaderboard = new Leaderboard(som.scene.leaderboard, this.api, null)
       this.board = leaderboard
+    }
+  }
+
+  showRewards(itemArray: Item[], popupType: PopupWindowType, msg: string = ''): void {
+    console.log('showRewards() ' + popupType)
+    if (itemArray != null) {
+      for (var i: number = 0; i < itemArray.length; i++) {
+        if (itemArray[i].ItemId === 'MeteorLootBonus') {
+          // log("ITEM " + i + ": " + itemArray[i]["DisplayName"]);
+          // don't include parent bundle
+          msg = 'Bonus Drop!'
+          break
+        } else if (itemArray[i].ItemId === 'MeteorDoubleLoot') {
+          msg = 'Double Loot!'
+          break
+        } else if (itemArray[i].ItemId === 'MeteorDoubleBonus') {
+          msg = 'Double Bonus Drop!'
+          break
+        }
+      }
+
+      // HACK
+      if (popupType === PopupWindowType.MinedShared) {
+        msg = 'Large Meteor!'
+      } else if (popupType === PopupWindowType.SharedBonus) {
+        msg = 'Shared Bonus!'
+      }
+    }
+
+    const delayMillis = popupType === PopupWindowType.LevelUp ? 20000 : 8000
+
+    this.queuePopup(popupType, msg, itemArray, null, delayMillis)
+    if (GameManager.instance != null) {
+      GameManager.instance.getPlayerInventory()
+    }
+  }
+
+  showCraftingError(msg: string): void {
+    // GameUi.instance.showTimedPopup(PopupWindowType.CraftError, msg, null, GameManager.instance.machine.craftedRecipe.itemId, 120000, null);
+    if (GameManager.instance?.machine?.craftedRecipe != null) {
+      this.queuePopup(PopupWindowType.CraftError, msg, null, GameManager.instance.machine.craftedRecipe.itemId, 120000)
+    }
+
+    if (GameManager.instance?.machine != null) {
+      GameManager.instance.machine.reset(true)
+    }
+  }
+
+  // --- POPUPS ---
+
+  queuePopup(
+    _type: PopupWindowType,
+    _msg: string = '',
+    // eslint-disable-next-line @typescript-eslint/ban-types
+    _rewards: Item[] | null = null,
+    _itemId: string | null = null,
+    _millis: number = 8000
+  ): void {
+    if (this.popupQueue == null) {
+      this.popupQueue = new PopupQueue()
+    }
+
+    // add will try to show the popup if it's the only one in the queue
+    if (_itemId !== null) {
+      this.popupQueue.addPopup(_type, _msg, _rewards, _itemId, _millis)
     }
   }
 }
