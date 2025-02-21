@@ -6,6 +6,8 @@ import { ProjectLoader } from 'src/projectloader'
 import { MeteorTypeList } from './meteortypelist'
 import { addEphemeralComponentToEntity } from 'src/timer/ephemeral'
 import * as utils from '@dcl-sdk/utils'
+import { Eventful, HitMeteorEvent } from 'src/events'
+import { DclUser } from 'shared-dcl/src/playfab/dcluser'
 
 export class Meteor {
   public meteor: number
@@ -105,19 +107,17 @@ export class Meteor {
     const mi: MeteorInstance = loader.loadMeteorInstance(_data)
     console.log('meteor id=' + mi.id)
     // TODO hardcoded meteor List
-    MeteorTypeList.types = {
-      SmallMeteor: {
-        name: 'SmallMeteor',
-        filename: 'assets/models/meteors/meteor_gold_old.glb',
-        scale: [1, 1, 1],
-        metalType: 1,
-        chance: 100,
-        idleClip: 'idle',
-        dropClip: 'drop',
-        hitClip: 'hit',
-        depleteClip: 'deplete',
-        dropSound: 'sounds/meteorFall.mp3'
-      }
+    MeteorTypeList.types.SmallMeteor = {
+      name: 'SmallMeteor',
+      filename: 'assets/models/meteors/meteor_gold_old.glb',
+      scale: [1, 1, 1],
+      metalType: 1,
+      chance: 100,
+      idleClip: 'idle',
+      dropClip: 'drop',
+      hitClip: 'hit',
+      depleteClip: 'deplete',
+      dropSound: 'sounds/meteorFall.mp3'
     }
     mi.type = MeteorTypeList.getType(mi.typeName)
     console.log(mi.type, 'Might be the problem')
@@ -244,6 +244,12 @@ export class Meteor {
     return true
   }
 
+  onMeteorExpired(): void {
+    if (this.instanceData !== null) console.log('removing meteor ' + this.instanceData.id)
+
+    this.removeMeteor(this, false)
+  }
+
   // setupStateMachine(): void {
   //   // Construct the FSM with the inital state
   //   this.fsm = new FiniteStateMachine<MeteorState>(MeteorState.Idle)
@@ -291,6 +297,14 @@ export class Meteor {
   //   })
   // }
 
+  init(): void {
+    this.onIdle()
+  }
+
+  idle(): void {
+    // this.fsm.go(MeteorState.Idle);
+  }
+
   onIdle(): void {
     utils.timers.setTimeout(() => {
       this.drop()
@@ -299,5 +313,188 @@ export class Meteor {
 
   drop(): void {
     // this.fsm.go(MeteorState.Falling)
+  }
+
+  onDrop(): void {
+    // log("Meteor.onDrop()");
+
+    // scale down
+    this.stopAnimations()
+
+    // this.setScale(this.finalModelScale);
+    this.enabled = true // should be false!
+
+    // this.idleAnim.stop();
+
+    // this.idleAnim.weight = 0;
+    // this.dropAnim.weight = 1;
+    // this.dropAnim.play(true)
+
+    // const as: AudioSource = this.modelEntity.getComponent(AudioSource)
+    // log("meteor audio clip = " + as.audioClip.url);
+
+    // SoundManager.playOnce(this.modelEntity, 1.0)
+
+    // put it up at the drop point
+    this.moveY(this.yAdjust)
+
+    // let trans = this.entity.getComponent(Transform);
+    // log("active meteor at " + trans.position + "; scale=" + trans.scale);
+    // let shape = this.modelEntity.getComponent(GLTFShape);
+    // log("visible shape: " + shape.visible);
+
+    // 2DO: why doesn't this delayed function ever happen?
+    // if (this.entity.hasComponent(Delay)) {
+    //   this.entity.removeComponent(Delay)
+    // }
+
+    // TODO
+  }
+
+  setScale(_scale: Vector3): void {
+    if (this.entity !== null) Transform.getMutable(this.entity).scale = _scale
+  }
+
+  moveY(deltaY: number): void {
+    if (this.entity !== null) {
+      Transform.getMutable(this.entity).position.y = Transform.get(this.entity).position.y + deltaY
+    }
+  }
+
+  activate(): void {
+    console.log('Meteor.activate()')
+    // this.fsm.go(MeteorState.Active)
+  }
+
+  hit(): void {
+    console.log('Meteor.hit()')
+    // if (this.fsm.currentState != MeteorState.Mining) {
+    //   // this.fsm.go(MeteorState.Mining)
+    // }
+  }
+
+  onHit(): void {
+    console.log('Meteor.onHit()')
+    this.enabled = false
+    // this.dropAnim.stop();
+    // this.dropAnim.weight = 0;
+    // this.stopAnimations();
+    // 2DO: Add delay here?
+    // this.hitAnim.weight = 1;
+    // this.hitAnim.play(true)
+  }
+
+  /**
+   * Called when the player clicks on this meteor
+   */
+  onHitByPlayer(hitPoint: Vector3): void {
+    // log("onHitByPlayer() enabled=" + this.enabled);
+    if (this.alreadyMined) {
+      // log("Player has already hit this meteor!");
+      //  GameUi.instance.showTimedMessage('You already mined this meteor.', 5000)
+      this.disable()
+      return
+    } else {
+      for (let i = 0; i < this.hitters.length; i++) {
+        // if (this.hitters[i] == DclUser.activeUser.userId) {
+        //   // log("Player has already hit this meteor!");
+        //   GameUi.instance.showTimedMessage('You already mined this meteor.', 5000)
+        //   return
+        // }
+      }
+    }
+
+    // if ((this.isShared && this.hits >= this.maxHits) || this.fsm.currentState == MeteorState.Depleted) {
+    //   // log("Meteor is already depleted!");
+    //   // GameUi.instance.showTimedMessage('This meteor is depleted.', 5000)
+    //   return
+    // }
+
+    if (!this.enabled) return
+
+    if (this.onHitByPlayer != null) {
+      console.log('METEOR HIT')
+      Eventful.instance.fireEvent(new HitMeteorEvent(this, hitPoint))
+      // if (Meteor.onHitCallback(hitPoint, this))
+      // {
+      //   // record the hit
+      //   this.hitters.push(DclUser.activeUser.userId);
+      //   // can't hit this meteor any more
+      //   this.modelEntity.removeComponent(OnPointerDown);
+      // }
+    } else {
+      // record the hit
+      this.hitters.push(DclUser.activeUser.userId)
+    }
+
+    // remove the OnClick
+  }
+
+  disable(): void {
+    // record the hit
+    // this.hitters.push(DclUser.activeUser.userId)
+    // // can't hit this meteor any more
+    // this.modelEntity.removeComponent(OnPointerDown)
+  }
+
+  deplete(): void {
+    // this.fsm.go(MeteorState.Depleted)
+  }
+
+  onDeplete(): void {
+    console.log('Meteor.onDeplete()')
+    this.enabled = false
+
+    this.stopAnimations()
+    // this.depleteAnim.weight = 1;
+    // this.depleteAnim.play()
+
+    utils.timers.setTimeout(() => {
+      this.removeMeteor(this)
+
+      // if (this.pb != null) {
+      //   engine.removeEntity(this.pb)
+      // }
+    }, 15000)
+
+    // sound plays
+  }
+
+  stopAnimations(): void {
+    // if (this.dropAnim != null)
+    // {
+    //   //this.dropAnim.stop();
+    //   this.dropAnim.weight = 0;
+    // }
+    // if (this.hitAnim != null) {
+    //   this.hitAnim.stop()
+    //   // this.hitAnim.weight = 0;
+    // }
+    // if (this.idleAnim != null)
+    // {
+    //   //this.idleAnim.stop();
+    //   this.idleAnim.weight = 0;
+    // }
+    // if (this.depleteAnim != null)
+    // {
+    //   //this.depleteAnim.stop();
+    //   this.depleteAnim.weight = 0;
+    // }
+  }
+
+  setHits(hits: number): void {
+    if (hits < 0) hits = 0
+    this.hits = Math.min(hits, this.maxHits)
+    // if (this.isShared && this.pb != null) {
+    //   this.pb.setProgress(this.hits / this.maxHits)
+    // }
+  }
+
+  // getShape(): GLTFShape {
+  //   return this.modelEntity.getComponent(GLTFShape)
+  // }
+
+  reset(): void {
+    this.stopAnimations()
   }
 }
