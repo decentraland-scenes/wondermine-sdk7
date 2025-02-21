@@ -33,6 +33,9 @@ import { Meteor } from './wondermine/meteor'
 import { PickaxeTypeList } from './pickaxetypelist'
 import { PopupQueue } from './ui/popupqueue'
 import { type Item } from './ui/uipopuppanel'
+import { type LootItem } from './wondermine/lootitem'
+import { LootVault } from './wondermine/lootvault'
+import { transform } from 'typescript'
 
 export class GameManager {
   static instance: GameManager | null = null
@@ -57,6 +60,11 @@ export class GameManager {
   public axe: Pickaxe | null = null
   private readonly lootHomePos: number[] = [6.5, 0, 57]
   public popupQueue: PopupQueue | null = null
+
+  public lootItems: Item[] | null = null
+  // eslint-disable-next-line @typescript-eslint/ban-types
+  public sharedLootItems: Object[] | null = null
+  public miningErrorMessage: string = '' // "Something's wrong with this meteor.\nTry a different one."
   constructor(titleId: string) {
     this.api = new WondermineApi(titleId)
     this.checkContracts()
@@ -152,8 +160,8 @@ export class GameManager {
       GameUi.instance.init()
     }
 
-    // this.setUpMeteors();
-    // this.setUpPickaxes();
+    this.setUpMeteors()
+    this.setUpPickaxes()
 
     // this.loadResourceModels();
 
@@ -479,8 +487,107 @@ export class GameManager {
       console.log('onMiningCompleteCallback(), hasLootDropped=' + m.hasLootDropped + ', isShared=' + m.isShared)
       // eslint-disable-next-line @typescript-eslint/no-unused-expressions
       m.isMiningDone
-      // 2DO: check that server call has completed too
+      // 2DO: check that server call has completed too´
+      if (m.hasLootDropped) {
+        // open the meteor
+        m.hit()
+
+        let item: any
+        let itemClass: string
+        let lootEnt: LootItem
+
+        if (this.lootItems != null && this.lootItems.length > 0) {
+          for (var i: number = 0; i < this.lootItems.length; i++) {
+            item = this.lootItems[i]
+
+            itemClass = item.ItemClass
+
+            if (itemClass === 'metal' || itemClass === 'gem') {
+              // log("METAL " + i + ": " + item["DisplayName"]);
+              if (LootVault.instance != null) {
+                lootEnt = LootVault.instance.get(item.ItemId)
+                if (lootEnt != null) {
+                  const tPos: Vector3.MutableVector3 = Vector3.clone(Transform.getMutable(m.entity).position)
+                  tPos.y = tPos.y + 1
+                  // log(tPos);
+                  lootEnt.showAt(tPos)
+                }
+              }
+            }
+          }
+          // show the loot popup
+          this.showLootRewards(this.lootItems, m.isShared)
+        } else {
+          // no loot probably means an error
+          if (this.miningErrorMessage !== '') {
+            this.showMiningError(this.miningErrorMessage)
+          }
+          utils.timers.setTimeout(() => {
+            this.removePickaxe()
+          }, 2000)
+        }
+      } else {
+        // show an error message about the loot not arriving
+        this.showMiningError(
+          "The loot didn't arrive! It might still be applied to your inventory. We will investigate."
+        )
+        // hide the pickaxe in a few seconds
+        utils.timers.setTimeout(() => {
+          this.removePickaxe()
+        }, 2000)
+      }
     }
+  }
+
+  hidePickaxe(): void {
+    if (this.axe != null) {
+      this.axe.hide()
+      // remove the pickaxe in a few seconds (to give sounds a chance to finish)
+      utils.timers.setTimeout(() => {
+        this.removePickaxe()
+      }, 4000)
+    }
+  }
+
+  removePickaxe(): void {
+    if (this.axe != null && !this.axe.isBusy) {
+      this.axe.removeEntity()
+    }
+  }
+
+  showLootRewards(lootItems: Item[], isShared: boolean = false, isSharedBonus: boolean = false): void {
+    console.log(
+      'showLootRewards() #items: ' + lootItems.length + ', isShared: ' + isShared + ', isSharedBonus: ' + isSharedBonus
+    )
+    this.hidePickaxe()
+
+    // update level display
+    if (GameUi.instance != null) {
+      GameUi.instance.setLevel(DclUser.activeUser.level, DclUser.activeUser.xp)
+    }
+
+    // show mining loot
+    this.showRewards(
+      lootItems,
+      isSharedBonus ? PopupWindowType.SharedBonus : isShared ? PopupWindowType.MinedShared : PopupWindowType.Mined
+    )
+    // log("showLootRewards()");
+    // log(this.lootItems);
+    // let msg:string = "";
+    // if (this.lootItems != null)
+    // {
+    //   for (var i:number = 0; i < this.lootItems.length; i++)
+    //   {
+    //     //item = this.loader.populate(new ItemInfo(), items[i]);
+
+    //     if (this.lootItems[i]["ItemId"] != "MeteorLootStone")
+    //     {
+    //       log("ITEM " + i + ": " + this.lootItems[i]["DisplayName"]);
+    //       // don't include parent bundle
+    //       msg += '\n' + this.lootItems[i]["DisplayName"];
+    //     }
+    //   }
+    // }
   }
 
   // --- LEADERBOARD ---
@@ -534,6 +641,12 @@ export class GameManager {
 
     if (GameManager.instance?.machine != null) {
       GameManager.instance.machine.reset(true)
+    }
+  }
+
+  showMiningError(msg: string): void {
+    if (GameUi.instance != null) {
+      GameUi.instance.showTimedMessage(msg, 8000)
     }
   }
 

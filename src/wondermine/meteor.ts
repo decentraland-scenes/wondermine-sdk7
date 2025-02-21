@@ -169,7 +169,7 @@ export class Meteor {
 
     const mod: Entity = loader.spawnMeteorModel(m)
     if (this.entity != null) {
-      Transform.create(mod, { parent: this.entity })
+      Transform.getMutable(mod).parent = this.entity
     }
 
     // --- set the animations
