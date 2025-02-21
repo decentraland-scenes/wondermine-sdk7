@@ -1,7 +1,7 @@
 /**
  * Keeps all wearable IDs in one place
  */
-export const wearablesData: object[] = [
+export const wearablesData: any[] = [
   // SKINS
   {
     id: '0xed2692690fb36a4906ec8d04add42e2fa1510151',
