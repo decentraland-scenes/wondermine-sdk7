@@ -45,11 +45,13 @@ export class CraftItemEvent {
 // @EventConstructor()
 export class HitMeteorEvent {
   public meteor: Meteor
-  public hitPoint: Vector3
+  public hitPoint: Vector3 | undefined
 
-  constructor(_meteor: Meteor, _hitPoint: Vector3) {
+  constructor(_meteor: Meteor, _hitPoint: Vector3 | undefined) {
     this.meteor = _meteor
-    this.hitPoint = _hitPoint
+    if (_hitPoint !== undefined) {
+      this.hitPoint = _hitPoint
+    }
   }
 }
 

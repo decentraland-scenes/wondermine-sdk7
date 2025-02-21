@@ -136,7 +136,7 @@ export class GameManager {
     }
   }
 
-  hitMeteor(hitPoint: Vector3.MutableVector3, meteor: Meteor): boolean {
+  hitMeteor(hitPoint: Vector3.MutableVector3 | undefined, meteor: Meteor): boolean {
     return true
   }
 

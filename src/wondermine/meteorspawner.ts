@@ -4,7 +4,7 @@ import { MeteorTypeList } from './meteortypelist'
 import { type MeteorType, type MeteorInstance } from '../projectdata'
 import { MeteorTypeId } from '../enums'
 import { Vector3 } from '@dcl/sdk/math'
-import { AABB } from 'shared-dcl/physics/aabb'
+import { AABB } from 'shared-dcl/src/physics/aabb'
 // import { GameManager } from '../gamemanager';
 
 export class MeteorSpawner {
