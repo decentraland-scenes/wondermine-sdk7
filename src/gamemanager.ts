@@ -825,7 +825,7 @@ export class GameManager {
 
   spawnMeteor(): void {
     if (this.spawner !== null) {
-      const m: Meteor = this.spawner.spawn(MeteorTypeId[MeteorTypeId.Local]) // MeteorTypeId[MeteorTypeId.Medium]
+      const m: Meteor | null = this.spawner.spawn(MeteorTypeId[MeteorTypeId.Local]) // MeteorTypeId[MeteorTypeId.Medium]
       // 1DO A1 Need to provide the right context here!
       Meteor.onHitCallback = (hitPoint: Vector3, m: Meteor) => {
         // log("onHitCallback in GameManager");

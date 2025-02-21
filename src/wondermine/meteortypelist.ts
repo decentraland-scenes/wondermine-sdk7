@@ -24,22 +24,21 @@ export class MeteorTypeList {
     return MeteorTypeList.types[typeName] as MeteorType
   }
 
-  static getRandomType(): MeteorType | null {
+  static getRandomType(): MeteorType {
     const rand: number = Math.floor(Math.random() * this.totalChance)
     const typeNames: string[] = Object.keys(this.types)
 
     let runningTotal: number = 0
-    let mt: MeteorType
+    let mt: MeteorType | null = null
 
     for (let i = 0; i < typeNames.length; i++) {
-      mt = this.types[typeNames[i]] as MeteorType
+      mt = this.types[typeNames[i]] as MeteorType // Asegurar el tipo correcto
       runningTotal += mt.chance
       if (runningTotal >= rand) {
-        // this is the lucky type
         console.log('rand=' + rand + ', running=' + runningTotal + ', type=' + mt.name)
         return mt
       }
     }
-    return null
+    return mt ?? (this.types[typeNames[typeNames.length - 1]] as MeteorType)
   }
 }

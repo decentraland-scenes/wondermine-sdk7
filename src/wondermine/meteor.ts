@@ -357,7 +357,7 @@ export class Meteor {
 
     // log("meteor audio clip = " + as.audioClip.url);
 
-    SoundManager.playOnce(this.modelEntity, 1.0)
+    SoundManager.playOnce(this.modelEntity, 1.0) 
 
     // put it up at the drop point
     this.moveY(this.yAdjust)
