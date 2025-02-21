@@ -13,7 +13,7 @@ import {
 } from '@dcl/sdk/ecs'
 import { Vector3, Quaternion } from '@dcl/sdk/math'
 import { DclUser } from 'shared-dcl/src/playfab/dcluser'
-import { SoundManager } from 'shared-dcl/src/sound/soundmanager'
+// import { SoundManager } from 'shared-dcl/src/sound/soundmanager'
 import { Eventful, HitMeteorEvent } from 'src/events'
 import { FiniteStateMachine } from 'shared-dcl/src/fsm/typestate'
 import { MeteorInstance } from 'src/projectdata'
@@ -128,7 +128,6 @@ export class Meteor {
       console.log(this.loadInstance(_data), ' -->>>>> THIS NEEDS TO BE TRUE ')
       if (this.loadInstance(_data)) {
         // log("loaded Meteor at " + _data["pos"]);
-        this.entity = engine.addEntity()
         console.log('ENTITY ADDED TO ENGINE!')
       }
     }
@@ -225,7 +224,7 @@ export class Meteor {
     this.setupStateMachine()
 
     // add sounds
-    SoundManager.attachSoundFile(this.modelEntity, 'meteorFall', mi.type.dropSound)
+    // SoundManager.attachSoundFile(this.modelEntity, 'meteorFall', mi.type.dropSound)
 
     // --- make this a physics object
     // this.rigidBody = new RigidBody( this.entity, new Vector3(1,0,1), 0.6, 0.2, true);
@@ -357,7 +356,7 @@ export class Meteor {
 
     // log("meteor audio clip = " + as.audioClip.url);
 
-    SoundManager.playOnce(this.modelEntity, 1.0) 
+    // SoundManager.playOnce(this.modelEntity, 1.0) 
 
     // put it up at the drop point
     this.moveY(this.yAdjust)
@@ -387,8 +386,7 @@ export class Meteor {
 
   moveY(deltaY: number): void {
     const trans: TransformType = Transform.get(this.entity)
-    trans.position = Vector3.create(trans.position.x, trans.position.y + deltaY, trans.position.z)
-    Transform.getMutable(this.entity).position = trans.position
+    Transform.getMutable(this.entity).position = Vector3.create(trans.position.x, trans.position.y + deltaY, trans.position.z)
   }
 
   activate(): void {
@@ -554,6 +552,7 @@ export class Meteor {
   }
 
   getShape(): PBGltfContainer {
+    console.log(GltfContainer.get(this.modelEntity).src, 'meteor path')
     return GltfContainer.get(this.modelEntity)
   }
 
