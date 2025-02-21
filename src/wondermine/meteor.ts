@@ -16,7 +16,7 @@ export class Meteor {
   public hits: number = 0
   public maxHits: number = 10
   public hitters: string[] = []
-  public entity: Entity | null = null
+  public entity: Entity = engine.addEntity()
 
   public isShared: boolean = false
 
