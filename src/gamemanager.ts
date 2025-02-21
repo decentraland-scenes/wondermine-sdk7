@@ -105,7 +105,6 @@ export class GameManager {
 
     // //Load the leaderboard model itself and initialize it,
     // //then load the actual stats from inside loginToPlayFab()
-    // this.loadLeaderboard();
     this.loadScenery()
     this.loadShop()
     this.loadCrafting()
@@ -305,9 +304,11 @@ export class GameManager {
       console.log('*** CHANGED TOOL ***:', newTool)
 
       this.spawnPickaxe(newTool)
-      // GameUi.instance.changeAxeIcon(newTool);
-      // update the mining bonus display
-      // GameUi.instance.showBonus();
+      if (GameUi.instance != null) {
+        GameUi.instance.changeAxeIcon(newTool)
+        // update the mining bonus display
+        GameUi.instance.showBonus()
+      }
 
       // 2DO: after the first time, we don't need to update every time a player plays
       if (updateServer ?? false) {
