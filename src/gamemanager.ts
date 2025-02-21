@@ -9,7 +9,7 @@ import { CoinShop } from './coinshop'
 import { CraftingMachine } from './craftingmachine'
 import * as utils from '@dcl-sdk/utils'
 import { Vector3 } from '@dcl/sdk/math'
-import { Eventful, CraftItemEvent, BenchmarkEvent } from './events'
+import { Eventful, CraftItemEvent, BenchmarkEvent, ChangeToolEvent } from './events'
 import { svr } from './svr'
 import { type EventManager } from './eventManager'
 import { Leaderboard } from './leaderboard'
@@ -19,6 +19,11 @@ import { ContractManager } from './contracts/contractManager'
 import { WzNftContract } from './contracts/wzNftContract'
 import { ChainId, PopupWindowType } from './enums'
 import { getProviderPromise } from './contracts/nftChecker'
+import { Pickaxe } from './pickaxe'
+import { type ItemInfo } from 'shared-dcl/src/playfab/iteminfo'
+import { PickaxeInstance } from './projectdata'
+import { type Meteor } from './wondermine/meteor'
+import { PickaxeTypeList } from './pickaxetypelist'
 import { PopupQueue } from './ui/popupqueue'
 import { type Item } from './ui/uipopuppanel'
 
@@ -39,6 +44,9 @@ export class GameManager {
   public shop: CoinShop | null = null
   public machine: CraftingMachine | null = null
   private board: Leaderboard | null = null
+
+  public axe: Pickaxe | null = null
+  private readonly lootHomePos: number[] = [6.5, 0, 57]
   public popupQueue: PopupQueue | null = null
   constructor(titleId: string) {
     this.api = new WondermineApi(titleId)
@@ -288,6 +296,41 @@ export class GameManager {
     }
   }
 
+  setUpPickaxes(): void {
+    console.log('setUpPickaxes(), test=' + Pickaxe.test)
+    PickaxeTypeList.loadTypes(som.toolTypes)
+
+    // listen for tool events
+    Eventful.instance.addListener(ChangeToolEvent, null, ({ newTool, updateServer }) => {
+      console.log('*** CHANGED TOOL ***:', newTool)
+
+      this.spawnPickaxe(newTool)
+      // GameUi.instance.changeAxeIcon(newTool);
+      // update the mining bonus display
+      // GameUi.instance.showBonus();
+
+      // 2DO: after the first time, we don't need to update every time a player plays
+      if (updateServer ?? false) {
+        executeTask(async () => {
+          if (this.api != null) {
+            // eslint-disable-next-line @typescript-eslint/unbound-method
+            this.api.CallCloudScript('changeTool', { id: newTool.ItemInstanceId }, this.onToolChanged, false)
+          }
+        })
+      }
+    })
+  }
+
+  onToolChanged(error: any, json: any): void {
+    // log("onToolChanged()");
+    if (error != null) {
+      console.log('onToolChanged call error!')
+      console.log(error)
+    } else {
+      console.log('onToolChanged', json)
+    }
+  }
+
   getPlayerInventory(): void {
     // log("getPlayerInventory()");
     executeTask(async () => {
@@ -319,6 +362,66 @@ export class GameManager {
         this.machine.refreshRecipe()
       }
     })
+  }
+
+  changeTool(newTool: ItemInfo): void {
+    console.log('changeTool()', newTool)
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    if (!newTool) {
+      console.log('ERROR: No pickaxe!')
+    } else {
+      if (newTool.ItemId !== this.axe?.instanceData?.ItemId) {
+        console.log('axe type has changed')
+        this.spawnPickaxe(newTool)
+      } else {
+        // can use the same axe model; only instance data changed
+      }
+    }
+  }
+
+  spawnPickaxe(axeData: ItemInfo): void {
+    console.log('SPAWN PICKAXE: ' + axeData.ItemId)
+    let axeInstance: PickaxeInstance = new PickaxeInstance()
+    if (this.loader != null) {
+      axeInstance = this.loader.populate(axeInstance, axeData)
+    }
+    axeInstance.typeName = axeData.ItemId
+    axeInstance.pos = this.lootHomePos
+    axeInstance.scale = [1, 1, 1]
+
+    console.log('axeInstance: test=' + Pickaxe.test)
+    console.log(axeInstance)
+    const p: Pickaxe = new Pickaxe(axeInstance)
+    if (p != null) {
+      if (this.axe != null) {
+        // clear out the old axe so it can be garbage-collected
+        this.axe.onMiningAnimCompleteCallback = null
+        if (this.axe.entity != null && engine.getEntityState(this.axe.entity) === 1) {
+          engine.removeEntity(this.axe.entity)
+        }
+        // do we need to clear out the shape and other objects too?
+        this.axe = null
+      }
+
+      p.onMiningAnimCompleteCallback = (m: Meteor | null) => {
+        // log("onMiningCompleteCallback in GameManager");
+        this.onMiningCompleteCallback(m)
+      }
+      this.axe = p
+    }
+  }
+
+  /**
+   * Called when pickaxe animation is complete
+   * @param m
+   */
+  onMiningCompleteCallback(m: Meteor | null): void {
+    if (m !== null) {
+      console.log('onMiningCompleteCallback(), hasLootDropped=' + m.hasLootDropped + ', isShared=' + m.isShared)
+      // eslint-disable-next-line @typescript-eslint/no-unused-expressions
+      m.isMiningDone
+      // 2DO: check that server call has completed too
+    }
   }
 
   // --- LEADERBOARD ---

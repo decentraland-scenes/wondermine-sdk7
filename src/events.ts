@@ -78,14 +78,12 @@ export class MeteorLootEvent {
 
 // @EventConstructor()
 export class ChangeToolEvent {
-  public newTool: ItemInfo | undefined
-  public updateServer: boolean | undefined
+  public newTool: ItemInfo
+  public updateServer: boolean | null = null
 
-  constructor(_newTool: ItemInfo | undefined, _updateSvr: boolean) {
-    if (_newTool !== undefined) {
-      this.newTool = _newTool
-      this.updateServer = _updateSvr
-    }
+  constructor(_newTool: ItemInfo, _updateSvr: boolean) {
+    this.newTool = _newTool
+    this.updateServer = _updateSvr
   }
 }
 

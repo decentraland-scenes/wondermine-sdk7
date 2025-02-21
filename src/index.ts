@@ -20,5 +20,7 @@ export async function main(): Promise<void> {
       DclUser.setUserInfo(response.data.userId, response.data.displayName, response.data.publicKey)
     }
   }
+
+  // Crear un nuevo meteorito
 }
 // function getUserData(Request: any): Promise<Response>
