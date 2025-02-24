@@ -1,4 +1,4 @@
-import { Recipe } from './projectdata'
+import { Recipe, type SharedMeteor } from './projectdata'
 
 /**
  * Local store of game-wide data (not user specific)
@@ -28,12 +28,17 @@ export class GameData {
   public static setRecipes(recipeList: Object[]): void {
     // log("setRecipes()");
     const recipeArray: Recipe[] = []
-    let item: Recipe
+    let item: Recipe | SharedMeteor
 
-    for (var i: number = 0; i < recipeList.length; i++) {
+    for (let i: number = 0; i < recipeList.length; i++) {
       try {
         item = this.populate(new Recipe(), recipeList[i]) // TODO: error checking
-        recipeArray.push(item)
+        // recipeArray.push(item)
+        if (item instanceof Recipe) {
+          recipeArray.push(item) // TODO TEST FOR SharedMeteor | Find work around
+        } else {
+          console.log('Skipping non-Recipe item:', item)
+        }
       } catch (e) {
         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
         console.log('Error converting recipe item: ' + e)
@@ -66,7 +71,7 @@ export class GameData {
 
   // --- UTILITY FUNCTIONS ---
   // eslint-disable-next-line @typescript-eslint/ban-types
-  static populate(target: Recipe, ...args: Array<Record<string, any>>): Recipe {
+  static populate(target: Recipe | SharedMeteor, ...args: Array<Record<string, any>>): Recipe | SharedMeteor {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (!target) {
       throw TypeError('Cannot convert undefined or null to object')
@@ -90,7 +95,7 @@ export class GameData {
 
   public static getRecipeById(recipeId: string): Recipe | null {
     let item: Recipe
-    for (var i: number = 0; i < GameData.recipes.length; i++) {
+    for (let i: number = 0; i < GameData.recipes.length; i++) {
       item = GameData.recipes[i]
       if (item.id === recipeId) {
         return item

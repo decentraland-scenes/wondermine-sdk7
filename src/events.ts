@@ -58,9 +58,9 @@ export class HitMeteorEvent {
 // @EventConstructor()
 export class MeteorServerEvent {
   public msg: string
-  public room: Room<any>
+  public room: Room<any> | null
 
-  constructor(_msg: string, _room: Room<any>) {
+  constructor(_msg: string, _room: Room<any> | null = null) {
     // _room inside the constructor should allow this '  = null ' in case you dont pass any parameter as a room.
     this.msg = _msg
     this.room = _room

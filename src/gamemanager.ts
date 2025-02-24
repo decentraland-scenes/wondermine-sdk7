@@ -9,7 +9,15 @@ import { CoinShop, type StoreItem } from './coinshop'
 import { CraftingMachine } from './craftingmachine'
 import * as utils from '@dcl-sdk/utils'
 import { type Quaternion, Vector3 } from '@dcl/sdk/math'
-import { Eventful, CraftItemEvent, BenchmarkEvent, HitMeteorEvent, ChangeToolEvent, MeteorLootEvent } from './events'
+import {
+  Eventful,
+  CraftItemEvent,
+  BenchmarkEvent,
+  HitMeteorEvent,
+  ChangeToolEvent,
+  MeteorLootEvent,
+  MeteorServerEvent
+} from './events'
 import { svr } from './svr'
 import { type EventManager } from './eventManager'
 import { Leaderboard } from './leaderboard'
@@ -22,6 +30,7 @@ import { MeteorTypeList } from './wondermine/meteortypelist'
 import { SharedMeteor, type MeteorSpawnerInstance } from './projectdata'
 import { MeteorSpawner } from './wondermine/meteorspawner'
 import { ChainId, MeteorTypeId, PopupWindowType, ToolIds } from './enums'
+import { getPlayer } from '@dcl/sdk/src/players'
 
 import { Pickaxe } from './pickaxe'
 import { ItemInfo } from 'shared-dcl/src/playfab/iteminfo'
@@ -35,6 +44,7 @@ import { LootVault } from './wondermine/lootvault'
 import { transform } from 'typescript'
 import { GameData } from './gamedata'
 import calcWearablesBonus from './bonusmanager'
+import { MeteorServer } from './multiplayer/meteorserver'
 
 export class GameManager {
   static instance: GameManager | null = null
@@ -116,7 +126,35 @@ export class GameManager {
     this.loadLeaderboard()
   }
 
-  connectToMeteorServer(): void {}
+  connectToMeteorServer(): void {
+    const options = {
+      userData: {
+        userId: DclUser.activeUser.userId,
+        displayName: DclUser.activeUser.displayName,
+        publicKey: DclUser.activeUser.publicKey
+      },
+      realm: DclUser.getRealmName()
+    }
+
+    // connect to meteor server
+    const server: MeteorServer = new MeteorServer()
+    server.connectToServer(options)
+
+    Eventful.instance.addListener(MeteorServerEvent, this, (event: MeteorServerEvent) => {
+      console.log('MessageEvent: ' + event.msg)
+      if (event.msg === 'connected') {
+        console.log('onConnectedToMeteorServer()')
+      } else if (event.msg === 'connectError') {
+        server.reconnect()
+      } else if (event.msg === 'leftRoom 1000') {
+        // possible server restart
+        // remove all shared meteors!
+        this.removeSharedMeteors()
+
+        server.reconnect()
+      }
+    })
+  }
 
   async getCurrentUser(): Promise<void> {
     executeTask(async () => {
@@ -530,7 +568,7 @@ export class GameManager {
 
       if (canCraft) {
         const body = {
-          recipeId: recipeId,
+          recipeId,
           addr: DclUser.activeUser.userId,
           toolId: DclUser.activeUser.heldItem?.ItemInstanceId
         }
@@ -903,7 +941,7 @@ export class GameManager {
 
     // let obj:object = som.loot;
     // log(Object.keys(obj));
-    for (var i: number = 0; i < keys.length; i++) {
+    for (let i: number = 0; i < keys.length; i++) {
       // log("loading " + keys[i]);
       // load the model, but don't add it to the engine
       // ent = this.loader.spawnSceneObject(som.loot[keys[i]], true);
@@ -1011,7 +1049,7 @@ export class GameManager {
         let lootEnt: LootItem
 
         if (this.lootItems != null && this.lootItems.length > 0) {
-          for (var i: number = 0; i < this.lootItems.length; i++) {
+          for (let i: number = 0; i < this.lootItems.length; i++) {
             item = this.lootItems[i]
 
             itemClass = item.ItemClass

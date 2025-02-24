@@ -8,7 +8,7 @@ import {
   Transform,
   Animator,
   pointerEventsSystem,
-  InputAction,
+  // InputAction,
   GltfContainer
 } from '@dcl/sdk/ecs'
 import { Vector3, Quaternion } from '@dcl/sdk/math'
@@ -204,23 +204,23 @@ export class Meteor {
     }
     this.modelEntity = mod
 
-    if (mi.type.idleClip !== 'none') {
-      this.idleAnim = { clip: mi.type.idleClip, loop: true, weight: 0 }
-      Animator.getMutable(mod).states = [this.idleAnim]
-    }
+    // if (mi.type.idleClip !== 'none') {
+    //   this.idleAnim = { clip: mi.type.idleClip, loop: true, weight: 0 }
+    //   Animator.getMutable(mod).states = [this.idleAnim]
+    // }
 
-    if (mi.type.dropClip !== 'none') {
-      this.dropAnim = { clip: mi.type.dropClip, loop: false, weight: 0 }
-      Animator.getMutable(mod).states = [this.dropAnim]
-    }
-    if (mi.type.hitClip !== 'none') {
-      this.hitAnim = { clip: mi.type.hitClip, loop: false, weight: 0 }
-      Animator.getMutable(mod).states = [this.hitAnim]
-    }
-    if (mi.type.depleteClip !== 'none') {
-      this.depleteAnim = { clip: mi.type.depleteClip, loop: false, weight: 0 }
-      Animator.getMutable(mod).states = [this.depleteAnim]
-    }
+    // if (mi.type.dropClip !== 'none') {
+    //   this.dropAnim = { clip: mi.type.dropClip, loop: false, weight: 0 }
+    //   Animator.getMutable(mod).states = [this.dropAnim]
+    // }
+    // if (mi.type.hitClip !== 'none') {
+    //   this.hitAnim = { clip: mi.type.hitClip, loop: false, weight: 0 }
+    //   Animator.getMutable(mod).states = [this.hitAnim]
+    // }
+    // if (mi.type.depleteClip !== 'none') {
+    //   this.depleteAnim = { clip: mi.type.depleteClip, loop: false, weight: 0 }
+    //   Animator.getMutable(mod).states = [this.depleteAnim]
+    // }
     this.setupStateMachine()
 
     // add sounds
@@ -235,18 +235,18 @@ export class Meteor {
       this.onMeteorExpired()
     })
 
-    pointerEventsSystem.onPointerDown(
-      {
-        entity: this.modelEntity,
-        opts: { button: InputAction.IA_POINTER, hoverText: 'Mine', maxDistance: 8 }
-      },
-      (event) => {
-        if (event.hit != null) {
-          const hp: Vector3 | undefined = event.hit.position // Obtiene las coordenadas del hit
-          this.onHitByPlayer(hp)
-        }
-      }
-    )
+    // pointerEventsSystem.onPointerDown(
+    //   {
+    //     entity: this.modelEntity,
+    //     opts: { button: InputAction.IA_POINTER, hoverText: 'Mine', maxDistance: 8 }
+    //   },
+    //   (event) => {
+    //     if (event.hit != null) {
+    //       const hp: Vector3 | undefined = event.hit.position // Obtiene las coordenadas del hit
+    //       this.onHitByPlayer(hp)
+    //     }
+    //   }
+    // )
 
     return true
   }
@@ -356,7 +356,7 @@ export class Meteor {
 
     // log("meteor audio clip = " + as.audioClip.url);
 
-    // SoundManager.playOnce(this.modelEntity, 1.0) 
+    // SoundManager.playOnce(this.modelEntity, 1.0)
 
     // put it up at the drop point
     this.moveY(this.yAdjust)
@@ -386,7 +386,11 @@ export class Meteor {
 
   moveY(deltaY: number): void {
     const trans: TransformType = Transform.get(this.entity)
-    Transform.getMutable(this.entity).position = Vector3.create(trans.position.x, trans.position.y + deltaY, trans.position.z)
+    Transform.getMutable(this.entity).position = Vector3.create(
+      trans.position.x,
+      trans.position.y + deltaY,
+      trans.position.z
+    )
   }
 
   activate(): void {
