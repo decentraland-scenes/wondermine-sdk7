@@ -24,6 +24,7 @@ import { MeteorState } from 'src/states'
 import { MeteorTypeId } from 'src/enums'
 import * as utils from '@dcl-sdk/utils'
 import { GameUi } from 'src/ui/gameui'
+import { SoundManager } from 'shared-dcl/src/sound/soundmanager'
 
 export class Meteor {
   static activeMeteors: Meteor[] = []
@@ -219,7 +220,7 @@ export class Meteor {
     this.setupStateMachine()
 
     // add sounds
-    // SoundManager.attachSoundFile(this.modelEntity, 'meteorFall', mi.type.dropSound)
+    SoundManager.attachSoundFile(this.modelEntity, 'meteorFall', mi.type.dropSound)
 
     // --- make this a physics object
     // this.rigidBody = new RigidBody( this.entity, new Vector3(1,0,1), 0.6, 0.2, true);
@@ -351,7 +352,7 @@ export class Meteor {
 
     // log("meteor audio clip = " + as.audioClip.url);
 
-    // SoundManager.playOnce(this.modelEntity, 1.0)
+    SoundManager.playOnce(this.modelEntity, 1.0)
 
     // put it up at the drop point
     this.moveY(this.yAdjust)
