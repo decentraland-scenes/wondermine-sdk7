@@ -547,7 +547,6 @@ export class Meteor {
   }
 
   getShape(): PBGltfContainer {
-    console.log(GltfContainer.get(this.modelEntity).src, 'meteor path')
     return GltfContainer.get(this.modelEntity)
   }
 
