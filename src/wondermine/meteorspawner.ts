@@ -4,7 +4,7 @@ import { MeteorTypeList } from './meteortypelist'
 import { type MeteorType, type MeteorInstance } from '../projectdata'
 import { MeteorTypeId } from '../enums'
 import { Vector3 } from '@dcl/sdk/math'
-import { AABB } from 'shared-dcl/physics/aabb'
+import { AABB } from 'shared-dcl/src/physics/aabb'
 // import { GameManager } from '../gamemanager';
 
 export class MeteorSpawner {
@@ -59,16 +59,10 @@ export class MeteorSpawner {
     }
   }
 
-  spawn(typeName: string | null = null): Meteor {
-    // Obtener el tipo de meteorito
-    let type: MeteorType
-
-    if (typeName != null && typeName.length > 0) {
-      type = MeteorTypeList.getType(typeName)
-    } else {
-      throw new Error('typeName is null or undefined')
-    }
-
+  spawn(typeName: string): Meteor {
+    // get meteor type data
+    const type: MeteorType = (typeName.length > 0) ? MeteorTypeList.getType(typeName) : MeteorTypeList.getRandomType()
+    console.log('meteor spawn', type)
     const dropX = this.xMin + Math.ceil(Math.random() * this.xWidth * 1)
     const dropZ = this.zMin + Math.ceil(Math.random() * this.zWidth * 1)
 
@@ -127,7 +121,6 @@ export class MeteorSpawner {
     alreadyMined: boolean = false
   ): Meteor {
     // place the meteor at the right point, with disabled status
-
     // start it tiny, in case it appears on the ground first
 
     if (dur === 0) {

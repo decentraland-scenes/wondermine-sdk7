@@ -1,5 +1,5 @@
 // som modules
-import { engine, type Entity, GltfContainer, Transform } from '@dcl/sdk/ecs'
+import { engine, type Entity, GltfContainer, type PBGltfContainer, Transform } from '@dcl/sdk/ecs'
 import { ModelLoader } from '../shared-dcl/src/som/modelloader'
 import {
   UiImageData,
@@ -82,18 +82,18 @@ export class ProjectLoader extends ModelLoader {
     const mod = engine.addEntity()
 
     // check cache to see if shape is already there
-    let shape: string
+    let shape: PBGltfContainer
     // HACK: disable caching to debug a meteor issue
     // shape = this.cache[data.type.filename];
-    shape = this.filePrefix + data.type.filename
+    shape = { src: this.filePrefix + data.type.filename }
     // log("loading " + data.type.filename);
 
     if (shape === undefined) {
       // log("shape does not exist yet");
-      shape = this.filePrefix + data.type.filename
+      shape = { src: this.filePrefix + data.type.filename }
       this.cache[data.type.filename] = shape
     }
-    GltfContainer.create(mod, { src: shape })
+    GltfContainer.create(mod, shape)
 
     Transform.create(mod, { position: Vector3.create(...data.pos), scale: Vector3.create(...data.scale) })
     Transform.getMutable(mod).rotation = Quaternion.fromEulerDegrees(data.angles[0], data.angles[1], data.angles[2])
