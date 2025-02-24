@@ -76,7 +76,7 @@ export class SoundManager {
     const as: PBAudioSource | null = AudioSource.getOrNull(_ent)
     if (as != null) {
       AudioSource.getMutable(_ent).loop = false
-      if (AudioSource.get(_ent).playing === true){
+      if (AudioSource.get(_ent).playing === true) {
         AudioSource.getMutable(_ent).playing = false
       }
       AudioSource.getMutable(_ent).volume = Math.max(_vol, 1.0)
