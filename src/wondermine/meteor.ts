@@ -2,7 +2,6 @@ import {
   engine,
   type Entity,
   type PBGltfContainer,
-  type PBAnimator,
   type PBAnimationState,
   type TransformType,
   Transform,
@@ -85,11 +84,10 @@ export class Meteor {
   public finalModelScale: Vector3 = Vector3.create(1, 1, 1)
   // public displayTxt: TextShape;
 
-  public anim: PBAnimator | null = null
-  public idleAnim: PBAnimationState | null = null
-  public dropAnim: PBAnimationState | null = null
-  public hitAnim: PBAnimationState | null = null
-  public depleteAnim: PBAnimationState | null = null
+  public idleAnim: PBAnimationState = { clip: '' }
+  public dropAnim: PBAnimationState = { clip: '' }
+  public hitAnim: PBAnimationState = { clip: '' }
+  public depleteAnim: PBAnimationState = { clip: '' }
 
   public enabled: boolean = true
 
@@ -125,7 +123,6 @@ export class Meteor {
 
   constructor(_data: MeteorInstance) {
     if (_data !== null && _data !== undefined) {
-      console.log(this.loadInstance(_data), ' -->>>>> THIS NEEDS TO BE TRUE ')
       if (this.loadInstance(_data)) {
         // log("loaded Meteor at " + _data["pos"]);
         console.log('ENTITY ADDED TO ENGINE!')
@@ -194,33 +191,31 @@ export class Meteor {
     m.type = mi.type
 
     const mod: Entity = loader.spawnMeteorModel(m)
-    if (this.entity != null) {
-      Transform.createOrReplace(mod).parent = this.entity
-    }
+
+    Transform.getMutable(mod).parent = this.entity
     // --- set the animations
-    this.anim = { states: [] }
-    if (mi.type.dropClip !== 'none' || mi.type.hitClip !== 'none' || mi.type.depleteClip !== 'none') {
-      Animator.create(mod, this.anim)
-    }
-    this.modelEntity = mod
 
     if (mi.type.idleClip !== 'none') {
-      this.idleAnim = { clip: mi.type.idleClip, loop: true, weight: 0 }
-      Animator.getMutable(mod).states = [this.idleAnim]
+      this.idleAnim = { clip: mi.type.idleClip, loop: true }
     }
 
     if (mi.type.dropClip !== 'none') {
-      this.dropAnim = { clip: mi.type.dropClip, loop: false, weight: 0 }
-      Animator.getMutable(mod).states = [this.dropAnim]
+      this.dropAnim = { clip: mi.type.dropClip, loop: false }
     }
     if (mi.type.hitClip !== 'none') {
-      this.hitAnim = { clip: mi.type.hitClip, loop: false, weight: 0 }
-      Animator.getMutable(mod).states = [this.hitAnim]
+      this.hitAnim = { clip: mi.type.hitClip, loop: false }
     }
     if (mi.type.depleteClip !== 'none') {
-      this.depleteAnim = { clip: mi.type.depleteClip, loop: false, weight: 0 }
-      Animator.getMutable(mod).states = [this.depleteAnim]
+      this.depleteAnim = { clip: mi.type.depleteClip, loop: false }
     }
+
+    if (mi.type.dropClip !== 'none' || mi.type.hitClip !== 'none' || mi.type.depleteClip !== 'none') {
+      Animator.create(mod, {
+        states: [this.idleAnim, this.dropAnim, this.hitAnim, this.depleteAnim]
+      })
+    }
+    this.modelEntity = mod
+
     this.setupStateMachine()
 
     // add sounds
@@ -350,13 +345,13 @@ export class Meteor {
 
     // this.idleAnim.weight = 0;
     // this.dropAnim.weight = 1;
-    if (this.dropAnim != null) {
-      this.dropAnim.playing = true
-    }
+    Animator.getClip(this.modelEntity, this.dropAnim.clip).playing = true
+    Animator.getClip(this.modelEntity, this.dropAnim.clip).shouldReset = true
+    // this.dropAnim.playing = true
 
     // log("meteor audio clip = " + as.audioClip.url);
 
-    // SoundManager.playOnce(this.modelEntity, 1.0) 
+    // SoundManager.playOnce(this.modelEntity, 1.0)
 
     // put it up at the drop point
     this.moveY(this.yAdjust)
@@ -386,7 +381,11 @@ export class Meteor {
 
   moveY(deltaY: number): void {
     const trans: TransformType = Transform.get(this.entity)
-    Transform.getMutable(this.entity).position = Vector3.create(trans.position.x, trans.position.y + deltaY, trans.position.z)
+    Transform.getMutable(this.entity).position = Vector3.create(
+      trans.position.x,
+      trans.position.y + deltaY,
+      trans.position.z
+    )
   }
 
   activate(): void {
@@ -430,9 +429,8 @@ export class Meteor {
     // this.stopAnimations();
     // 2DO: Add delay here?
     // this.hitAnim.weight = 1;
-    if (this.hitAnim != null) {
-      this.hitAnim.playing = true
-    }
+    Animator.getClip(this.modelEntity, this.hitAnim.clip).playing = true
+    Animator.getClip(this.modelEntity, this.hitAnim.clip).shouldReset = true
   }
 
   /**
@@ -505,10 +503,7 @@ export class Meteor {
     this.enabled = false
 
     this.stopAnimations()
-    // this.depleteAnim.weight = 1;
-    if (this.depleteAnim != null) {
-      this.depleteAnim.playing = true
-    }
+    Animator.playSingleAnimation(this.modelEntity, this.depleteAnim.clip)
 
     utils.timers.setTimeout(() => {
       this.removeMeteor(this)
@@ -527,10 +522,9 @@ export class Meteor {
     //   //this.dropAnim.stop();
     //   this.dropAnim.weight = 0;
     // }
-    if (this.hitAnim != null) {
-      this.hitAnim.playing = false
-      // this.hitAnim.weight = 0;
-    }
+    Animator.getClip(this.modelEntity, this.hitAnim.clip).playing = false
+    // this.hitAnim.playing = false
+    // this.hitAnim.weight = 0;
     // if (this.idleAnim != null)
     // {
     //   //this.idleAnim.stop();
