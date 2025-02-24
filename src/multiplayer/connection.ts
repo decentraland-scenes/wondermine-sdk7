@@ -1,15 +1,19 @@
+/* eslint-disable @typescript-eslint/triple-slash-reference */
+/* eslint-disable spaced-comment */
 //
 // IMPORTANT :
 // - include `noLib: false` to your tsconfig.json file, under "compilerOptions"
 //
-// ///<reference lib="es2015.symbol" />
-// ///<reference lib="es2015.symbol.wellknown" />
-// ///<reference lib="es2015.collection" />
-// ///<reference lib="es2015.iterable" />
+// eslint-disable-next-line @typescript-eslint/triple-slash-reference
+///<reference lib="es2015.symbol" />
+///<reference lib="es2015.symbol.wellknown" />
+///<reference lib="es2015.collection" />
+///<reference lib="es2015.iterable" />
 
 import { Client, type Room } from 'colyseus.js'
 import { Color4 } from '@dcl/sdk/math'
 import { getPlayer } from '@dcl/sdk/src/players'
+import { type EndpointSettings } from 'colyseus.js/lib/Client'
 // import { isPreviewMode, getCurrentRealm } from '@decentraland/EnvironmentAPI'
 
 export async function connect(roomName: string, options: any = {}): Promise<Room<any>> {
@@ -34,20 +38,27 @@ export async function connect(roomName: string, options: any = {}): Promise<Room
   if (isPreview !== null) {
     addConnectionDebugger(ENDPOINT)
   }
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const client = new Client(ENDPOINT)
+  const endpointSettings: EndpointSettings = {
+    hostname: ENDPOINT,
+    secure: true
+  }
+
+  const client = new Client(endpointSettings)
 
   try {
+    console.log(roomName, 'this point')
     //
     // Docs: https://docs.colyseus.io/client/client/#joinorcreate-roomname-string-options-any
     //
     const room = await client.joinOrCreate<any>(roomName, options)
+    console.log(room, 'this other point')
     if (isPreview !== null) {
       updateConnectionDebugger(room)
     }
 
     return room
   } catch (e) {
+    console.log('ERROR')
     // updateConnectionMessage(`Error: ${e}`, Color4.Red());
     updateConnectionMessage(`Not connected`, Color4.Red())
     // reconnect(roomName, 60000);

@@ -50,6 +50,7 @@ export class MeteorServer {
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/ban-types
   connectToServer(options: {} | null = null) {
     console.log('connectToServer()')
+
     if (options == null) {
       console.log("No user data -- can't connect to meteor server")
       Eventful.instance.fireEvent(new MeteorServerEvent('connectError'))
