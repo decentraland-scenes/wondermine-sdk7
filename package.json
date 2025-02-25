@@ -37,10 +37,17 @@
   },
   "dependencies": {
     "@colyseus/schema": "^1.0.46",
-    "colyseus.js": "^0.15.26",
+    "@dcl-sdk/utils": "^1.2.8",
+    "colyseus.js": "^0.15.14",
     "httpie": "^1.1.2",
     "typescript": "^5.7.3",
     "whatwg-url-without-unicode": "^8.0.0-3",
-    "xmlhttprequest-polyfill": "^1.0.1"
-  }
+    "xmlhttprequest-polyfill": "^0.1.2"
+  },
+  "bundledDependencies": [
+    "colyseus.js"
+  ],
+  "bundleDependencies": [
+    "colyseus.js"
+  ]
 }

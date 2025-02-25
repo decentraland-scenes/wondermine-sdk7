@@ -10,10 +10,11 @@
 ///<reference lib="es2015.collection" />
 ///<reference lib="es2015.iterable" />
 
-import { Client, type Room } from 'colyseus.js'
+import { type Room } from 'colyseus.js'
 import { Color4 } from '@dcl/sdk/math'
 import { getPlayer } from '@dcl/sdk/src/players'
-import { type EndpointSettings } from 'colyseus.js/lib/Client'
+import * as Colyseus from 'colyseus.js'
+// import { type EndpointSettings } from 'colyseus.js/lib/Client'
 // import { isPreviewMode, getCurrentRealm } from '@decentraland/EnvironmentAPI'
 
 export async function connect(roomName: string, options: any = {}): Promise<Room<any>> {
@@ -29,6 +30,14 @@ export async function connect(roomName: string, options: any = {}): Promise<Room
   // options.userData = await getUserData();
 
   console.log('userData:', options)
+  const testOptions = {
+    realm: 'LocalPreview',
+    userData: {
+      displayName: 'GaffoMdz#3275',
+      publicKey: '0xc502975b49398f9754afc4e9693cf0e1594f3275',
+      userId: '0xc502975b49398f9754afc4e9693cf0e1594f3275'
+    }
+  }
 
   const ENDPOINT = 'wss://app-dev-west-wondermine-web.azurewebsites.net:443'
   // const ENDPOINT = (isPreview)
@@ -38,19 +47,20 @@ export async function connect(roomName: string, options: any = {}): Promise<Room
   if (isPreview !== null) {
     addConnectionDebugger(ENDPOINT)
   }
-  const endpointSettings: EndpointSettings = {
-    hostname: ENDPOINT,
-    secure: true
-  }
+  // const endpointSettings: EndpointSettings = {
+  //   hostname: ENDPOINT,
+  //   secure: true
+  // }
 
-  const client = new Client(endpointSettings)
+  const client = new Colyseus.Client(ENDPOINT)
 
   try {
     console.log(roomName, 'this point')
     //
     // Docs: https://docs.colyseus.io/client/client/#joinorcreate-roomname-string-options-any
     //
-    const room = await client.joinOrCreate<any>(roomName, options)
+    console.log('Aqui', roomName, testOptions)
+    const room = await client.joinOrCreate<any>(roomName, testOptions)
     console.log(room, 'this other point')
     if (isPreview !== null) {
       updateConnectionDebugger(room)
@@ -58,7 +68,7 @@ export async function connect(roomName: string, options: any = {}): Promise<Room
 
     return room
   } catch (e) {
-    console.log('ERROR')
+    console.log('ERROR', e)
     // updateConnectionMessage(`Error: ${e}`, Color4.Red());
     updateConnectionMessage(`Not connected`, Color4.Red())
     // reconnect(roomName, 60000);

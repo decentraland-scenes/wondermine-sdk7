@@ -1,8 +1,10 @@
-/* eslint-disable @typescript-eslint/dot-notation */
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import 'xmlhttprequest-polyfill'
 
-// @ts-expect-error
+// eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error
+// @ts-ignore
 import { URL } from 'whatwg-url-without-unicode'
 
-// @ts-expect-error
-globalThis['URL'] = URL
+// eslint-disable-next-line @typescript-eslint/prefer-ts-expect-error
+// @ts-ignore
+globalThis.URL = URL
