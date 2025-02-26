@@ -48,8 +48,8 @@ export class SoundManager {
       console.log('sound attached', this.filePrefix + file)
     }
 
-    const audioSource = AudioSource.getMutable(entity)
-    audioSource.playing = false
+    // const audioSource = AudioSource.getMutable(entity)
+    // audioSource.playing = false
   }
 
   // /**

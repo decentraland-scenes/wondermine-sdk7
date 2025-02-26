@@ -7,8 +7,9 @@ import {
   Transform,
   Animator,
   pointerEventsSystem,
-  InputAction,
-  GltfContainer
+  // InputAction,
+  GltfContainer,
+  InputAction
 } from '@dcl/sdk/ecs'
 import { Vector3, Quaternion } from '@dcl/sdk/math'
 import { DclUser } from 'shared-dcl/src/playfab/dcluser'
