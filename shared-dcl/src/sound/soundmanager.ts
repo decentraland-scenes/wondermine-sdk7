@@ -75,12 +75,12 @@ export class SoundManager {
   static playOnce(_ent: Entity, _vol: number = 1.0): void {
     const as: PBAudioSource | null = AudioSource.getOrNull(_ent)
     if (as != null) {
-      as.loop = false
-      if (as.playing ?? false) {
-        as.playing = false
+      AudioSource.getMutable(_ent).loop = false
+      if (AudioSource.get(_ent).playing === true) {
+        AudioSource.getMutable(_ent).playing = false
       }
-      as.volume = Math.max(_vol, 1.0)
-      as.playing = true
+      AudioSource.getMutable(_ent).volume = Math.max(_vol, 1.0)
+      AudioSource.playSound(_ent, as?.audioClipUrl)
     }
   }
 

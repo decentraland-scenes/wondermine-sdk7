@@ -862,6 +862,7 @@ export class GameManager {
   }
 
   spawnMeteor(): void {
+    console.log('spawn meteor once')
     if (this.spawner !== null) {
       const m: Meteor | null = this.spawner.spawn(MeteorTypeId[MeteorTypeId.Local]) // MeteorTypeId[MeteorTypeId.Medium]
       // 1DO A1 Need to provide the right context here!
