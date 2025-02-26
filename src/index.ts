@@ -6,7 +6,7 @@ import { svr } from './svr'
 import './polyfill'
 import { XMLHttpRequest } from './xmlRequest'
 export async function main(): Promise<void> {
-  globalThis.XMLHttpRequest = XMLHttpRequest
+  ;(globalThis as any).XMLHttpRequest = XMLHttpRequest
   /**
    * The main game.ts file sets up system-level services, like Input and Systems
    */
