@@ -8,7 +8,8 @@ import {
   Animator,
   pointerEventsSystem,
   // InputAction,
-  GltfContainer
+  GltfContainer,
+  InputAction
 } from '@dcl/sdk/ecs'
 import { Vector3, Quaternion } from '@dcl/sdk/math'
 import { DclUser } from 'shared-dcl/src/playfab/dcluser'
@@ -231,18 +232,18 @@ export class Meteor {
       this.onMeteorExpired()
     })
 
-    // pointerEventsSystem.onPointerDown(
-    //   {
-    //     entity: this.modelEntity,
-    //     opts: { button: InputAction.IA_POINTER, hoverText: 'Mine', maxDistance: 8 }
-    //   },
-    //   (event) => {
-    //     if (event.hit != null) {
-    //       const hp: Vector3 | undefined = event.hit.position // Obtiene las coordenadas del hit
-    //       this.onHitByPlayer(hp)
-    //     }
-    //   }
-    // )
+    pointerEventsSystem.onPointerDown(
+      {
+        entity: this.modelEntity,
+        opts: { button: InputAction.IA_POINTER, hoverText: 'Mine', maxDistance: 8 }
+      },
+      (event) => {
+        if (event.hit != null) {
+          const hp: Vector3 | undefined = event.hit.position // Obtiene las coordenadas del hit
+          this.onHitByPlayer(hp)
+        }
+      }
+    )
 
     return true
   }
