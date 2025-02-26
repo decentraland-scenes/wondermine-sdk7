@@ -135,7 +135,7 @@ export class GameManager {
       },
       realm: DclUser.getRealmName()
     }
-
+    console.log('CONNECT TO METEOR SERVER OBJECT:', options)
     // connect to meteor server
     const server: MeteorServer = new MeteorServer()
     server.connectToServer(options)

@@ -30,6 +30,9 @@ export async function connect(roomName: string, options: any = {}): Promise<Room
   // options.userData = await getUserData();
 
   console.log('userData:', options)
+
+  // hardcode object to match SDK6 format.
+
   const testOptions = {
     realm: 'LocalPreview',
     userData: {
@@ -59,7 +62,7 @@ export async function connect(roomName: string, options: any = {}): Promise<Room
     //
     // Docs: https://docs.colyseus.io/client/client/#joinorcreate-roomname-string-options-any
     //
-    console.log('Aqui', roomName, testOptions)
+    console.log('Connection details', roomName, testOptions)
     const room = await client.joinOrCreate<any>(roomName, testOptions)
     console.log(room, 'this other point')
     if (isPreview !== null) {
