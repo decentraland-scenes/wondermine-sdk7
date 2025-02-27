@@ -135,7 +135,7 @@ export class Pickaxe {
   showAt(pos: Vector3.MutableVector3, _angles: Vector3.MutableVector3, m: Meteor): void {
     // log("Pickaxe.showAt()");
 
-    const t: TransformType = Transform.get(this.entity)
+    const t: TransformType = Transform.getMutable(this.entity)
 
     let rotDelta = -90
 

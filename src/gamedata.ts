@@ -71,7 +71,7 @@ export class GameData {
 
   // --- UTILITY FUNCTIONS ---
   // eslint-disable-next-line @typescript-eslint/ban-types
-  static populate(target: Recipe | SharedMeteor, ...args: Array<Record<string, any>>): Recipe | SharedMeteor {
+  static populate(target: any | SharedMeteor, ...args: Array<Record<string, any>>): SharedMeteor {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (!target) {
       throw TypeError('Cannot convert undefined or null to object')
@@ -80,7 +80,7 @@ export class GameData {
       // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
       if (source) {
         // eslint-disable-next-line no-return-assign
-        Object.keys(source).forEach((key) => ((target as any)[key] = source[key]))
+        Object.keys(source).forEach((key) => ((target)[key] = source[key]))
       }
     }
     return target

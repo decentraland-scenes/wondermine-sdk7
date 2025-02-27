@@ -18,7 +18,6 @@ export type Item = {
   ItemClass: string
   DisplayName: string
   IsBonus: boolean
-  error?: string
 }
 
 export class UiPopupPanel {

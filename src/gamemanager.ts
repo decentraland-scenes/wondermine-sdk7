@@ -8,7 +8,7 @@ import { WondermineApi } from '../shared-dcl/src/playfab/wondermineapi'
 import { CoinShop, type StoreItem } from './coinshop'
 import { CraftingMachine } from './craftingmachine'
 import * as utils from '@dcl-sdk/utils'
-import { type Quaternion, Vector3 } from '@dcl/sdk/math'
+import { Quaternion, Vector3 } from '@dcl/sdk/math'
 import {
   Eventful,
   CraftItemEvent,
@@ -27,7 +27,7 @@ import { ContractManager } from './contracts/contractManager'
 import { WzNftContract } from './contracts/wzNftContract'
 import { getProviderPromise } from './contracts/nftChecker'
 import { MeteorTypeList } from './wondermine/meteortypelist'
-import { SharedMeteor, type MeteorSpawnerInstance } from './projectdata'
+import { Recipe, type SharedMeteor, type MeteorSpawnerInstance } from './projectdata'
 import { MeteorSpawner } from './wondermine/meteorspawner'
 import { ChainId, MeteorTypeId, PopupWindowType, ToolIds } from './enums'
 import { getPlayer } from '@dcl/sdk/src/players'
@@ -91,7 +91,6 @@ export class GameManager {
 
   constructor(titleId: string) {
     this.api = new WondermineApi(titleId)
-    this.checkContracts()
   }
 
   static createAndAddToEngine(titleId: string): GameManager {
@@ -169,7 +168,7 @@ export class GameManager {
       }
       Eventful.instance.addListener(MeteorLootEvent, null, ({ msg, result }) => {
         console.log('MeteorLootEvent: ' + msg)
-        // this.onMeteorLootReceived(msg, result)
+        this.onMeteorLootReceived(msg, result)
       })
 
       // pull out the first (0,0,0) camera rotation (old bug; is this still necessary?)
@@ -238,12 +237,13 @@ export class GameManager {
         await this.api.CountClaimableItems()
       }
 
-      // this.checkContracts();
+      this.checkContracts()
 
       DclUser.activeUser.checkT()
       if (this.machine != null) {
         this.machine.setCooldownStatus()
       }
+      this.checkWearables()
     })
   }
 
@@ -419,10 +419,76 @@ export class GameManager {
    * @param msg The message type, either "meteorLoot", "sharedLoot", "localLoot" or "error"
    * @param result The result object, which contains the loot items
    */
-  onMeteorLootReceived(msg: string, result: Item): void {
+  onMeteorLootReceived(msg: string, result: any): void {
     console.log('onMeteorLootReceived(): ' + msg)
     console.log(result)
-    // TODO
+
+    if (msg === 'error') {
+      console.log('ERROR getting loot!')
+    } else {
+      // result should contain an ItemGrantResults structure, which is a list of PlayFab inventory items
+      // and a bonusPct property
+      // the structure is the same as the FunctionResult from the mineMeteor CloudScript call
+      if (result != null) {
+        const err = result.error
+        if (err != null) {
+          // force an error message
+          if (GameManager.instance !== null) {
+            GameManager.instance.miningErrorMessage = err
+            GameManager.instance.lootItems = []
+            GameManager.instance.sharedLootItems = []
+          }
+        } else {
+          // eslint-disable-next-line @typescript-eslint/ban-types
+          const items: any[] = result.ItemGrantResults
+
+          // 2DO: save the current meteor somehow and update hasLootDropped when the server call returns
+          // log("grantResults:", items);
+          if (items != null && items.length > 0) {
+            if (msg !== 'sharedLoot') {
+              // localLoot or meteorLoot
+              // for localLoot and meteorLoot (from shared meteor server)
+              if (GameManager.instance !== null) {
+                GameManager.instance.lootItems = items
+              }
+
+              // if this is a normal mining operation, showLootRewards will be called in the onMiningComplete() callback
+              // setTimeout(13000, () => { this.showLootRewards(items, false); });
+            } else {
+              // only for sharedLoot = the team bonus
+              if (GameManager.instance !== null) {
+                GameManager.instance.sharedLootItems = items
+                utils.timers.setTimeout(() => {
+                  this.showLootRewards(items, true, true)
+                }, 15000)
+              }
+            }
+
+            // log(items.length + " items")
+            // lootItems will get displayed after th emining animation is done
+            // 1DO: HUGE PROBLEM if the server call takes longer than the mining animation
+
+            // let item:ItemInfo;
+            // let msg:string = "Meteor mined! You found:\n"
+            // for (var i:number = 0; i < items.length; i++)
+            // {
+            //   //item = this.loader.populate(new ItemInfo(), items[i]);
+            //   log("ITEM " + i + ": " + items[i]["DisplayName"]);
+            //   if (items[i]["ItemId"] != "MeteorLootStone")
+            //   {
+            //     // don't include parent bundle
+            //     msg += '\n' + items[i]["DisplayName"];
+            //   }
+            // }
+          }
+
+          // we got the loot, now let's get the experience
+          if (GameManager.instance !== null) {
+            GameManager.instance.checkLevel()
+          }
+        }
+      }
+    }
   }
 
   showLootRewards(lootItems: Item[], isShared: boolean = false, isSharedBonus: boolean = false): void {
@@ -474,9 +540,74 @@ export class GameManager {
 
   // eslint-disable-next-line @typescript-eslint/ban-types
   public levelUpItems: Object[] = []
-  onLevelCheckComplete(_error: any, json: any): void {}
+  onLevelCheckComplete(error: any, json: any): void {
+    // log("onLevelCheckComplete()");
+    if (error != null) {
+      console.log('script call error!')
+      console.log(error)
+    } else {
+      // log(json);
+      try {
+        const data = json.data
+        // log(data);
+        if (data != null) {
+          const result = data.FunctionResult
+          // log(result);
+          if (result != null) {
+            const levelResult = result.Level
+            if (levelResult != null) {
+              // 2DO: Check for level up loot result
+              const newXp = levelResult.xp
+              const newLevel = levelResult.level
 
-  showRewards(itemArray: Item[], popupType: PopupWindowType, msg: string = ''): void {
+              if (newXp != null) {
+                // log("newXp=" + newXp + ", newLevel=" + newLevel);
+
+                // call function so bonus gets calculated too
+                DclUser.setUserXpAndLevel(parseInt(newXp), parseInt(newLevel))
+
+                // GameUi.instance.setLevel(DclUser.activeUser.level, DclUser.activeUser.xp);
+              }
+            }
+
+            // eslint-disable-next-line @typescript-eslint/ban-types
+            const items: Object[] = result.ItemGrantResults
+            if (GameManager.instance != null) {
+              GameManager.instance.levelUpItems = items
+            }
+            // log(items);
+            if (items != null && items.length > 0) {
+              // place a marker so we show level up popup and loot later
+              if (GameManager.instance != null) {
+                GameManager.instance.hasLeveledUp = true
+              }
+
+              // set a timeout to update level info in 15 seconds
+              utils.timers.setTimeout(() => {
+                const msg: string = 'Level ' + DclUser.activeUser.level + '!\n'
+                if (GameUi.instance != null) {
+                  GameUi.instance.showBonus()
+                }
+                if (GameManager.instance != null) {
+                  GameManager.instance.showRewards(GameManager.instance.levelUpItems, PopupWindowType.LevelUp, msg)
+                  GameManager.instance.hasLeveledUp = false
+                }
+              }, 15000)
+            }
+
+            // trigger a claimable items check (useful during events)
+            if (GameManager.instance != null) {
+              GameManager.instance.updateClaimableItemsCount()
+            }
+          }
+        }
+      } catch (error) {
+        console.log('Error parsing XP and level: ', error)
+      }
+    }
+  }
+
+  showRewards(itemArray: any[], popupType: PopupWindowType, msg: string = ''): void {
     console.log('showRewards() ' + popupType)
     if (itemArray != null) {
       for (let i: number = 0; i < itemArray.length; i++) {
@@ -588,7 +719,151 @@ export class GameManager {
     })
   }
 
-  onCraftingComplete(_error: any, _json: any): void {}
+  onCraftingComplete(error: any, json: any): void {
+    console.log('onCraftingComplete()')
+    svr.waitingForCraftResponse = false
+    if (error != null) {
+      console.log('script error!')
+      console.log(error)
+    } else {
+      console.log(json)
+      try {
+        const data = json.data
+        // log(data);
+        if (data != null) {
+          const result = data.FunctionResult
+          console.log(result)
+          if (result != null) {
+            console.log('ITEM CRAFTED!')
+            const err = result.error
+            if (err != null) {
+              if (Boolean(err.message) && err.message.indexOf('soon') >= 0) {
+                console.log('crafting too soon')
+                if (GameManager.instance != null) {
+                  GameManager.instance.showCraftingError(
+                    '\n\n\n\n\n\nThe current limit is one wearable per day.\nPlease try again later.'
+                  )
+                }
+              } else if (Boolean(err.message) && err.message.indexOf('Sold out') >= 0) {
+                console.log(err.message)
+                if (GameManager.instance != null) {
+                  GameManager.instance.showCraftingError(
+                    '\n\n\n\n\n\nThat item has sold out.\nNo materials were used.\nPlease try a different item.'
+                  )
+                }
+              } else {
+                // timeout error crafting a wearable
+                console.log('timeout error!')
+
+                // 1DO: meanwhile get the right voucher from the server
+                // OLDER CALL
+                // this.api.GetClaimedVoucher(GameManager.instance.machine.craftedRecipe.wi, DclUser.playfabId, (error, json) => { this.onGetClaimedVoucherComplete(error, json);});
+                // NEWER CALL -- but not in active use?
+                // this.api.GetLatestClaim(GameManager.instance.machine.craftedRecipe.wi,
+                //   DclUser.playfabId,
+                //   DclUser.activeUser.userId,
+                //   (error, json) => { this.onGetClaimComplete(error, json);});
+              }
+            } else if (result.ItemId === 'AxeRepair') {
+              // special case
+              // log("Axe Repair!");
+              if (
+                LootVault.instance != null &&
+                DclUser.activeUser.heldItem != null &&
+                GameManager.instance?.machine != null
+              ) {
+                const lootEnt: LootItem = LootVault.instance.get(DclUser.activeUser.heldItem.ItemId)
+                GameManager.instance.machine.animateMachine(lootEnt, true)
+              }
+            } else {
+              if (GameManager.instance?.machine?.craftedRecipe != null) {
+                const craftedId: string = GameManager.instance.machine.craftedRecipe.itemId
+                const limitOne: boolean = GameManager.instance.machine.craftedRecipe.limitOne
+                if (limitOne) {
+                  // add to the limited list temporarily
+                  DclUser.activeUser.limitOneItems.push(craftedId)
+                }
+              }
+              // eslint-disable-next-line @typescript-eslint/ban-types
+              const items: any[] = result.ItemGrantResults
+              // log(items);
+              if (items != null && items.length > 0) {
+                const item = items[0]
+                // log(item);
+                const itemId: string = item.ItemId
+                let isWearable: boolean = false
+                const prefix: string = itemId.substr(0, 5)
+
+                // 2DO: is there a better way to check for this? Does this even happen? Check cloud
+                // 2DO: also need the sig and claim number
+
+                // OLD PROCESS -- we no longer allow L1 (ethereum) wearable crafting
+                // if (prefix == "meteo" || prefix == "steam")
+                // {
+                //
+                //   log("L1 wearable was crafted!");
+                //   // wearable was crafted!
+                //   isWearable = true;
+                //   // reset the crafting cooldown time
+                //   //DclUser.setCraftCooldown(1621706400000); // TODO: reset cooldown time
+                //   DclUser.setCraftCooldown(Date.now());
+
+                //   log(item["Claim"]);
+                //   let claimObj:object = item["Claim"];
+
+                //   GameManager.instance.mintWearable(itemId, claimObj);
+                // }
+                // else
+                if (prefix === 'wear_') {
+                  console.log('L2 wearable was crafted!')
+                  // wearable was crafted!
+                  isWearable = true
+                  // reset the crafting cooldown time
+                  // DclUser.setCraftCooldown(1621706400000); // TODO: reset cooldown time
+                  DclUser.setCraftCooldown(Date.now())
+
+                  console.log(item.Claim)
+                  const claimObj: object = item.Claim
+
+                  // GameManager.instance.mintWearable(itemId, claimObj);
+
+                  const msg =
+                    '\n\n\n\n\nSuccess! Your wearable is reserved.\nGo to https://wondermine.wonderzone.io/claimitem\nto mint it on the Polygon network.'
+                  // GameUi.instance.showTimedPopup(PopupWindowType.Crafted, msg, null, itemId, 30000, null);
+                  utils.timers.setTimeout(() => {
+                    this.queuePopup(PopupWindowType.Crafted, msg, null, itemId, 30000)
+                  }, 6500)
+
+                  if (LootVault.instance !== null && GameManager.instance?.machine !== null) {
+                    const lootEnt: LootItem = LootVault.instance.get('StarGold')
+                    GameManager.instance?.machine.animateMachine(lootEnt)
+                  }
+
+                  // update supply counts
+                  // 2DO: delay this? We call it right before crafting as well
+                  if (GameManager.instance?.api !== null) {
+                    void GameManager.instance?.api.CountClaimableItems()
+                  }
+                } else {
+                  if (LootVault.instance !== null && GameManager.instance?.machine !== null) {
+                    const lootEnt: LootItem = LootVault.instance.get(itemId)
+                    GameManager.instance?.machine.animateMachine(lootEnt)
+                  }
+                }
+              }
+            }
+          }
+        }
+        // update inventory display in any case
+        // if we got a new axe, this should take care of using the new one too
+        if (GameManager.instance !== null) {
+          GameManager.instance.getPlayerInventory()
+        }
+      } catch (error) {
+        console.log('Error crafting that item: ', error)
+      }
+    }
+  }
 
   public wearClaimer: WearableClaimerContract | null = null
   public latestClaim: object | null = null
@@ -734,7 +1009,45 @@ export class GameManager {
     }
   }
 
-  onCheckedCoinBonus(_error: any, _json: any): void {}
+  onCheckedCoinBonus(error: any, json: any): void {
+    if (error != null) {
+      console.log('checkCoinBonus() call error!')
+      console.log(error)
+    } else {
+      // log(json);
+      const data: any = json.data
+
+      const errObj = data.Error
+
+      // log("errObj:", errObj);
+      if (errObj != null) {
+        // timeout error
+        // GameManager.instance.checkLocalWearables();
+        console.log('could not check coin bonus')
+        if (GameUi.instance != null) {
+          GameUi.instance.showTimedMessage('There was an error when checking for your coin bonus.', 12000)
+        }
+      } else {
+        const result = data.FunctionResult
+        // log("result:", result);
+
+        if (result === false) {
+          if (GameUi.instance != null) {
+            GameUi.instance.showTimedMessage('You already collected your bonus.', 12000)
+          }
+          DclUser.activeUser.collectedCoinBonus = true
+        } else {
+          if (GameUi.instance != null) {
+            GameUi.instance.showTimedMessage('Here are your 100 WonderCoins!\nThanks for playing WonderMine.', 12000)
+          }
+          DclUser.activeUser.collectedCoinBonus = true // simple check to reduce call churn
+          if (GameManager.instance !== null) {
+            GameManager.instance.getPlayerInventory()
+          }
+        }
+      }
+    }
+  }
 
   showStatueMessage(): void {
     if (GameManager.instance !== null) {
@@ -769,7 +1082,7 @@ export class GameManager {
     // listen for crafting events
     Eventful.instance.addListener(CraftItemEvent, null, ({ recipeId, wearableId, itemClass }) => {
       console.log('crafting recipe:', recipeId, wearableId, itemClass)
-      // this.craftItem(recipeId, wearableId, itemClass);
+      this.craftItem(recipeId, wearableId, itemClass)
     })
   }
 
@@ -979,12 +1292,66 @@ export class GameManager {
     })
   }
 
-  onCheckedWearables(_error: any, json: any): void {
-    // TODO
+  onCheckedWearables(error: any, json: any): void {
+    if (error != null) {
+      console.log('checkWearables() call error!')
+      console.log(error)
+    } else {
+      // log(json);
+      const data: any = json.data
+
+      const errObj = data.Error
+      // log(errObj);
+      if (errObj != null) {
+        // timeout error
+        // GameManager.instance.checkLocalWearables();
+        console.log('could not check wearables')
+      } else {
+        const result: any = data.FunctionResult
+        // log(result);
+        const numWearables: number = result.numWearables
+
+        let wearBonus: number = 0
+        if (result.wearablesBonus != null) {
+          wearBonus = result.wearablesBonus
+          DclUser.activeUser.wearablesBonus = wearBonus
+        } else {
+          wearBonus = numWearables * 3
+          DclUser.activeUser.wearablesBonus = wearBonus
+        }
+        console.log('SVR: player wears ' + numWearables + ' WonderZone wearables for +' + wearBonus + '% bonus')
+
+        // this will be null when testing
+        const wearableNames: string[] = result.wearableNames
+        DclUser.activeUser.wearables = wearableNames
+      }
+    }
   }
 
-  onCheckedMetakey(_error: any, json: any): void {
-    // TODO
+  onCheckedMetakey(error: any, json: any): void {
+    console.log('onCheckedMetaKey()')
+    if (error != null) {
+      console.log('call error!')
+      console.log(error)
+    } else {
+      console.log(json)
+      const data: any = json.data
+      const errObj = data.Error
+      if (errObj != null) {
+        // timeout error
+        console.log('could not check Metakey')
+      } else {
+        const result: any = data.FunctionResult
+        const ownsToken: boolean = result.ownsToken
+        if (ownsToken) {
+          DclUser.activeUser.tokenBonus = 5
+          console.log('player owns a Metakey')
+        } else {
+          DclUser.activeUser.tokenBonus = 0
+          console.log('No Metakey')
+        }
+      }
+    }
   }
 
   calcWearBonus(wearables: string[]): void {
@@ -1022,6 +1389,97 @@ export class GameManager {
   }
 
   hitMeteor(hitPoint: Vector3.MutableVector3 | undefined, m: Meteor): boolean {
+    // log("GameManager.hitMeteor()");
+    this.listMeteors()
+    // log("active meteors: " + Meteor.activeMeteors.length);
+
+    // place pickaxe at hitPoint
+    if (this.axe == null) {
+      if (DclUser.activeUser.heldItem == null) {
+        console.log('ERROR: No axe data!')
+        return false
+      } else {
+        this.spawnPickaxe(DclUser.activeUser.heldItem)
+        // 2DO: Delay to give pickaxe model time to load?
+      }
+    }
+
+    console.log('meteor instance:', m.instanceData)
+
+    // first check coin balance and axe status
+    if (DclUser.activeUser.coins < this.coinCost) {
+      this.showMiningError(
+        'You need ' +
+          this.coinCost +
+          ' WonderCoins to mine!\nGet some at the Shop, or\nwait for your balance to replenish.'
+      )
+      return false
+    }
+    if (DclUser.activeUser.heldItem !== null) {
+      if (DclUser.activeUser.heldItem.RemainingUses <= 1) {
+        // send a message and exit
+        this.showMiningError('Your axe is broken!\nYou can repair it at the crafting station.')
+        return false
+      }
+    }
+
+    if (this.axe == null) {
+      this.showMiningError("We can't find your pickaxe.\nTalk to us and we'll try to fix it.")
+      return false
+    }
+
+    if (this.axe.isBusy) {
+      this.showMiningError('Your axe is already hard at work.\nTry again in a few seconds.')
+      return false
+    }
+
+    // check if this is a local or shared meteor
+    if (m.isShared) {
+      // check with meteorserver to see how many hits are left
+      if (MeteorServer.instance !== null && m.instanceData !== null) {
+        const meteorData: SharedMeteor | null | undefined = MeteorServer.instance.getMeteor(m.instanceData.id)
+        console.log('HIT SHARED METEOR')
+        console.log(meteorData)
+        if (meteorData !== null && meteorData !== undefined) {
+          if (meteorData.maxHits <= meteorData.hits) {
+            this.showMiningError('That meteor is already depleted!')
+            return false
+          }
+        }
+      }
+    }
+
+    // Decrement coin balance display (server will confirm this later)
+    DclUser.activeUser.coins = DclUser.activeUser.coins - this.coinCost
+    if (GameUi.instance !== null) {
+      GameUi.instance.showBalances(DclUser.activeUser.coins, DclUser.activeUser.gems)
+    }
+
+    if (DclUser.activeUser.heldItem !== null) {
+      DclUser.activeUser.heldItem.RemainingUses--
+    }
+
+    // start mining animation
+    if (hitPoint !== undefined) {
+      this.axe.showAt(hitPoint, Quaternion.fromEulerDegrees(0, 0, 0), m)
+    }
+    // delay until the end of the animation
+
+    // call server, open the meteor, get the loot
+    // 2DO: save the current meteor somehow and update hasLootDropped when the server call returns
+    m.hasLootDropped = true
+
+    if (m.isShared) {
+      if (MeteorServer.instance !== null && m.instanceData !== null && hitPoint !== undefined) {
+        MeteorServer.instance.onHitMeteor(m.instanceData.id, hitPoint)
+      }
+    } else {
+      void this.getMeteorLoot(m)
+    }
+
+    // stop the meteor from responding to clicks
+    m.disable()
+
     return true
   }
 
@@ -1114,6 +1572,71 @@ export class GameManager {
     if (this.api != null) {
       const leaderboard: Leaderboard = new Leaderboard(som.scene.leaderboard, this.api, null)
       this.board = leaderboard
+    }
+  }
+
+  // --- GAME LOOP ---
+
+  callLater(seconds: number, callback: (...args: any) => void): void {
+    // log("callLater(" + seconds + ")");
+    if (this.delayTime > 0) {
+      // log("removing existing callLater")
+    }
+    this.delayTime = seconds
+    this.delayElapsed = 0
+    this.delayCallback = callback
+  }
+
+  timeToCall(): void {
+    // log("timeToCall()");
+    this.delayTime = 0
+    this.delayElapsed = 0
+    if (this.delayCallback != null) {
+      this.delayCallback()
+    }
+  }
+
+  // ---
+
+  updateClaimableItemsCount(): void {
+    // log("updateClaimableItemsCount()");
+    executeTask(async () => {
+      if (this.api != null) {
+        await this.api.CountClaimableItems()
+      }
+      if (this.machine != null) {
+        this.machine.refreshRecipe()
+      }
+    })
+  }
+
+  public elapsedSeconds: number = 0
+  public checkItemsCounter = 0
+  public checkItemsInterval = 120 // 55 seconds
+  /**
+   * The main game loop. Called every frame.
+   * @param dt Delta time; usually about 1/30th of a second, or 0.0333
+   */
+  update(dt: number): void {
+    // log("GM paused=" + this.paused + ", currentState=" + this.currentSession.currentState);
+    if (this.paused) return
+
+    if (this.delayTime > 0) {
+      this.delayElapsed += dt
+      if (this.delayElapsed > this.delayTime) {
+        this.timeToCall()
+      }
+    }
+    if (this.spawner != null) {
+      this.spawner.update(dt)
+    }
+    if (DclUser.weLive) {
+      this.checkItemsCounter += dt
+      if (this.checkItemsCounter > this.checkItemsInterval) {
+        // this.checkCrafting();
+        this.updateClaimableItemsCount()
+        this.checkItemsCounter = 0
+      }
     }
   }
 }
