@@ -38,9 +38,9 @@ export class Pickaxe {
   public finalScale: Vector3.MutableVector3 = Vector3.create(1, 1, 1)
 
   public anim: PBAnimator | null = null
-  public miningAnim: PBAnimationState | null = null
-  public extraAnim1: PBAnimationState | null = null
-  public extraAnim2: PBAnimationState | null = null
+  public miningAnim: PBAnimationState = { clip: '' }
+  public extraAnim1: PBAnimationState = { clip: '' }
+  public extraAnim2: PBAnimationState = { clip: '' }
 
   /**
    * The total number of hits this meteorite can take before it disappears
@@ -111,15 +111,16 @@ export class Pickaxe {
 
     // --- set the animations
     if (pi.type.miningClip !== 'none') {
-      Animator.create(mod)
       this.miningAnim = { clip: pi.type.miningClip, loop: pi.ItemId === 'AxeVroomway' }
-      Animator.getMutable(mod).states = [this.miningAnim]
+      Animator.create(mod, {
+        states: [this.miningAnim]
+      })
       if (pi.ItemId === 'AxeSteam') {
-        // two more animations to add { layer: 0 }
-        this.extraAnim1 = { clip: pi.type.extraClip1, loop: false, weight: 1 }
-        Animator.getMutable(mod).states = [this.extraAnim1]
-        this.extraAnim2 = { clip: pi.type.extraClip2, loop: false, weight: 2 }
-        Animator.getMutable(mod).states = [this.extraAnim2]
+        this.extraAnim1 = { clip: pi.type.extraClip1, loop: false }
+        this.extraAnim2 = { clip: pi.type.extraClip2, loop: false }
+        Animator.createOrReplace(mod, {
+          states: [this.miningAnim, this.extraAnim1, this.extraAnim2]
+        })
       }
     }
     this.modelEntity = mod
@@ -212,17 +213,11 @@ export class Pickaxe {
     this.stopAnimations()
     this.isBusy = true
     DclUser.activeUser.isAxeBusy = true
-    if (this.miningAnim != null) {
-      this.miningAnim.playing = true
-    }
+    Animator.getClip(this.modelEntity, this.miningAnim.clip).playing = true
     if (this.instanceData?.ItemId === 'AxeSteam') {
       console.log('playing extra animations')
-      if (this.extraAnim1 != null) {
-        this.extraAnim1.playing = true
-      }
-      if (this.extraAnim2 != null) {
-        this.extraAnim2.playing = true
-      }
+      Animator.getClip(this.modelEntity, this.extraAnim1.clip).playing = true
+      Animator.getClip(this.modelEntity, this.extraAnim2.clip).playing = true
     }
 
     SoundManager.playOnce(this.modelEntity, 1.0)
@@ -243,9 +238,7 @@ export class Pickaxe {
   }
 
   stopAnimations(): void {
-    if (this.miningAnim != null) {
-      this.miningAnim.playing = false
-    }
+    Animator.getClip(this.modelEntity, this.miningAnim.clip).playing = false
   }
 
   hide(): void {
