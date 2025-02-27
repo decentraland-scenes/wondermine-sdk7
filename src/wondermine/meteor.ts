@@ -431,8 +431,8 @@ export class Meteor {
     // this.stopAnimations();
     // 2DO: Add delay here?
     // this.hitAnim.weight = 1;
-    Animator.getClip(this.modelEntity, this.hitAnim.clip).playing = true
     Animator.getClip(this.modelEntity, this.hitAnim.clip).shouldReset = true
+    Animator.playSingleAnimation(this.modelEntity,this.hitAnim.clip)
   }
 
   /**
@@ -524,7 +524,7 @@ export class Meteor {
     //   //this.dropAnim.stop();
     //   this.dropAnim.weight = 0;
     // }
-    Animator.getClip(this.modelEntity, this.hitAnim.clip).playing = false
+    Animator.stopAllAnimations(this.modelEntity, false)
     // this.hitAnim.playing = false
     // this.hitAnim.weight = 0;
     // if (this.idleAnim != null)

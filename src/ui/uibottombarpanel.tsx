@@ -188,6 +188,7 @@ export class UiBottomBarPanel {
     console.log('updateInventory()')
     if (DclUser.activeUser != null) {
       const inv: ItemInfo[] = DclUser.activeUser.inventoryArray
+      console.log('updateeeeee',inv)
       if (inv != null) {
         let id: string
         let item: object | null
@@ -210,7 +211,6 @@ export class UiBottomBarPanel {
         for (var i: number = 0; i < inv.length; i++) {
           id = inv[i].ItemId
           qty = inv[i].RemainingUses
-
           if (inv[i].ItemClass !== 'pickaxe' && this.iconValues[id] != null) {
             // NOTE: GiftBox can't be set Stackable in PlayFab, or else this logic will fail
             if (id === 'GiftBox' && qty == null) {

@@ -1,4 +1,4 @@
-import { type ReadOnlyQuaternion, type Vector3 } from '~system/EngineApi'
+import { type Vector3 } from '~system/EngineApi'
 import { type Quaternion } from '~system/RestrictedActions'
 
 export function rotationAxisToRef(axis: Vector3, angle: number, result: Quaternion): Quaternion {
@@ -13,7 +13,7 @@ export function rotationAxisToRef(axis: Vector3, angle: number, result: Quaterni
   return result
 }
 
-export function multiplyInPlace(q1: ReadOnlyQuaternion, result: Quaternion): Quaternion {
+export function multiplyInPlace(q1: Quaternion, result: Quaternion): Quaternion {
   result.x *= q1.x
   result.y *= q1.y
   result.z *= q1.z

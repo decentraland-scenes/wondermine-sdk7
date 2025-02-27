@@ -6,7 +6,7 @@ import { MeteorTypeId } from '../enums'
 import { type Room } from 'colyseus.js'
 import { Eventful, MeteorLootEvent, MeteorServerEvent } from '../events'
 import { GameData } from '../gamedata'
-import { type Recipe, SharedMeteor } from '../projectdata'
+import { SharedMeteor } from '../projectdata'
 // import { GameUi } from '../ui/gameui'
 import { DclUser } from 'shared-dcl/src/playfab/dcluser'
 import { Color4, type Vector3 } from '@dcl/sdk/math'
@@ -214,7 +214,7 @@ export class MeteorServer {
     if (this.reconnectDelay < 600000) this.reconnectDelay *= 2
   }
 
-  getMeteor(id: string): SharedMeteor | Recipe | null | undefined {
+  getMeteor(id: string): SharedMeteor | undefined | null {
     if (MeteorServer.instance !== null) {
       if (MeteorServer.instance?.room !== null) {
         const data = MeteorServer.instance.room.state.meteors[id]
