@@ -230,6 +230,7 @@ export class GameManager {
       // await this.api.GetCraftingRecipes();
       if (GameUi.instance != null) {
         GameUi.instance.showBalances(DclUser.activeUser.coins, DclUser.activeUser.gems)
+        console.log('balances',DclUser.activeUser.coins, DclUser.activeUser.gems)
         GameUi.instance.setLevel(DclUser.activeUser.level, DclUser.activeUser.xp)
       }
 
