@@ -203,6 +203,7 @@ export class Pickaxe {
     }
 
     if (this.shape != null) {
+      this.show()
       // this.shape.visible = true
     }
     this.mine(m)
@@ -241,8 +242,15 @@ export class Pickaxe {
     Animator.getClip(this.modelEntity, this.miningAnim.clip).playing = false
   }
 
+  show(): void {
+    // Hack to make it visible on SDK7
+    Transform.getMutable(this.modelEntity).scale = Vector3.create(1, 1, 1)
+  }
+
   hide(): void {
     if (this.shape != null) {
+      // Hack to make it invisible on SDK7
+      Transform.getMutable(this.modelEntity).scale = Vector3.create(0, 0, 0)
       // this.shape.visible = false
     }
   }
