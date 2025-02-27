@@ -32,7 +32,6 @@ export class GameUi implements IGameUi {
     this.closeAlert = () => {}
     this.getInstance = () => this
     this.showAlert = (_type: PopupWindowType) => {}
-    this.showBalances = (_coins: number, _gems: number) => {}
     this.showBonus = () => {}
     this.showTimedMessage = (_text: string, _millis?: number) => {}
     ReactEcsRenderer.setUiRenderer(this.render.bind(this))
