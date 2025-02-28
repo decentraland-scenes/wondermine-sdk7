@@ -947,10 +947,10 @@ export class GameManager {
 
     if (GameManager.instance?.machine != null) {
       GameManager.instance.machine.reset(true)
-    }
+    } 
   }
 
-  loadScenery(): void {
+  loadScenery(): void { 
     if (this.loader != null) {
       const signInstructions = this.loader.spawnSceneObject(som.scene.signInstructions)
       const ground01 = this.loader.spawnSceneObject(som.scene.ground01)

@@ -14,6 +14,7 @@ import { type Room } from 'colyseus.js'
 import { Color4 } from '@dcl/sdk/math'
 import { getPlayer } from '@dcl/sdk/src/players'
 import * as Colyseus from 'colyseus.js'
+import { GameUi } from 'src/ui/gameui'
 // import { type EndpointSettings } from 'colyseus.js/lib/Client'
 // import { isPreviewMode, getCurrentRealm } from '@decentraland/EnvironmentAPI'
 
@@ -95,7 +96,9 @@ function addConnectionDebugger(endpoint: string): void {
 }
 
 export function updateConnectionMessage(value: string, color: Color4 = Color4.White()): void {
-  //   GameUi.instance.showTimedMessage(value, 6000, color)
+  if (GameUi.instance !== null){
+    GameUi.instance.showTimedMessage(value, 6000, color)
+  }
   //   // message.value = value;
   //   // message.color = color;
   //   console.log(value)

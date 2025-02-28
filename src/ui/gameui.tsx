@@ -10,6 +10,15 @@ import { ProjectLoader } from 'src/projectloader'
 import * as utils from '@dcl-sdk/utils'
 import { type Item, UiPopupPanel } from './uipopuppanel'
 import { type UiImageData } from 'src/projectdata'
+import { Color4 } from '@dcl/sdk/math'
+import TimedMessage from './timedmessage'
+
+type MessageText = {
+  _text: string
+  _millis: number
+  _color: Color4
+  visible: boolean
+}
 
 export class GameUi implements IGameUi {
   static instance: GameUi | null = null
@@ -22,18 +31,18 @@ export class GameUi implements IGameUi {
   public onPopupClosedCallback: (() => void) | null = null
   public showingTimedPopup: boolean = false
   public showingTimedAlert: boolean = false
+  public messageTxt: MessageText = { _text: '', _millis: 0, _color: Color4.White(), visible: false }
+  public showingTimedMessage: boolean = false
   constructor() {
     if (ProjectLoader.instance == null) {
       this.loader = new ProjectLoader()
     } else {
       this.loader = ProjectLoader.instance
     }
-    this.init = () => {}
+
     this.closeAlert = () => {}
-    this.getInstance = () => this
     this.showAlert = (_type: PopupWindowType) => {}
     this.showBonus = () => {}
-    this.showTimedMessage = (_text: string, _millis?: number) => {}
     ReactEcsRenderer.setUiRenderer(this.render.bind(this))
   }
 
@@ -44,12 +53,21 @@ export class GameUi implements IGameUi {
     return GameUi.instance
   }
 
+  init(): void {
+    this.messageTxt._text = som.ui.messagePanel.textField.message
+  }
+
+  public getInstance(): IGameUi | null {
+    return GameUi.instance
+  }
+
   render(): ReactEcs.JSX.Element | null {
     if (this.canvasInfo === null) return null
     return (
       <UiEntity>
         <Canvas>{this.bottomBarPanel.renderUI()}</Canvas>
         <Canvas>{this.popupPanel.renderUI()}</Canvas>
+        <Canvas>{this.timedMessageUI()}</Canvas>
       </UiEntity>
     )
   }
@@ -89,7 +107,6 @@ export class GameUi implements IGameUi {
     return this.resourceAtlas
   }
 
-  init: () => void
   changeAxeIcon(itemData: ItemInfo): void {
     if (this.bottomBarPanel != null) {
       this.bottomBarPanel.changeAxeIcon(itemData)
@@ -97,7 +114,7 @@ export class GameUi implements IGameUi {
   }
 
   closeAlert: () => void
-  getInstance: () => IGameUi
+
   closePopup(): void {
     if (this.popupPanel != null) {
       this.popupPanel.hide()
@@ -111,7 +128,26 @@ export class GameUi implements IGameUi {
 
   showAlert: (_type: PopupWindowType) => void
   showBonus: () => void
-  showTimedMessage: (_text: string, _millis?: number) => void
+
+  showTimedMessage(_text: string, _millis: number = 5000, _color: Color4 = Color4.White()): void {
+    this.messageTxt._text = _text
+    this.messageTxt._color = _color
+    this.showingTimedMessage = true
+    utils.timers.setInterval(() => {
+      if (GameUi.instance !== null) {
+        GameUi.instance.clearMessage()
+      }
+    }, _millis)
+  }
+
+  clearMessage(): void {
+    this.showingTimedMessage = false
+    this.messageTxt._text = ''
+  }
+
+  timedMessageUI(): ReactEcs.JSX.Element {
+    return <TimedMessage visible={true} text={this.messageTxt._text} color={this.messageTxt._color} />
+  }
 
   updateImageFromAtlas(img: UIImage, data: UiImageData): void {
     // this.loader.populate(img, data)
