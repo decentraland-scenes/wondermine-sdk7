@@ -29,6 +29,7 @@ import { type ItemInfo } from 'shared-dcl/src/playfab/iteminfo'
 import * as utils from '@dcl-sdk/utils'
 import { CraftItemEvent, Eventful } from './events'
 import { type LootItem } from './wondermine/lootitem'
+import { GameUi } from './ui/gameui'
 
 export type MachineData = {
   filename: string
@@ -201,7 +202,7 @@ export class CraftingMachine {
     })
 
     engine.addSystem(() => {
-      if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.backButton)) {
+      if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.backButton)) { 
         this.prevRecipe()
       }
       if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.nextButton)) {
@@ -801,7 +802,7 @@ export class CraftingMachine {
 
   animateMachine(itemEnt: LootItem, isRepair: boolean = false): void {
     console.log('animateMachine()')
-    Animator.getClip(this.machineModelEntity, this.craftingClip).playing = false
+    Animator.stopAllAnimations(this.machineModelEntity)
     Animator.playSingleAnimation(this.machineModelEntity, this.craftingClip)
 
     SoundManager.playOnce(this.machineModelEntity, 0.8)
@@ -810,10 +811,12 @@ export class CraftingMachine {
     utils.timers.setTimeout(() => {
       this.showCraftedItem(itemEnt)
       if (isRepair) {
-        // GameUi.instance.showTimedMessage("Your pickaxe is fixed!", 7000);
+        if (GameUi.instance !== null) {
+          GameUi.instance.showTimedMessage('Your pickaxe is fixed!', 7000)
+        } 
       }
     }, 7200)
-  }
+  } 
 
   showCraftedItem(itemEnt: LootItem): void {
     console.log('CRAFTED ' + itemEnt.instanceData?.itemId + '!')

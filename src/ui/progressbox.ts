@@ -91,7 +91,7 @@ export class ProgressBox {
 
     this.progValue = _value
     const progScale: number = this.progScaleX * _value
-    const t: TransformType = Transform.get(this.progBox)
+    const t: TransformType = Transform.getMutable(this.progBox)
     t.scale.x = progScale
     t.position.x = (this.progScaleX - progScale) / 2
     // t.position.z = 0.2;

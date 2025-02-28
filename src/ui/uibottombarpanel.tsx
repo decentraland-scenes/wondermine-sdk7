@@ -482,9 +482,6 @@ export class UiBottomBarPanel {
                         uvs: ImageData.uvs,
                         texture: { src: this.resourceAtlas }
                       }}
-                      onMouseDown={() => {
-                        console.log('clicked on Tools bar', key, this.iconValues[key])
-                      }}
                     />
                     {/* Label */}
                     <UiEntity
@@ -690,7 +687,7 @@ export class UiBottomBarPanel {
               uiBackground={{
                 textureMode: 'stretch',
                 uvs: this.toolBtn.uvs,
-                texture: { src: this.toolBtn.atlas }
+                texture: { src: this.toolBtn.atlas } 
               }}
               onMouseDown={() => {
                 console.log('clicked on Tools button')

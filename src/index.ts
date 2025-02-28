@@ -6,6 +6,7 @@ import { svr } from './svr'
 import './polyfill'
 import { XMLHttpRequest } from './xmlRequest'
 export async function main(): Promise<void> {
+  GameManager.createAndAddToEngine(svr.t);
   ;(globalThis as any).XMLHttpRequest = XMLHttpRequest
   /**
    * The main game.ts file sets up system-level services, like Input and Systems
@@ -14,15 +15,12 @@ export async function main(): Promise<void> {
   console.log('scene: ' + som.scene.title)
   const response = await getUserData(Request)
   console.log('HERE', response)
-  const gameManager = new GameManager(svr.t)
-  void gameManager.init()
-  await gameManager.getCurrentUser()
+  await GameManager.instance?.init();
+  void GameManager.instance?.getCurrentUser();
   if (response.data != null) {
     if (response.data.publicKey != null) {
       DclUser.setUserInfo(response.data.userId, response.data.displayName, response.data.publicKey)
     }
   }
-
-  // Crear un nuevo meteorito
 }
 // function getUserData(Request: any): Promise<Response>
