@@ -770,12 +770,14 @@ export class GameManager {
               // log("Axe Repair!");
               if (
                 LootVault.instance != null &&
-                DclUser.activeUser.heldItem != null &&
-                GameManager.instance?.machine != null
+                DclUser.activeUser.heldItem != null
               ) {
                 const lootEnt: LootItem = LootVault.instance.get(DclUser.activeUser.heldItem.ItemId)
-                GameManager.instance.machine.animateMachine(lootEnt, true)
-              }
+                if (GameManager.instance?.machine !== null){
+                  GameManager.instance?.machine.animateMachine(lootEnt, true)
+                }
+                }
+          
             } else {
               if (GameManager.instance?.machine?.craftedRecipe != null) {
                 const craftedId: string = GameManager.instance.machine.craftedRecipe.itemId
