@@ -10,6 +10,7 @@ import { SharedMeteor } from '../projectdata'
 // import { GameUi } from '../ui/gameui'
 import { DclUser } from 'shared-dcl/src/playfab/dcluser'
 import { Color4, type Vector3 } from '@dcl/sdk/math'
+import { GameUi } from 'src/ui/gameui'
 
 // import { ambienceSound, clickSound, fallSound, finishSound1, finishSound2, newLeaderSound, countdownRestartSound, playLoop, playOnce, playOnceRandom } from './sound';
 
@@ -175,7 +176,11 @@ export class MeteorServer {
         room.onMessage('announce', (announcement: any) => {
           console.log('announcement: ', announcement.msg)
           if (announcement?.msg !== null) {
-            // GameUi.instance.showTimedMessage(announcement.msg, 9000)
+            if(GameUi.instance !== null){
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+              GameUi.instance.showTimedMessage(announcement.msg, 9000)
+            }
+    
           }
         })
 

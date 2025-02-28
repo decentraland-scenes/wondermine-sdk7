@@ -14,20 +14,19 @@ import {
   Transform
 } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
-import { type ECS6ComponentGltfShape } from '~system/EngineApi'
 import * as utils from '@dcl-sdk/utils'
 
 /**
  * An item that can be mined from a meteor, or crafted in the machine.
  */
 export class LootItem {
-  public entity: Entity | null = null
+  public entity = engine.addEntity()
   public static homePos: Vector3 = Vector3.One()
   public adjustPos: Vector3 = Vector3.Zero()
   public instanceData: LootItemInstance | null = null
   public modelEntity: Entity = engine.addEntity()
   public modelFile: string = ''
-  public shape: ECS6ComponentGltfShape | null = null
+  public shape: PBGltfContainer = { src: '' }
   public anim: PBAnimator | null = null
   public idleAnim: string = ''
   public enabled: boolean = false
@@ -46,7 +45,6 @@ export class LootItem {
     if (_data != null && _data !== undefined) {
       if (this.loadInstance(_data, _itemId)) {
         // console.log("loaded Loot Item at " + _data["pos"]);
-        this.entity = engine.addEntity()
       }
     }
   }
@@ -151,9 +149,7 @@ export class LootItem {
   showAt(newPos: Vector3): void {
     this.enabled = true
     this.moveTo(newPos)
-    if (this.shape !== null) {
-      this.shape.visible = true
-    }
+       GltfContainer.getMutable(this.modelEntity).src = this.shape.src
     this.idle()
     // if (this.instanceData.itemId.substring(0,3) != "Axe")
     // {
@@ -179,9 +175,7 @@ export class LootItem {
     // back to the hiding place
     this.stopAnimations()
     this.moveTo(LootItem.homePos, false)
-    if (this.shape !== null) {
-      this.shape.visible = false
-    }
+    GltfContainer.getMutable(this.modelEntity).src = ''
     // 2DO: callback
   }
 

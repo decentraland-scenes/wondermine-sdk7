@@ -2,7 +2,19 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { som } from './som'
 import { ProjectLoader } from './projectloader'
-import { executeTask, AvatarModifierArea, AvatarModifierType, engine, Transform } from '@dcl/sdk/ecs'
+import {
+  executeTask,
+  AvatarModifierArea,
+  AvatarModifierType,
+  engine,
+  Transform,
+  PointerEvents,
+  PointerEventType,
+  InputAction,
+  inputSystem,
+  MeshCollider,
+  MeshRenderer
+} from '@dcl/sdk/ecs'
 import { DclUser } from '../shared-dcl/src/playfab/dcluser'
 import { WondermineApi } from '../shared-dcl/src/playfab/wondermineapi'
 import { CoinShop, type StoreItem } from './coinshop'
@@ -41,7 +53,7 @@ import { PopupQueue } from './ui/popupqueue'
 import { type Item } from './ui/uipopuppanel'
 import { LootItem } from './wondermine/lootitem'
 import { LootVault } from './wondermine/lootvault'
-import { transform } from 'typescript'
+import { transform, transpileDeclaration } from 'typescript'
 import { GameData } from './gamedata'
 import calcWearablesBonus from './bonusmanager'
 import { MeteorServer } from './multiplayer/meteorserver'
@@ -230,7 +242,7 @@ export class GameManager {
       // await this.api.GetCraftingRecipes();
       if (GameUi.instance != null) {
         GameUi.instance.showBalances(DclUser.activeUser.coins, DclUser.activeUser.gems)
-        console.log('balances',DclUser.activeUser.coins, DclUser.activeUser.gems)
+        console.log('balances', DclUser.activeUser.coins, DclUser.activeUser.gems)
         GameUi.instance.setLevel(DclUser.activeUser.level, DclUser.activeUser.xp)
       }
 
@@ -768,16 +780,12 @@ export class GameManager {
             } else if (result.ItemId === 'AxeRepair') {
               // special case
               // log("Axe Repair!");
-              if (
-                LootVault.instance != null &&
-                DclUser.activeUser.heldItem != null
-              ) {
+              if (LootVault.instance != null && DclUser.activeUser.heldItem != null) {
                 const lootEnt: LootItem = LootVault.instance.get(DclUser.activeUser.heldItem.ItemId)
-                if (GameManager.instance?.machine !== null){
+                if (GameManager.instance?.machine !== null) {
                   GameManager.instance?.machine.animateMachine(lootEnt, true)
                 }
-                }
-          
+              }
             } else {
               if (GameManager.instance?.machine?.craftedRecipe != null) {
                 const craftedId: string = GameManager.instance.machine.craftedRecipe.itemId
@@ -953,6 +961,31 @@ export class GameManager {
   loadScenery(): void {
     if (this.loader != null) {
       const signInstructions = this.loader.spawnSceneObject(som.scene.signInstructions)
+      const signInstructionsCollider = engine.addEntity()
+      MeshCollider.setPlane(signInstructionsCollider)
+      Transform.create(signInstructionsCollider, {
+        position: Vector3.create(1.35, 0.88, 14),
+        scale: Vector3.create(2.4, 4, 1),
+        rotation: Quaternion.fromEulerDegrees(0, 90, 0)
+      })
+      PointerEvents.createOrReplace(signInstructionsCollider, {
+        pointerEvents: [
+          {
+            eventType: PointerEventType.PET_UP,
+            eventInfo: {
+              button: InputAction.IA_POINTER
+            }
+          }
+        ]
+      })
+      engine.addSystem(() => {
+        if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_UP, signInstructionsCollider)) {
+          // log("clicked on sign");
+          if (GameUi.instance !== null) {
+            GameUi.instance.showTimedMessage(som.scene.title + '\n' + som.scene.changeLog)
+          }
+        }
+      })
       const ground01 = this.loader.spawnSceneObject(som.scene.ground01)
       const ground02 = this.loader.spawnSceneObject(som.scene.ground02)
       const ground03 = this.loader.spawnSceneObject(som.scene.ground03)
