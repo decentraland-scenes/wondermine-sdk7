@@ -1,3 +1,4 @@
+import { type PBRealmInfo } from '~system/Runtime'
 import { UserInfo } from './userinfo'
 
 // import { getRealm } from '~system/Runtime'
@@ -17,7 +18,7 @@ export class DclUser {
   public static displayName: string
   public static publicKey: string
   public static playfabId: string
-  public static realm: Realm
+  public static realm: PBRealmInfo
 
   public static activeUser: UserInfo
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -125,14 +126,14 @@ export class DclUser {
     }
   }
 
-  public static setRealm(r: Realm): void {
+  public static setRealm(r: PBRealmInfo): void {
     this.realm = r
   }
 
   public static getRealmName(): string {
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (this.realm) {
-      return this.realm.displayName
+      return this.realm.realmName
     } else {
       return 'none'
     }
