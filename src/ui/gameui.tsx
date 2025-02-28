@@ -107,6 +107,12 @@ export class GameUi implements IGameUi {
     return this.resourceAtlas
   }
 
+  // --- MESSAGE PANEL ---
+  showMessage(_text: string): void {
+    this.messageTxt._text = _text
+    this.showingTimedMessage = false
+  }
+
   changeAxeIcon(itemData: ItemInfo): void {
     if (this.bottomBarPanel != null) {
       this.bottomBarPanel.changeAxeIcon(itemData)
