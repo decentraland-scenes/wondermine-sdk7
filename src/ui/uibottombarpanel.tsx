@@ -55,6 +55,7 @@ export class UiBottomBarPanel {
   public atlas: string = ''
   public resourceAtlas: string = ''
   public axeType: string = 'AxeStone'
+  public toolTxt_visible: boolean = false
   constructor(ui: IGameUi) {
     this.parentUi = ui
     this.init()
@@ -67,7 +68,6 @@ export class UiBottomBarPanel {
     this.addDisplayRow()
     this.showBalances(0, 0)
     this.addInventoryPopup()
-    this.toggleInventory()
   }
 
   addBottomBar(): void {
@@ -102,10 +102,12 @@ export class UiBottomBarPanel {
       som.ui.bottomBarPanel.image.toolBtn,
       this.atlas
     )
+    this.toolTxt_visible = false;
   }
 
   showToolText(showIt: boolean): void {
     this.isToolTxtVisible = showIt
+    this.toolTxt_visible = showIt;
   }
 
   addDisplayRow(): void {
@@ -373,10 +375,18 @@ export class UiBottomBarPanel {
   }
 
   changeAxeIcon(itemData: ItemInfo): void {
+    const img:UIImage = this.iconImages.AxeStone;
     const data = som.ui.resourceIcons.image[itemData.ItemId]
+    this.toolTxt_visible = true
     if (data != null) {
       this.axeType = itemData.ItemId
-      // this.parentUi.loader.populate(img, data);
+      this.parentUi.updateImageFromAtlas(img, data);
+      this.toolIcon = this.parentUi.loadImageFromAtlas(
+        getUvs(data, { x: 1024, y: 1024 }),
+        data,
+        this.resourceAtlas
+      )
+      this.parentUi.updateImageFromAtlas(this.toolIcon, data);
 
       // show tool text
       const qty: number = itemData.RemainingUses - 1
@@ -445,6 +455,9 @@ export class UiBottomBarPanel {
               textureMode: 'stretch',
               uvs: this.inventoryBg.uvs,
               texture: { src: this.inventoryBg.atlas }
+            }}
+            onMouseDown={() => {
+              this.parentUi.showInventoryPopup()
             }}
           >
             {/* Inventory - First Column */}
@@ -628,7 +641,7 @@ export class UiBottomBarPanel {
               width: getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.width) * uiScaleFactor,
               height: getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.height) * uiScaleFactor,
               positionType: 'relative',
-              display: this.isToolTxtVisible ? 'flex' : 'none'
+              display: this.toolTxt_visible ? 'flex' : 'none'
             }}
           >
             <Label
@@ -667,8 +680,8 @@ export class UiBottomBarPanel {
               uiTransform={{
                 position: { top: '7%', left: '5%' },
                 positionType: 'absolute',
-                width: getSizeAsNumber(this.toolIcon.som.width) * uiScaleFactor,
-                height: getSizeAsNumber(this.toolIcon.som.height) * uiScaleFactor
+                width: getSizeAsNumber(this.toolIcon.som.width) * uiScaleFactor * 1.2,
+                height: getSizeAsNumber(this.toolIcon.som.height) * uiScaleFactor * 1.2
               }}
               uiBackground={{
                 textureMode: 'stretch',
