@@ -170,7 +170,6 @@ export class UiBottomBarPanel {
     const xOffset = Math.floor(pct * 13)
     const newX = xOffset - 26
     this.progBar_positionX = newX
-    console.log('progress bar', this.progBar_positionX)
 
     this.levelTxt = level.toString()
   }
@@ -275,7 +274,6 @@ export class UiBottomBarPanel {
     for (var i: number = 0; i < keys.length; i++) {
       if (this.iconValues[keys[i]] != null) {
         this.iconValues[keys[i]].value = '0'
-        console.log('icon value array', this.iconValues[keys[i]].value)
       }
     }
   }
@@ -294,69 +292,62 @@ export class UiBottomBarPanel {
   }
 
   updateInventory(): void {
-    console.log('updateInventory()')
+    console.log('updateInventory()');
     if (DclUser.activeUser != null) {
-      const inv: ItemInfo[] = DclUser.activeUser.inventoryArray
+      const inv: ItemInfo[] = DclUser.activeUser.inventoryArray;
       if (inv != null) {
-        let id: string
-        let item: ItemInfo | null
-        let qty: number = 0
-        let hasGift: boolean = false
+        let id: string;
+        let item: ItemInfo | null;
+        let qty: number = 0;
+        let hasGift: boolean = false;
   
         // set held axe info
-        const axe: ItemInfo | null = DclUser.activeUser.getHeldItem()
+        const axe: ItemInfo | null = DclUser.activeUser.getHeldItem();
         // we show axe uses at one less, so we can stop mining when there is just 1 use remaining
         if (axe != null) {
-          const axeQty = axe.RemainingUses - 1
-          this.updateAxeQty(axeQty)
+          const axeQty = axe.RemainingUses - 1;
+          this.updateAxeQty(axeQty);
         } else {
-          this.iconValues.AxeStone.value = '1'
+          this.iconValues.AxeStone.value = '1';
         }
   
         for (let i = 0; i < inv.length; i++) {
-          id = inv[i].ItemId
-          qty = inv[i].RemainingUses
+          id = inv[i].ItemId;
+          qty = inv[i].RemainingUses;
   
           if (inv[i].ItemClass !== 'pickaxe' && this.iconValues[id] != null) {
             // NOTE: GiftBox can't be set Stackable in PlayFab, or else this logic will fail
             if (id === 'GiftBox' && qty == null) {
-              hasGift = true
-              this.iconValues[id].value = '1' // Asignar valor para 'GiftBox'
+              hasGift = true;
+              this.iconValues[id].value = '1'; // Asignar valor para 'GiftBox'
             } else {
-              this.iconValues[id].value = qty != null ? qty.toString() : '0'
-              console.log('Actualizado:', id, this.iconValues[id].value)
+              this.iconValues[id].value = qty != null ? qty.toString() : '0';
             }
           }
         }
   
         if (!hasGift) {
-          this.iconValues.GiftBox.value = '0'
+          this.iconValues.GiftBox.value = '0';
         }
   
         // find if any values must be set to zero (no data from server for those items)
-        const textFieldNames: string[] = Object.keys(this.iconValues)
+        const textFieldNames: string[] = Object.keys(this.iconValues);
   
         textFieldNames.forEach((id: string) => {
-          const prefix: string = id.substr(0, 3)
+          const prefix: string = id.substr(0, 3);
           if (prefix !== 'Axe' && prefix !== 'Gif') {
-            // Busca el ítem en el inventario por su 'ItemId'
-            item = this.findFirst(inv, 'ItemId', id)
-            console.log('Buscando en inv: ', id, item) // Verifica lo que se encuentra
+            item = this.findFirst(inv, 'ItemId', id);
   
             if (item != null) {
-              // Si el ítem se encuentra, actualiza el valor correspondiente
-              this.iconValues[id].value = item.RemainingUses.toString()
-              console.log('Encontrado valor: ', this.iconValues[id].value) // Verifica lo que se encuentra
+              const updatedValue = item.RemainingUses != null ? item.RemainingUses.toString() : '0';
+              this.iconValues[id] = {...this.iconValues[id], value: updatedValue}; 
             } else {
-              console.log(`No se encontró el ítem ${id}, asignando valor 0`)
-              this.iconValues[id].value = '0' // Asigna 0 si no se encuentra el ítem
+              this.iconValues[id] = {...this.iconValues[id], value: '0'}; 
             }
-            console.log('debug todos valor: ', this.iconValues) // Verifica lo que se encuentra
           }
-        })
+        });
       }
-      this.showBonus()
-      console.log('debug', this.iconValues)
+      this.showBonus();
     }
   }
   
