@@ -318,8 +318,8 @@ export class UiBottomBarPanel {
           if (inv[i].ItemClass !== 'pickaxe' && this.iconValues[id] != null) {
             // NOTE: GiftBox can't be set Stackable in PlayFab, or else this logic will fail
             if (id === 'GiftBox' && qty == null) {
-              hasGift = true;
-              this.iconValues[id].value = '1'; // Asignar valor para 'GiftBox'
+              hasGift = true; 
+              this.iconValues[id].value = '1';
             } else {
               this.iconValues[id].value = qty != null ? qty.toString() : '0';
             }
@@ -337,7 +337,6 @@ export class UiBottomBarPanel {
           const prefix: string = id.substr(0, 3);
           if (prefix !== 'Axe' && prefix !== 'Gif') {
             item = this.findFirst(inv, 'ItemId', id);
-  
             if (item != null) {
               const updatedValue = item.RemainingUses != null ? item.RemainingUses.toString() : '0';
               this.iconValues[id] = {...this.iconValues[id], value: updatedValue}; 
