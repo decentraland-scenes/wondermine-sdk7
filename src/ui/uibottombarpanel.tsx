@@ -23,8 +23,6 @@ export type IconValue = {
   value: string
 }
 
-type MyObject = Record<string, any>
-
 export class UiBottomBarPanel {
   public parentUi: IGameUi
   mainPanel_visible: boolean = false
@@ -102,12 +100,12 @@ export class UiBottomBarPanel {
       som.ui.bottomBarPanel.image.toolBtn,
       this.atlas
     )
-    this.toolTxt_visible = false;
+    this.toolTxt_visible = false
   }
 
   showToolText(showIt: boolean): void {
     this.isToolTxtVisible = showIt
-    this.toolTxt_visible = showIt;
+    this.toolTxt_visible = showIt
   }
 
   addDisplayRow(): void {
@@ -301,64 +299,70 @@ export class UiBottomBarPanel {
       const inv: ItemInfo[] = DclUser.activeUser.inventoryArray
       if (inv != null) {
         let id: string
-        let item: object | null
+        let item: ItemInfo | null
         let qty: number = 0
         let hasGift: boolean = false
-        // log(inv);
-
+  
         // set held axe info
         const axe: ItemInfo | null = DclUser.activeUser.getHeldItem()
-        // log("heldItem", axe);
-
         // we show axe uses at one less, so we can stop mining when there is just 1 use remaining
-        // (otherwise PlayFab removes their axe completely)
         if (axe != null) {
           const axeQty = axe.RemainingUses - 1
           this.updateAxeQty(axeQty)
         } else {
           this.iconValues.AxeStone.value = '1'
         }
-        for (var i: number = 0; i < inv.length; i++) {
+  
+        for (let i = 0; i < inv.length; i++) {
           id = inv[i].ItemId
           qty = inv[i].RemainingUses
+  
           if (inv[i].ItemClass !== 'pickaxe' && this.iconValues[id] != null) {
             // NOTE: GiftBox can't be set Stackable in PlayFab, or else this logic will fail
             if (id === 'GiftBox' && qty == null) {
-              // log("GiftBox qty=" + qty);
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
               hasGift = true
-              this.iconValues[id].value = '1'
+              this.iconValues[id].value = '1' // Asignar valor para 'GiftBox'
             } else {
-              this.iconValues[id].value = qty.toString()
+              this.iconValues[id].value = qty != null ? qty.toString() : '0'
+              console.log('Actualizado:', id, this.iconValues[id].value)
             }
           }
         }
+  
         if (!hasGift) {
           this.iconValues.GiftBox.value = '0'
         }
-
+  
         // find if any values must be set to zero (no data from server for those items)
-
         const textFieldNames: string[] = Object.keys(this.iconValues)
-        // log(textFieldNames);
-        textFieldNames.forEach((id: string, index: number, arr: string[]) => {
-          // why can't we use find() ?
-          // inv.find((item) => item.ItemId === id)
+  
+        textFieldNames.forEach((id: string) => {
           const prefix: string = id.substr(0, 3)
           if (prefix !== 'Axe' && prefix !== 'Gif') {
+            // Busca el ítem en el inventario por su 'ItemId'
             item = this.findFirst(inv, 'ItemId', id)
-            if (item == null) {
-              this.iconValues[id].value = '0'
+            console.log('Buscando en inv: ', id, item) // Verifica lo que se encuentra
+  
+            if (item != null) {
+              // Si el ítem se encuentra, actualiza el valor correspondiente
+              this.iconValues[id].value = item.RemainingUses.toString()
+              console.log('Encontrado valor: ', this.iconValues[id].value) // Verifica lo que se encuentra
+            } else {
+              console.log(`No se encontró el ítem ${id}, asignando valor 0`)
+              this.iconValues[id].value = '0' // Asigna 0 si no se encuentra el ítem
             }
+            console.log('debug todos valor: ', this.iconValues) // Verifica lo que se encuentra
           }
-        }, this)
+        })
       }
       this.showBonus()
+      console.log('debug', this.iconValues)
     }
   }
+  
 
-  findFirst(objArray: MyObject[], propName: string, matchVal: string): object | null {
-    for (var i = 0; i < objArray.length; i++) {
+  findFirst<T extends keyof ItemInfo>(objArray: ItemInfo[], propName: T, matchVal: ItemInfo[T]): ItemInfo | null {
+    for (let i = 0; i < objArray.length; i++) {
       if (objArray[i][propName] === matchVal) {
         return objArray[i]
       }
@@ -375,18 +379,14 @@ export class UiBottomBarPanel {
   }
 
   changeAxeIcon(itemData: ItemInfo): void {
-    const img:UIImage = this.iconImages.AxeStone;
+    const img: UIImage = this.iconImages.AxeStone
     const data = som.ui.resourceIcons.image[itemData.ItemId]
     this.toolTxt_visible = true
     if (data != null) {
       this.axeType = itemData.ItemId
-      this.parentUi.updateImageFromAtlas(img, data);
-      this.toolIcon = this.parentUi.loadImageFromAtlas(
-        getUvs(data, { x: 1024, y: 1024 }),
-        data,
-        this.resourceAtlas
-      )
-      this.parentUi.updateImageFromAtlas(this.toolIcon, data);
+      this.parentUi.updateImageFromAtlas(img, data)
+      this.toolIcon = this.parentUi.loadImageFromAtlas(getUvs(data, { x: 1024, y: 1024 }), data, this.resourceAtlas)
+      this.parentUi.updateImageFromAtlas(this.toolIcon, data)
 
       // show tool text
       const qty: number = itemData.RemainingUses - 1
@@ -700,7 +700,7 @@ export class UiBottomBarPanel {
               uiBackground={{
                 textureMode: 'stretch',
                 uvs: this.toolBtn.uvs,
-                texture: { src: this.toolBtn.atlas } 
+                texture: { src: this.toolBtn.atlas }
               }}
               onMouseDown={() => {
                 console.log('clicked on Tools button')
