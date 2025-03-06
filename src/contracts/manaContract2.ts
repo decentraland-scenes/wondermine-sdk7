@@ -18,6 +18,7 @@ export class ManaContract2 {
   }
 
   async loadContract(): Promise<void> {
+    console.log('loading.... contratc')
     // chainId:ChainId = ChainId.ETHEREUM_MAINNET
     const [c, r] = (await ContractManager.instance.getContract('mana', this.chainId)) as any
     this.contract = c
@@ -27,7 +28,10 @@ export class ManaContract2 {
   }
 
   async getPlayerBalance(): Promise<number> {
-    if (this.contract === null) await this.loadContract()
+    console.log(this.contract, 'checking contract nullish')
+    if (this.contract === null || this.contract === undefined) {
+      await this.loadContract()
+    }
     const userData = getPlayer()
     const address = userData?.userId
     console.log('wallet address', address)
