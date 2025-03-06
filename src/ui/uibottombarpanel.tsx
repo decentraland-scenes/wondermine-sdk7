@@ -672,10 +672,7 @@ export class UiBottomBarPanel {
               uvs: this.barTools.uvs,
               texture: { src: this.barTools.atlas }
             }}
-            onMouseDown={() => {
-              console.log('clicked on Tools bar')
-              this.showToolText(!this.isToolTxtVisible)
-            }}
+
           >
             {/* Tool Icon */}
             <UiEntity
@@ -689,6 +686,10 @@ export class UiBottomBarPanel {
                 textureMode: 'stretch',
                 uvs: this.toolIcon.uvs,
                 texture: { src: this.toolIcon.atlas }
+              }}
+              onMouseDown={() => {
+                console.log('clicked on Tools bar',this.isToolTxtVisible)
+                this.showToolText(!this.isToolTxtVisible)
               }}
             />
             {/* Tool Button */}
