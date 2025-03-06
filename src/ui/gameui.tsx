@@ -188,6 +188,7 @@ export class GameUi implements IGameUi {
     }
 
     this.popupPanel.show()
+    console.log('showing pop up')
 
     // 1DO: fix this -- if popups stack up too fast it could be chaos
     this.onPopupClosedCallback = _callback

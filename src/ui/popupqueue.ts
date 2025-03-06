@@ -10,12 +10,12 @@ export class PopupQueue {
 
   public isActive(): boolean {
     // assume that if there's acive data, then it's being shown
-    // log("$$$$$$$$$$ isActive() = " + (this.active != null));
+   console.log("$$$$$$$$$$ isActive() = " + (this.active != null));
     return this.active != null
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
-  public addPopup(type: PopupWindowType, msg: string, rewards: Item[] | null, itemId: string, millis: number): void {
+  public addPopup(type: PopupWindowType, msg: string, rewards: Item[] | null, itemId: string | null, millis: number): void {
     this.add(new PopupData(type, msg, rewards, itemId, millis))
   }
 
@@ -24,8 +24,8 @@ export class PopupQueue {
       this.queue.push(data)
     }
 
-    // console.log("$$$$$$$$$$ added popup: active=" + (this.active != null));
-    // console.log(data);
+    console.log("$$$$$$$$$$ added popup: active=" + (this.active != null));
+    console.log(data);
     if (this.active == null || Date.now() > this.lastActiveTime) {
       this.showNext()
     }
@@ -43,9 +43,9 @@ export class PopupQueue {
   }
 
   public show(): void {
-    // log("$$$$$$$$$$ show(), active=" + (this.active != null));
+   console.log("$$$$$$$$$$ show(), active=" + (this.active != null));
     if (this.active != null) {
-      // log("$$$$$$$$$$ showing popup window: " + this.active.msg);
+     console.log("$$$$$$$$$$ showing popup window: " + this.active.msg);
       this.lastActiveTime = Date.now() + this.active.millis
       if (GameUi.instance != null) {
         GameUi.instance.showTimedPopup(
@@ -56,7 +56,7 @@ export class PopupQueue {
           this.active.millis,
           () => {
             this.active = null
-            // log("$$$$$$$$$$ popup window closed");
+           console.log("$$$$$$$$$$ popup window closed");
             this.showNext()
           }
         )

@@ -674,11 +674,8 @@ export class GameManager {
     if (this.popupQueue == null) {
       this.popupQueue = new PopupQueue()
     }
-
     // add will try to show the popup if it's the only one in the queue
-    if (_itemId !== null) {
-      this.popupQueue.addPopup(_type, _msg, _rewards, _itemId, _millis)
-    }
+    this.popupQueue.addPopup(_type, _msg, _rewards, _itemId, _millis)
   }
 
   // --- CRAFTING ---

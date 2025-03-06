@@ -52,10 +52,8 @@ export class UiPopupPanel {
   }
 
   init(): void {
-    this.atlas = this.parentUi.getUiAtlas()
+    this.atlas = this.parentUi.getUiAtlas() 
     this.resourceAtlas = this.parentUi.getResourceAtlas()
-
-    this.mainPanel_visible = false
 
     this.addWindowBg()
     this.addTitles()
