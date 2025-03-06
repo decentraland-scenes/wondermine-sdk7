@@ -1422,9 +1422,9 @@ export var som: any = {
           positionX: 0,
           positionY: 0,
           sourceLeft: 256,
-          sourceTop: 256,
+          sourceTop: 255.5,
           sourceWidth: 128,
-          sourceHeight: 128
+          sourceHeight: 128 
         },
         AxeTitanium: {
           width: '40px',

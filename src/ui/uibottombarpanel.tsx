@@ -23,8 +23,6 @@ export type IconValue = {
   value: string
 }
 
-type MyObject = Record<string, any>
-
 export class UiBottomBarPanel {
   public parentUi: IGameUi
   mainPanel_visible: boolean = false
@@ -55,6 +53,7 @@ export class UiBottomBarPanel {
   public atlas: string = ''
   public resourceAtlas: string = ''
   public axeType: string = 'AxeStone'
+  public toolTxt_visible: boolean = false
   constructor(ui: IGameUi) {
     this.parentUi = ui
     this.init()
@@ -67,7 +66,6 @@ export class UiBottomBarPanel {
     this.addDisplayRow()
     this.showBalances(0, 0)
     this.addInventoryPopup()
-    this.toggleInventory()
   }
 
   addBottomBar(): void {
@@ -102,10 +100,12 @@ export class UiBottomBarPanel {
       som.ui.bottomBarPanel.image.toolBtn,
       this.atlas
     )
+    this.toolTxt_visible = false
   }
 
   showToolText(showIt: boolean): void {
     this.isToolTxtVisible = showIt
+    this.toolTxt_visible = showIt
   }
 
   addDisplayRow(): void {
@@ -170,7 +170,6 @@ export class UiBottomBarPanel {
     const xOffset = Math.floor(pct * 13)
     const newX = xOffset - 26
     this.progBar_positionX = newX
-    console.log('progress bar', this.progBar_positionX)
 
     this.levelTxt = level.toString()
   }
@@ -275,9 +274,9 @@ export class UiBottomBarPanel {
     for (var i: number = 0; i < keys.length; i++) {
       if (this.iconValues[keys[i]] != null) {
         this.iconValues[keys[i]].value = '0'
-        console.log('icon value array', this.iconValues[keys[i]].value)
       }
     }
+    this.bonusPctTxt = 'Mining Bonus: 0%'
   }
 
   showBalances(coins: number, gems: number): void {
@@ -299,31 +298,27 @@ export class UiBottomBarPanel {
       const inv: ItemInfo[] = DclUser.activeUser.inventoryArray
       if (inv != null) {
         let id: string
-        let item: object | null
+        let item: ItemInfo | null
         let qty: number = 0
         let hasGift: boolean = false
-        // log(inv);
 
         // set held axe info
         const axe: ItemInfo | null = DclUser.activeUser.getHeldItem()
-        // log("heldItem", axe);
-
         // we show axe uses at one less, so we can stop mining when there is just 1 use remaining
-        // (otherwise PlayFab removes their axe completely)
         if (axe != null) {
           const axeQty = axe.RemainingUses - 1
           this.updateAxeQty(axeQty)
         } else {
-          this.iconValues.AxeStone.value = '1'
+          this.iconValues.AxeStone = { ...this.iconValues.AxeStone, value: '1' }
         }
-        for (var i: number = 0; i < inv.length; i++) {
+
+        for (let i = 0; i < inv.length; i++) {
           id = inv[i].ItemId
           qty = inv[i].RemainingUses
+
           if (inv[i].ItemClass !== 'pickaxe' && this.iconValues[id] != null) {
             // NOTE: GiftBox can't be set Stackable in PlayFab, or else this logic will fail
-            if (id === 'GiftBox' && qty == null) {
-              // log("GiftBox qty=" + qty);
-              // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            if (id === 'GiftBox' && qty === null) {
               hasGift = true
               this.iconValues[id].value = '1'
             } else {
@@ -331,32 +326,33 @@ export class UiBottomBarPanel {
             }
           }
         }
+
         if (!hasGift) {
-          this.iconValues.GiftBox.value = '0'
+          // this.iconValues.GiftBox.value = '0'
+          this.iconValues.GiftBox = { ...this.iconValues.GiftBox, value: '0' }
         }
-
         // find if any values must be set to zero (no data from server for those items)
-
         const textFieldNames: string[] = Object.keys(this.iconValues)
-        // log(textFieldNames);
-        textFieldNames.forEach((id: string, index: number, arr: string[]) => {
-          // why can't we use find() ?
-          // inv.find((item) => item.ItemId === id)
+
+        textFieldNames.forEach((id: string) => {
           const prefix: string = id.substr(0, 3)
           if (prefix !== 'Axe' && prefix !== 'Gif') {
             item = this.findFirst(inv, 'ItemId', id)
-            if (item == null) {
-              this.iconValues[id].value = '0'
+            if (item != null) {
+              const updatedValue = item.RemainingUses != null ? item.RemainingUses.toString() : '0'
+              this.iconValues[id] = { ...this.iconValues[id], value: updatedValue }
+            } else {
+              this.iconValues[id] = { ...this.iconValues[id], value: '0' }
             }
           }
-        }, this)
+        })
       }
       this.showBonus()
     }
   }
 
-  findFirst(objArray: MyObject[], propName: string, matchVal: string): object | null {
-    for (var i = 0; i < objArray.length; i++) {
+  findFirst<T extends keyof ItemInfo>(objArray: ItemInfo[], propName: T, matchVal: ItemInfo[T]): ItemInfo | null {
+    for (let i = 0; i < objArray.length; i++) {
       if (objArray[i][propName] === matchVal) {
         return objArray[i]
       }
@@ -373,15 +369,25 @@ export class UiBottomBarPanel {
   }
 
   changeAxeIcon(itemData: ItemInfo): void {
+    console.log('change axe icon', itemData)
+    const img: UIImage = this.iconImages.AxeStone
     const data = som.ui.resourceIcons.image[itemData.ItemId]
+    this.toolTxt_visible = true
     if (data != null) {
       this.axeType = itemData.ItemId
-      // this.parentUi.loader.populate(img, data);
+      this.parentUi.updateImageFromAtlas(img, data)
+      this.toolIcon = this.parentUi.loadImageFromAtlas(getUvs(data, { x: 1024, y: 1024 }), data, this.resourceAtlas)
+      this.iconImages.AxeStone = this.parentUi.loadImageFromAtlas(
+        getUvs(data, { x: 1024, y: 1024 }),
+        data,
+        this.resourceAtlas
+      )
 
       // show tool text
       const qty: number = itemData.RemainingUses - 1
       this.toolTxt = itemData.DisplayName + '\n' + 'Remaining: ' + qty
       this.iconValues.AxeStone.value = qty.toString()
+      console.log('hereee12313', this.iconValues.AxeStone.value)
     }
   }
 
@@ -391,7 +397,8 @@ export class UiBottomBarPanel {
     const idx: number = current.lastIndexOf(':')
 
     this.toolTxt = current.substr(0, idx + 2) + qty
-    this.iconValues.AxeStone.value = qty.toString()
+    this.iconValues.AxeStone = { ...this.iconValues.AxeStone, value: qty.toString() }
+    console.log('hereee', this.iconValues.AxeStone.value)
   }
 
   hide(): void {
@@ -446,6 +453,9 @@ export class UiBottomBarPanel {
               uvs: this.inventoryBg.uvs,
               texture: { src: this.inventoryBg.atlas }
             }}
+            onMouseDown={() => {
+              this.parentUi.showInventoryPopup()
+            }}
           >
             {/* Inventory - First Column */}
             <UiEntity
@@ -482,6 +492,9 @@ export class UiBottomBarPanel {
                         uvs: ImageData.uvs,
                         texture: { src: this.resourceAtlas }
                       }}
+                      onMouseDown={() => {
+                        console.log('axe icon render', key, this.iconValues[key].value)
+                      }}
                     />
                     {/* Label */}
                     <UiEntity
@@ -495,6 +508,7 @@ export class UiBottomBarPanel {
                         fontSize={getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.fontSize) * uiScaleFactor}
                         color={Color4.fromHexString(som.ui.bottomBarPanel.textField.invItemTxt.hexColor)}
                         font="sans-serif"
+                        textWrap="nowrap"
                       />
                     </UiEntity>
                   </UiEntity>
@@ -549,6 +563,7 @@ export class UiBottomBarPanel {
                         fontSize={getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.fontSize) * uiScaleFactor}
                         color={Color4.fromHexString(som.ui.bottomBarPanel.textField.invItemTxt.hexColor)}
                         font="sans-serif"
+                        textWrap="nowrap"
                       />
                     </UiEntity>
                   </UiEntity>
@@ -603,6 +618,7 @@ export class UiBottomBarPanel {
                         fontSize={getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.fontSize) * uiScaleFactor}
                         color={Color4.fromHexString(som.ui.bottomBarPanel.textField.invItemTxt.hexColor)}
                         font="sans-serif"
+                        textWrap="nowrap"
                       />
                     </UiEntity>
                   </UiEntity>
@@ -628,7 +644,7 @@ export class UiBottomBarPanel {
               width: getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.width) * uiScaleFactor,
               height: getSizeAsNumber(som.ui.bottomBarPanel.textField.toolTxt.height) * uiScaleFactor,
               positionType: 'relative',
-              display: this.isToolTxtVisible ? 'flex' : 'none'
+              display: this.toolTxt_visible ? 'flex' : 'none'
             }}
           >
             <Label
@@ -657,23 +673,23 @@ export class UiBottomBarPanel {
               uvs: this.barTools.uvs,
               texture: { src: this.barTools.atlas }
             }}
-            onMouseDown={() => {
-              console.log('clicked on Tools bar')
-              this.showToolText(!this.isToolTxtVisible)
-            }}
           >
             {/* Tool Icon */}
             <UiEntity
               uiTransform={{
                 position: { top: '7%', left: '5%' },
                 positionType: 'absolute',
-                width: getSizeAsNumber(this.toolIcon.som.width) * uiScaleFactor,
-                height: getSizeAsNumber(this.toolIcon.som.height) * uiScaleFactor
+                width: getSizeAsNumber(this.toolIcon.som.width) * uiScaleFactor * 1.2,
+                height: getSizeAsNumber(this.toolIcon.som.height) * uiScaleFactor * 1.2
               }}
               uiBackground={{
                 textureMode: 'stretch',
                 uvs: this.toolIcon.uvs,
                 texture: { src: this.toolIcon.atlas }
+              }}
+              onMouseDown={() => {
+                console.log('clicked on Tools bar', this.isToolTxtVisible)
+                this.showToolText(!this.isToolTxtVisible)
               }}
             />
             {/* Tool Button */}
@@ -687,7 +703,7 @@ export class UiBottomBarPanel {
               uiBackground={{
                 textureMode: 'stretch',
                 uvs: this.toolBtn.uvs,
-                texture: { src: this.toolBtn.atlas } 
+                texture: { src: this.toolBtn.atlas }
               }}
               onMouseDown={() => {
                 console.log('clicked on Tools button')
