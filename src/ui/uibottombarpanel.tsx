@@ -276,7 +276,7 @@ export class UiBottomBarPanel {
         this.iconValues[keys[i]].value = '0'
       }
     }
-    this.bonusPctTxt= "Mining Bonus: 0%";
+    this.bonusPctTxt = 'Mining Bonus: 0%'
   }
 
   showBalances(coins: number, gems: number): void {
@@ -306,32 +306,31 @@ export class UiBottomBarPanel {
         const axe: ItemInfo | null = DclUser.activeUser.getHeldItem()
         // we show axe uses at one less, so we can stop mining when there is just 1 use remaining
         if (axe != null) {
-          console.log('hereeee ',axe)
           const axeQty = axe.RemainingUses - 1
-          this.updateAxeQty(axeQty) 
+          this.updateAxeQty(axeQty)
         } else {
-          this.iconValues.AxeStone.value = '1'
+          this.iconValues.AxeStone = { ...this.iconValues.AxeStone, value: '1' }
         }
 
         for (let i = 0; i < inv.length; i++) {
           id = inv[i].ItemId
           qty = inv[i].RemainingUses
-
+        
           if (inv[i].ItemClass !== 'pickaxe' && this.iconValues[id] != null) {
             // NOTE: GiftBox can't be set Stackable in PlayFab, or else this logic will fail
-            if (id === 'GiftBox' && qty == null) {
+            if (id === 'GiftBox' && qty === null) {
               hasGift = true
               this.iconValues[id].value = '1'
             } else {
-              this.iconValues[id].value = qty != null ? qty.toString() : '0'
+              this.iconValues[id].value = qty.toString()
             }
           }
         }
 
         if (!hasGift) {
-          this.iconValues.GiftBox.value = '0'
+          // this.iconValues.GiftBox.value = '0'
+          this.iconValues.GiftBox = { ...this.iconValues.GiftBox, value: '0' }
         }
-
         // find if any values must be set to zero (no data from server for those items)
         const textFieldNames: string[] = Object.keys(this.iconValues)
 
@@ -398,8 +397,8 @@ export class UiBottomBarPanel {
     const idx: number = current.lastIndexOf(':')
 
     this.toolTxt = current.substr(0, idx + 2) + qty
-    this.iconValues.AxeStone.value = qty.toString()
-    console.log('hereee',this.iconValues.AxeStone.value)
+    this.iconValues.AxeStone = { ...this.iconValues.AxeStone, value: qty.toString() }
+    console.log('hereee', this.iconValues.AxeStone.value)
   }
 
   hide(): void {
@@ -494,8 +493,7 @@ export class UiBottomBarPanel {
                         texture: { src: this.resourceAtlas }
                       }}
                       onMouseDown={() => {
-                        console.log('axe icon render',key, this.iconValues[key].value)
-
+                        console.log('axe icon render', key, this.iconValues[key].value)
                       }}
                     />
                     {/* Label */}
@@ -672,7 +670,6 @@ export class UiBottomBarPanel {
               uvs: this.barTools.uvs,
               texture: { src: this.barTools.atlas }
             }}
-
           >
             {/* Tool Icon */}
             <UiEntity
@@ -688,7 +685,7 @@ export class UiBottomBarPanel {
                 texture: { src: this.toolIcon.atlas }
               }}
               onMouseDown={() => {
-                console.log('clicked on Tools bar',this.isToolTxtVisible)
+                console.log('clicked on Tools bar', this.isToolTxtVisible)
                 this.showToolText(!this.isToolTxtVisible)
               }}
             />
