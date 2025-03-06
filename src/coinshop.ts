@@ -20,6 +20,7 @@ import { ItemAmountPanel } from './ui/itemamountpanel'
 import { svr } from './svr'
 import { ManaContract2 } from './contracts/manaContract2'
 import { BenchmarkEvent, Eventful } from './events'
+import { GameUi } from './ui/gameui'
 
 export type BuildingData = {
   filename: string
@@ -181,7 +182,9 @@ export class CoinShop {
 
   onProductClicked(itemData: ShopItemInstance, hitPoint?: Vector3): boolean {
     if (this.txInProgress) {
-      // GameUi.instance.showTimedMessage("Please wait for your transaction to complete.", 300000);
+      if (GameUi.instance != null) {
+      GameUi.instance.showTimedMessage("Please wait for your transaction to complete.", 300000);
+      }
       return true
     }
 
@@ -194,8 +197,9 @@ export class CoinShop {
     svr.p = paymentAmount
     // log("id=" + svr.i + " price=" + svr.p);
     // pop up confirmation ui
-
-    // GameUi.instance.showTimedMessage("Thanks! First confirm your transaction.\nThen wait in the scene for a few minutes\nuntil the transaction completes...", 600000);
+    if (GameUi.instance != null) {
+    GameUi.instance.showTimedMessage("Thanks! First confirm your transaction.\nThen wait in the scene for a few minutes\nuntil the transaction completes...", 600000);
+    }
 
     // pay mana
 
@@ -210,8 +214,9 @@ export class CoinShop {
         .send(weiAmount, true)
         .then((tx) => {
           console.log('PAYMENT SUCCEEDED', tx)
-
-          // GameUi.instance.showTimedMessage("Transaction complete!\nYour WonderCoins will arrive soon.", 12000);
+          if (GameUi.instance != null) {
+          GameUi.instance.showTimedMessage("Transaction complete!\nYour WonderCoins will arrive soon.", 12000);
+          }
 
           // GameManager.instance.doIt();
           Eventful.instance.fireEvent(new BenchmarkEvent(paymentAmount))
@@ -225,14 +230,16 @@ export class CoinShop {
         })
         .catch((error) => {
           console.log(error)
-          let msg: string = 'The transaction was canceled.'
+          let msg: string = 'The transaction was canceled.' 
           if (error['message'] !== null) {
             msg += '\n' + error['message']
           } else if (error['data'] != null || error['data']['message'] != null) {
             msg += '\n' + (error['data'] != null || error['data']['message'])
           }
           console.log(msg)
-          // GameUi.instance.showTimedMessage(msg);
+          if (GameUi.instance != null) {
+          GameUi.instance.showTimedMessage(msg);
+          }
           this.txInProgress = false
         })
     })
