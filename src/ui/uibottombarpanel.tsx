@@ -315,7 +315,7 @@ export class UiBottomBarPanel {
         for (let i = 0; i < inv.length; i++) {
           id = inv[i].ItemId
           qty = inv[i].RemainingUses
-        
+
           if (inv[i].ItemClass !== 'pickaxe' && this.iconValues[id] != null) {
             // NOTE: GiftBox can't be set Stackable in PlayFab, or else this logic will fail
             if (id === 'GiftBox' && qty === null) {
@@ -508,6 +508,7 @@ export class UiBottomBarPanel {
                         fontSize={getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.fontSize) * uiScaleFactor}
                         color={Color4.fromHexString(som.ui.bottomBarPanel.textField.invItemTxt.hexColor)}
                         font="sans-serif"
+                        textWrap="nowrap"
                       />
                     </UiEntity>
                   </UiEntity>
@@ -562,6 +563,7 @@ export class UiBottomBarPanel {
                         fontSize={getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.fontSize) * uiScaleFactor}
                         color={Color4.fromHexString(som.ui.bottomBarPanel.textField.invItemTxt.hexColor)}
                         font="sans-serif"
+                        textWrap="nowrap"
                       />
                     </UiEntity>
                   </UiEntity>
@@ -616,6 +618,7 @@ export class UiBottomBarPanel {
                         fontSize={getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.fontSize) * uiScaleFactor}
                         color={Color4.fromHexString(som.ui.bottomBarPanel.textField.invItemTxt.hexColor)}
                         font="sans-serif"
+                        textWrap="nowrap"
                       />
                     </UiEntity>
                   </UiEntity>
