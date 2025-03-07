@@ -52,7 +52,7 @@ export class UiPopupPanel {
   }
 
   init(): void {
-    this.atlas = this.parentUi.getUiAtlas() 
+    this.atlas = this.parentUi.getUiAtlas()
     this.resourceAtlas = this.parentUi.getResourceAtlas()
 
     this.addWindowBg()
@@ -287,9 +287,10 @@ export class UiPopupPanel {
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
-  showRewards(itemArray: Item[]): void {
+  showRewards(itemArray: Item[] | null): void {
     // log("showRewards(" + itemArray.length + ")");
     // log(itemArray);
+    console.log(itemArray, 'item array 1')
     if (itemArray != null) {
       // this.clearRewards();
       let itemId: string
@@ -310,7 +311,7 @@ export class UiPopupPanel {
         displayName = itemArray[i].DisplayName
         isBonus = itemArray[i].IsBonus
         showIt = true
-
+        console.log(itemArray, 'item array 2')
         if (itemClass !== 'meteor' && itemClass !== 'levelup' && rewardIndex < this.iconImages.length) {
           ++rewardIndex
           // log("ITEM " + i + ": " + itemArray[i]["DisplayName"] + " rewardIndex: " + rewardIndex);
@@ -432,6 +433,7 @@ export class UiPopupPanel {
   renderUI(): ReactEcs.JSX.Element {
     const canvasInfo = UiCanvasInformation.get(engine.RootEntity)
     const uiScaleFactor = (Math.min(canvasInfo.width, canvasInfo.height) / 1080) * 1.2
+    console.log(this.iconImages)
     return (
       <UiEntity
         uiTransform={{
@@ -546,7 +548,7 @@ export class UiPopupPanel {
               this.parentUi.closePopup()
             }}
           />
-          {/* invStack01 */}
+          {/* First Column */}
           <UiEntity
             uiTransform={{
               flexDirection: 'column',
@@ -554,10 +556,35 @@ export class UiPopupPanel {
               alignItems: 'center',
               width: '33%',
               padding: '6px',
-              margin: { bottom: '0px', left: '0px' }
+              margin: { top: '25px', left: '5px' }
             }}
-          />
-          
+          >
+            {this.iconImages.map((ImageData, index) => (
+              <UiEntity
+                key={index} // Using index as the key
+                uiTransform={{
+                  flexDirection: 'row',
+                  justifyContent: 'flex-start',
+                  alignItems: 'center',
+                  padding: '0px',
+                  margin: { top: '0px', left: '40px' }
+                }}
+              >
+                <UiEntity
+                  uiTransform={{
+                    width: getSizeAsNumber(ImageData.som.width) * uiScaleFactor, // Using the width from the ImageData
+                    height: getSizeAsNumber(ImageData.som.height) * uiScaleFactor, // Using the height from the ImageData
+                    margin: { bottom: '0px' }
+                  }}
+                  uiBackground={{
+                    textureMode: 'stretch',
+                    uvs: ImageData.uvs, // Using the uvs from the ImageData
+                    texture: { src: ImageData.atlas } // Using the atlas from the ImageData
+                  }}
+                />
+              </UiEntity>
+            ))}
+          </UiEntity>
         </UiEntity>
       </UiEntity>
     )
