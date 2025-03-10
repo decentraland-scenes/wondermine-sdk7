@@ -3,7 +3,7 @@ import { engine, UiCanvasInformation, type Entity } from '@dcl/sdk/ecs'
 import { type UIImage, type IGameUi, type UIText } from './igameui'
 import { SoundManager } from 'shared-dcl/src/sound/soundmanager'
 import { som } from 'src/som'
-import { getSizeAsNumber, getUvs } from './utils/utils'
+import { getSizeAsNumber, getSizeAsText, getUvs } from './utils/utils'
 import { PopupWindowType } from 'src/enums'
 import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
 import { DclUser } from 'shared-dcl/src/playfab/dcluser'
@@ -557,25 +557,23 @@ export class UiPopupPanel {
           {/* Inv Stack */}
           <UiEntity
             uiTransform={{
-              position: { bottom: '0%', left: '19%' },
+              position: { bottom: '0%', left: '0%' },
               positionType: 'absolute',
               flexDirection: 'column',
-              justifyContent: 'flex-start',
+              justifyContent: 'center',
               alignItems: 'center',
-              width: '33%',
-              padding: '6px',
-              margin: { bottom: '25px', left: '5px' }
+              width: '100%',
+              padding: '6px'
             }}
           >
-            {this.iconImages.map((ImageData, index) => (
+            {this.iconImages.slice(0, 4).map((ImageData, index) => (
               <UiEntity
                 key={index} // Using index as the key
                 uiTransform={{
                   flexDirection: 'row',
-                  justifyContent: 'flex-start',
-                  alignItems: 'center',
                   padding: '6px',
-                  margin: { top: '0px', left: '40px' }
+                  width: '50%',
+                  position: { left: '80px', top: '0px' }
                 }}
               >
                 <UiEntity
@@ -593,8 +591,9 @@ export class UiPopupPanel {
                 {/* Label */}
                 <UiEntity
                   uiTransform={{
-                    width: getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.width) * uiScaleFactor,
-                    height: getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.height) * uiScaleFactor
+                    width: getSizeAsText(this.iconValues[index].value) * uiScaleFactor,
+                    height: getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.height) * uiScaleFactor,
+                    margin: { left: '10px' }
                   }}
                 >
                   <Label
