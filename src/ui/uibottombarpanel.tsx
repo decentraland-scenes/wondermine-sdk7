@@ -386,8 +386,8 @@ export class UiBottomBarPanel {
       // show tool text
       const qty: number = itemData.RemainingUses - 1
       this.toolTxt = itemData.DisplayName + '\n' + 'Remaining: ' + qty
-      this.iconValues.AxeStone.value = qty.toString()
-      console.log('hereee12313', this.iconValues.AxeStone.value)
+      // this.iconValues.AxeStone.value = qty.toString()
+      this.iconValues.AxeStone = { ...this.iconValues.AxeStone, value: qty.toString()}
     }
   }
 

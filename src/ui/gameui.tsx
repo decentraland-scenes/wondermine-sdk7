@@ -180,7 +180,7 @@ export class GameUi implements IGameUi {
     // log("showTimedPopup");
     this.popupPanel.showText(_msg)
     this.popupPanel.setType(_type, _itemId)
-
+    console.log('rewards',_rewards)
     if (_rewards != null) {
       this.popupPanel.showRewards(_rewards)
     } else {
@@ -188,6 +188,7 @@ export class GameUi implements IGameUi {
     }
 
     this.popupPanel.show()
+
 
     // 1DO: fix this -- if popups stack up too fast it could be chaos
     this.onPopupClosedCallback = _callback
@@ -226,7 +227,7 @@ export class GameUi implements IGameUi {
     return uiImage
   }
 
-  loadTextField(som: any, value?: string): UIText {
+  loadTextField(som: any, value: string): UIText {
     const uiText: UIText = { som, value }
     return uiText
   }

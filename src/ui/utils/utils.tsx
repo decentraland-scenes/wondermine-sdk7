@@ -38,3 +38,17 @@ export type PanelSprite = {
 export function getSizeAsNumber(size: string | undefined): number {
   return size != null ? parseInt(size, 10) : 0
 }
+
+export function getSizeAsText(text: string): number {
+  const baseWidth = 12; // Asumimos que cada carácter ocupa un ancho base de 12px.
+  let calculatedWidth = text.length * baseWidth;
+  
+  // Aseguramos que el width esté entre 10 y 200
+  if (calculatedWidth < 10) {
+      calculatedWidth = 10;
+  } else if (calculatedWidth > 200) {
+      calculatedWidth = 200;
+  }
+
+  return calculatedWidth;
+}

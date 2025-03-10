@@ -3,11 +3,12 @@ import { engine, UiCanvasInformation, type Entity } from '@dcl/sdk/ecs'
 import { type UIImage, type IGameUi, type UIText } from './igameui'
 import { SoundManager } from 'shared-dcl/src/sound/soundmanager'
 import { som } from 'src/som'
-import { getSizeAsNumber, getUvs } from './utils/utils'
+import { getSizeAsNumber, getSizeAsText, getUvs } from './utils/utils'
 import { PopupWindowType } from 'src/enums'
-import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
+import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
 import { DclUser } from 'shared-dcl/src/playfab/dcluser'
 import { type UiImageData } from 'src/projectdata'
+import { Color4 } from '@dcl/sdk/math'
 
 /**
  * A UI layer with a central popup window plus OK, Close and Cancel buttons.
@@ -54,8 +55,6 @@ export class UiPopupPanel {
   init(): void {
     this.atlas = this.parentUi.getUiAtlas()
     this.resourceAtlas = this.parentUi.getResourceAtlas()
-
-    this.mainPanel_visible = false
 
     this.addWindowBg()
     this.addTitles()
@@ -167,10 +166,10 @@ export class UiPopupPanel {
       )
     )
 
-    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt))
-    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt))
-    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt))
-    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt))
+    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt, ''))
+    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt, ''))
+    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt, ''))
+    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt, ''))
   }
 
   setType(type: PopupWindowType, itemId: string | null = null): void {
@@ -289,9 +288,10 @@ export class UiPopupPanel {
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
-  showRewards(itemArray: Item[]): void {
+  showRewards(itemArray: Item[] | null): void {
     // log("showRewards(" + itemArray.length + ")");
-    // log(itemArray);
+    console.log('check item array', itemArray)
+    console.log(itemArray, 'item array 1')
     if (itemArray != null) {
       // this.clearRewards();
       let itemId: string
@@ -300,7 +300,7 @@ export class UiPopupPanel {
       let isBonus: boolean = false
 
       let rewardIndex: number = -1
-      let uiImageObj: UiImageData
+      let uiImageObj: any
       let prevBundleType: string
       let showIt = true
 
@@ -312,7 +312,7 @@ export class UiPopupPanel {
         displayName = itemArray[i].DisplayName
         isBonus = itemArray[i].IsBonus
         showIt = true
-
+        console.log(itemArray, 'item array 2')
         if (itemClass !== 'meteor' && itemClass !== 'levelup' && rewardIndex < this.iconImages.length) {
           ++rewardIndex
           // log("ITEM " + i + ": " + itemArray[i]["DisplayName"] + " rewardIndex: " + rewardIndex);
@@ -358,7 +358,13 @@ export class UiPopupPanel {
             // log("itemId: " + itemId)
             // log(uiImageObj);
             this.parentUi.updateImageFromAtlas(this.iconImages[rewardIndex], uiImageObj)
+            this.iconImages[rewardIndex] = this.parentUi.loadImageFromAtlas(
+              getUvs(uiImageObj, { x: 1024, y: 1024 }),
+              uiImageObj,
+              this.resourceAtlas
+            )
             this.iconValues[rewardIndex].value = itemArray[i].DisplayName
+            console.log('check here', this.iconValues[rewardIndex].value)
             if (DclUser.activeUser.heldItem != null) {
               if (isBonus && DclUser.activeUser.heldItem.ItemId.length > 0) {
                 // log("showing bonus icon", som.ui.resourceIcons.image[DclUser.activeUser.heldItem.ItemId]);
@@ -548,18 +554,59 @@ export class UiPopupPanel {
               this.parentUi.closePopup()
             }}
           />
-          {/* invStack01 */}
+          {/* Inv Stack */}
           <UiEntity
             uiTransform={{
+              position: { bottom: '0%', left: '0%' },
+              positionType: 'absolute',
               flexDirection: 'column',
-              justifyContent: 'flex-start',
+              justifyContent: 'center',
               alignItems: 'center',
-              width: '33%',
-              padding: '6px',
-              margin: { bottom: '0px', left: '0px' }
+              width: '100%',
+              padding: '6px'
             }}
-          />
-          
+          >
+            {this.iconImages.slice(0, 4).map((ImageData, index) => (
+              <UiEntity
+                key={index} // Using index as the key
+                uiTransform={{
+                  flexDirection: 'row',
+                  padding: '6px',
+                  width: '50%',
+                  position: { left: '80px', top: '0px' }
+                }}
+              >
+                <UiEntity
+                  uiTransform={{
+                    width: getSizeAsNumber(ImageData.som.width) * uiScaleFactor, // Using the width from the ImageData
+                    height: getSizeAsNumber(ImageData.som.height) * uiScaleFactor, // Using the height from the ImageData
+                    margin: { bottom: '0px' }
+                  }}
+                  uiBackground={{
+                    textureMode: 'stretch',
+                    uvs: ImageData.uvs, // Using the uvs from the ImageData ImageData.uvs
+                    texture: { src: ImageData.atlas } // Using the atlas from the ImageData ImageData.atlas
+                  }}
+                />
+                {/* Label */}
+                <UiEntity
+                  uiTransform={{
+                    width: getSizeAsText(this.iconValues[index].value) * uiScaleFactor,
+                    height: getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.height) * uiScaleFactor,
+                    margin: { left: '10px' }
+                  }}
+                >
+                  <Label
+                    value={`<b>${this.iconValues[index].value}</b>`}
+                    fontSize={getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.fontSize) * uiScaleFactor}
+                    color={Color4.fromHexString(som.ui.bottomBarPanel.textField.invItemTxt.hexColor)}
+                    font="sans-serif"
+                    textWrap="nowrap"
+                  />
+                </UiEntity>
+              </UiEntity>
+            ))}
+          </UiEntity>
         </UiEntity>
       </UiEntity>
     )

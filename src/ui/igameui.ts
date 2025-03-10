@@ -9,7 +9,7 @@ export type UIImage = {
 
 export type UIText = {
   som: any,
-  value?: string
+  value: string
 }
 
 export type IGameUi = {
@@ -29,5 +29,5 @@ export type IGameUi = {
   getResourceAtlas: () => string
   getUiAtlas: () => string
   updateImageFromAtlas: (img: UIImage, data: UiImageData) => void
-  loadTextField: (som: any, value?: string) => UIText;
+  loadTextField: (som: any, value: string) => UIText;
 }
