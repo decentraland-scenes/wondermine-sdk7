@@ -52,3 +52,7 @@ export function getSizeAsText(text: string): number {
 
   return calculatedWidth;
 }
+
+export function trimLeadingSpaces(str: string): string {
+  return str.replace(/^\s+/, '');
+}

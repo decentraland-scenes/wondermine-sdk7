@@ -3,7 +3,7 @@ import { engine, UiCanvasInformation, type Entity } from '@dcl/sdk/ecs'
 import { type UIImage, type IGameUi, type UIText } from './igameui'
 import { SoundManager } from 'shared-dcl/src/sound/soundmanager'
 import { som } from 'src/som'
-import { getSizeAsNumber, getSizeAsText, getUvs } from './utils/utils'
+import { getSizeAsNumber, getSizeAsText, getUvs, trimLeadingSpaces } from './utils/utils'
 import { PopupWindowType } from 'src/enums'
 import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
 import { DclUser } from 'shared-dcl/src/playfab/dcluser'
@@ -35,7 +35,7 @@ export class UiPopupPanel {
   public headerTextImage: UIImage = { uvs: [], som: null, atlas: '' }
   public subheadTextImage: UIImage = { uvs: [], som: null, atlas: '' }
   public closeBtnImage: UIImage = { uvs: [], som: null, atlas: '' }
-  public messageTxt: string = ''
+  public messageTxt: UIText = { som: '', value: '' }
   public iconBadges: UIImage[] = []
   public iconImages: UIImage[] = []
   public iconValues: UIText[] = []
@@ -59,7 +59,7 @@ export class UiPopupPanel {
     this.addWindowBg()
     this.addTitles()
     this.addButtons()
-    this.messageTxt = som.ui.popupPanel.textField.message
+    this.messageTxt = this.parentUi.loadTextField(som.ui.popupPanel.textField.message, '')
     this.addPrizeList()
   }
 
@@ -284,7 +284,7 @@ export class UiPopupPanel {
   }
 
   showText(_text: string): void {
-    this.messageTxt = _text
+    this.messageTxt.value = _text
   }
 
   // eslint-disable-next-line @typescript-eslint/ban-types
@@ -401,7 +401,7 @@ export class UiPopupPanel {
 
   reset(): void {
     this.clearRewards()
-    this.messageTxt = ''
+    this.messageTxt.value = ''
   }
 
   hide(): void {
@@ -554,6 +554,25 @@ export class UiPopupPanel {
               this.parentUi.closePopup()
             }}
           />
+          {/* message */}
+          <UiEntity
+            uiTransform={{
+              width: getSizeAsNumber(this.messageTxt.som.width) * uiScaleFactor,
+              height: getSizeAsNumber(this.messageTxt.som.height) * uiScaleFactor,
+              position: { bottom: '25px', right: '0px' },
+              positionType: 'absolute',
+              justifyContent: 'center'
+            }}
+          >
+            <Label
+              value={`<b>${trimLeadingSpaces(this.messageTxt.value)}</b>`}
+              fontSize={getSizeAsNumber(this.messageTxt.som.fontSize) * uiScaleFactor}
+              color={Color4.fromHexString(this.messageTxt.som.hexColor)}
+              font="sans-serif"
+              textWrap="nowrap"
+            />
+          </UiEntity>
+
           {/* Inv Stack */}
           <UiEntity
             uiTransform={{
