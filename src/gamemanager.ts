@@ -184,7 +184,7 @@ export class GameManager {
       })
 
       // pull out the first (0,0,0) camera rotation (old bug; is this still necessary?)
-      const temp: Quaternion = Transform.get(engine.CameraEntity).rotation
+      // const temp: Quaternion = Transform.get(engine.CameraEntity).rotation
 
       // start with
       utils.timers.setTimeout(() => {

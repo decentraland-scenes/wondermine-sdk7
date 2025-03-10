@@ -5,9 +5,10 @@ import { SoundManager } from 'shared-dcl/src/sound/soundmanager'
 import { som } from 'src/som'
 import { getSizeAsNumber, getUvs } from './utils/utils'
 import { PopupWindowType } from 'src/enums'
-import ReactEcs, { UiEntity } from '@dcl/sdk/react-ecs'
+import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
 import { DclUser } from 'shared-dcl/src/playfab/dcluser'
 import { type UiImageData } from 'src/projectdata'
+import { Color4 } from '@dcl/sdk/math'
 
 /**
  * A UI layer with a central popup window plus OK, Close and Cancel buttons.
@@ -165,10 +166,10 @@ export class UiPopupPanel {
       )
     )
 
-    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt))
-    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt))
-    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt))
-    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt))
+    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt, ''))
+    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt, ''))
+    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt, ''))
+    this.iconValues.push(this.parentUi.loadTextField(som.ui.bottomBarPanel.textField.invItemTxt, ''))
   }
 
   setType(type: PopupWindowType, itemId: string | null = null): void {
@@ -289,7 +290,7 @@ export class UiPopupPanel {
   // eslint-disable-next-line @typescript-eslint/ban-types
   showRewards(itemArray: Item[] | null): void {
     // log("showRewards(" + itemArray.length + ")");
-    // log(itemArray);
+    console.log('check item array', itemArray)
     console.log(itemArray, 'item array 1')
     if (itemArray != null) {
       // this.clearRewards();
@@ -299,7 +300,7 @@ export class UiPopupPanel {
       let isBonus: boolean = false
 
       let rewardIndex: number = -1
-      let uiImageObj: UiImageData
+      let uiImageObj: any
       let prevBundleType: string
       let showIt = true
 
@@ -357,7 +358,13 @@ export class UiPopupPanel {
             // log("itemId: " + itemId)
             // log(uiImageObj);
             this.parentUi.updateImageFromAtlas(this.iconImages[rewardIndex], uiImageObj)
+            this.iconImages[rewardIndex] = this.parentUi.loadImageFromAtlas(
+              getUvs(uiImageObj, { x: 1024, y: 1024 }),
+              uiImageObj,
+              this.resourceAtlas
+            )
             this.iconValues[rewardIndex].value = itemArray[i].DisplayName
+            console.log('check here', this.iconValues[rewardIndex].value)
             if (DclUser.activeUser.heldItem != null) {
               if (isBonus && DclUser.activeUser.heldItem.ItemId.length > 0) {
                 // log("showing bonus icon", som.ui.resourceIcons.image[DclUser.activeUser.heldItem.ItemId]);
@@ -433,7 +440,6 @@ export class UiPopupPanel {
   renderUI(): ReactEcs.JSX.Element {
     const canvasInfo = UiCanvasInformation.get(engine.RootEntity)
     const uiScaleFactor = (Math.min(canvasInfo.width, canvasInfo.height) / 1080) * 1.2
-    console.log(this.iconImages)
     return (
       <UiEntity
         uiTransform={{
@@ -548,15 +554,17 @@ export class UiPopupPanel {
               this.parentUi.closePopup()
             }}
           />
-          {/* First Column */}
+          {/* Inv Stack */}
           <UiEntity
             uiTransform={{
+              position: { bottom: '0%', left: '19%' },
+              positionType: 'absolute',
               flexDirection: 'column',
               justifyContent: 'flex-start',
               alignItems: 'center',
               width: '33%',
               padding: '6px',
-              margin: { top: '25px', left: '5px' }
+              margin: { bottom: '25px', left: '5px' }
             }}
           >
             {this.iconImages.map((ImageData, index) => (
@@ -566,7 +574,7 @@ export class UiPopupPanel {
                   flexDirection: 'row',
                   justifyContent: 'flex-start',
                   alignItems: 'center',
-                  padding: '0px',
+                  padding: '6px',
                   margin: { top: '0px', left: '40px' }
                 }}
               >
@@ -578,10 +586,25 @@ export class UiPopupPanel {
                   }}
                   uiBackground={{
                     textureMode: 'stretch',
-                    uvs: ImageData.uvs, // Using the uvs from the ImageData
-                    texture: { src: ImageData.atlas } // Using the atlas from the ImageData
+                    uvs: ImageData.uvs, // Using the uvs from the ImageData ImageData.uvs
+                    texture: { src: ImageData.atlas } // Using the atlas from the ImageData ImageData.atlas
                   }}
                 />
+                {/* Label */}
+                <UiEntity
+                  uiTransform={{
+                    width: getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.width) * uiScaleFactor,
+                    height: getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.height) * uiScaleFactor
+                  }}
+                >
+                  <Label
+                    value={this.iconValues[index].value}
+                    fontSize={getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.fontSize) * uiScaleFactor}
+                    color={Color4.fromHexString(som.ui.bottomBarPanel.textField.invItemTxt.hexColor)}
+                    font="sans-serif"
+                    textWrap="nowrap"
+                  />
+                </UiEntity>
               </UiEntity>
             ))}
           </UiEntity>

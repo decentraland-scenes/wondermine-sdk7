@@ -227,7 +227,7 @@ export class GameUi implements IGameUi {
     return uiImage
   }
 
-  loadTextField(som: any, value?: string): UIText {
+  loadTextField(som: any, value: string): UIText {
     const uiText: UIText = { som, value }
     return uiText
   }
