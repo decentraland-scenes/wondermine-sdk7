@@ -597,7 +597,7 @@ export class UiPopupPanel {
                   }}
                 >
                   <Label
-                    value={this.iconValues[index].value}
+                    value={`<b>${this.iconValues[index].value}</b>`}
                     fontSize={getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.fontSize) * uiScaleFactor}
                     color={Color4.fromHexString(som.ui.bottomBarPanel.textField.invItemTxt.hexColor)}
                     font="sans-serif"
