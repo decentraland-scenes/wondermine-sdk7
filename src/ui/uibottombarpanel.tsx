@@ -12,7 +12,7 @@ import { Color4 } from '@dcl/sdk/math'
 import { DclUser } from 'shared-dcl/src/playfab/dcluser'
 import { type ItemInfo } from 'shared-dcl/src/playfab/iteminfo'
 import { Eventful, ShowErrorEvent, ChangeToolEvent } from 'src/events'
-import { type UIImage, type IGameUi } from './igameui'
+import { type UIImage, type IGameUi, type UIText } from './igameui'
 import { GameData } from 'src/gamedata'
 
 /**
@@ -45,9 +45,9 @@ export class UiBottomBarPanel {
   gemsTxt: string = ''
   toolTxt: string = 'Crescent Lava Pickaxe #333\nRemaining: 400'
   levelTxt: string = '1'
+  public bonusPctTxt: UIText = { som: som.ui.bottomBarPanel.textField.bonusPctTxt, value: '' }
   iconImages: Record<string, UIImage> = {}
   iconValues: Record<string, IconValue> = {}
-  public bonusPctTxt: string = ''
   public isToolTxtVisible: boolean = false
   inventoryPopup_visible: boolean = false
   public atlas: string = ''
@@ -170,6 +170,7 @@ export class UiBottomBarPanel {
     const xOffset = Math.floor(pct * 13)
     const newX = xOffset - 26
     this.progBar_positionX = newX
+    console.log('progress bar', this.progBar_positionX)
 
     this.levelTxt = level.toString()
   }
@@ -276,7 +277,7 @@ export class UiBottomBarPanel {
         this.iconValues[keys[i]].value = '0'
       }
     }
-    this.bonusPctTxt = 'Mining Bonus: 0%'
+    this.bonusPctTxt.value = 'Mining Bonus: 0%'
   }
 
   showBalances(coins: number, gems: number): void {
@@ -361,7 +362,7 @@ export class UiBottomBarPanel {
   }
 
   showBonus(): void {
-    this.bonusPctTxt = 'Mining Bonus: ' + DclUser.activeUser.getTotalBonus() + '%'
+    this.bonusPctTxt.value = 'Mining Bonus: ' + DclUser.activeUser.getTotalBonus() + '%'
   }
 
   closeInventory(): void {
@@ -413,7 +414,7 @@ export class UiBottomBarPanel {
 
   renderUI(): ReactEcs.JSX.Element {
     const canvasInfo = UiCanvasInformation.get(engine.RootEntity)
-    const uiScaleFactor = (Math.min(canvasInfo.width, canvasInfo.height) / 1080) * 1.4
+    const uiScaleFactor = (Math.min(canvasInfo.width, canvasInfo.height) / 1080) * 1.2
     return (
       <UiEntity
         uiTransform={{
@@ -465,7 +466,7 @@ export class UiBottomBarPanel {
                 alignItems: 'center',
                 width: '33%',
                 padding: '6px',
-                margin: { top: '25px', left: '5px' }
+                margin: { top: '25px', left: '6px' }
               }}
             >
               {Object.entries(this.iconImages)
@@ -623,6 +624,24 @@ export class UiBottomBarPanel {
                     </UiEntity>
                   </UiEntity>
                 ))}
+            </UiEntity>
+            {/* Coin Text */}
+            <UiEntity
+              uiTransform={{
+                position: { bottom: '6%', left: '45%' },
+                positionType: 'absolute',
+                width: getSizeAsNumber(this.bonusPctTxt.som.width) * uiScaleFactor,
+                height: getSizeAsNumber(this.bonusPctTxt.som.height) * uiScaleFactor
+              }}
+            >
+              <Label
+                value={`<b>${this.bonusPctTxt.value}</b>`}
+                fontSize={getSizeAsNumber(this.bonusPctTxt.som.fontSize) * uiScaleFactor}
+                textAlign="middle-center"
+                font="sans-serif"
+                color={Color4.fromHexString(this.bonusPctTxt.som.hexColor)}
+                textWrap="nowrap"
+              />
             </UiEntity>
           </UiEntity>
         </UiEntity>
