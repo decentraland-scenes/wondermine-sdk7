@@ -31,7 +31,7 @@ Some descriptions of the contents of this repo:
 
 #### Selected Source Files
 
-* game.ts - fetches user data, sets up Systems, creates the GameManager
+* index.ts - fetches user data, sets up Systems, creates the GameManager
 * gamemanager.ts - wires up all the game components, loads scene objects, and handles the main game loop
 * som.ts - JSON structure that defines all the objects in the scene
 * projectloader.ts - extends ModelLoader; reads som.ts objects and loads 3d models and creates entities 
