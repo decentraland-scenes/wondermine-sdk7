@@ -387,7 +387,7 @@ export class UiBottomBarPanel {
       const qty: number = itemData.RemainingUses - 1
       this.toolTxt = itemData.DisplayName + '\n' + 'Remaining: ' + qty
       // this.iconValues.AxeStone.value = qty.toString()
-      this.iconValues.AxeStone = { ...this.iconValues.AxeStone, value: qty.toString()}
+      this.iconValues.AxeStone = { ...this.iconValues.AxeStone, value: qty.toString() }
     }
   }
 
@@ -413,7 +413,7 @@ export class UiBottomBarPanel {
 
   renderUI(): ReactEcs.JSX.Element {
     const canvasInfo = UiCanvasInformation.get(engine.RootEntity)
-    const uiScaleFactor = (Math.min(canvasInfo.width, canvasInfo.height) / 1080) * 1.2
+    const uiScaleFactor = (Math.min(canvasInfo.width, canvasInfo.height) / 1080) * 1.4
     return (
       <UiEntity
         uiTransform={{
@@ -504,7 +504,7 @@ export class UiBottomBarPanel {
                       }}
                     >
                       <Label
-                        value={this.iconValues[key].value}
+                        value={`<b>${this.iconValues[key].value}</b>`}
                         fontSize={getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.fontSize) * uiScaleFactor}
                         color={Color4.fromHexString(som.ui.bottomBarPanel.textField.invItemTxt.hexColor)}
                         font="sans-serif"
@@ -559,7 +559,7 @@ export class UiBottomBarPanel {
                       }}
                     >
                       <Label
-                        value={this.iconValues[key].value}
+                        value={`<b>${this.iconValues[key].value}</b>`}
                         fontSize={getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.fontSize) * uiScaleFactor}
                         color={Color4.fromHexString(som.ui.bottomBarPanel.textField.invItemTxt.hexColor)}
                         font="sans-serif"
@@ -614,7 +614,7 @@ export class UiBottomBarPanel {
                       }}
                     >
                       <Label
-                        value={this.iconValues[key].value}
+                        value={`<b>${this.iconValues[key].value}</b>`}
                         fontSize={getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.fontSize) * uiScaleFactor}
                         color={Color4.fromHexString(som.ui.bottomBarPanel.textField.invItemTxt.hexColor)}
                         font="sans-serif"
