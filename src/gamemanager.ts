@@ -968,7 +968,7 @@ export class GameManager {
       PointerEvents.createOrReplace(signInstructionsCollider, {
         pointerEvents: [
           {
-            eventType: PointerEventType.PET_UP,
+            eventType: PointerEventType.PET_DOWN,
             eventInfo: {
               button: InputAction.IA_POINTER
             }
@@ -976,7 +976,7 @@ export class GameManager {
         ]
       })
       engine.addSystem(() => {
-        if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_UP, signInstructionsCollider)) {
+        if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, signInstructionsCollider)) {
           // log("clicked on sign");
           if (GameUi.instance !== null) {
             GameUi.instance.showTimedMessage(som.scene.title + '\n' + som.scene.changeLog)
@@ -1021,6 +1021,32 @@ export class GameManager {
       const crate02 = this.loader.spawnSceneObject(som.scene.crate02)
 
       const statue = this.loader.spawnSceneObject(som.scene.statue)
+      const statueCollider = engine.addEntity()
+      MeshCollider.setBox(statueCollider)
+      Transform.create(statueCollider, {
+        position: Vector3.create(44.85, 0.88, 119.49),
+        scale: Vector3.create(2, 4, 2),
+        rotation: Quaternion.fromEulerDegrees(0, 90, 0)
+      })
+      PointerEvents.createOrReplace(statueCollider, {
+        pointerEvents: [
+          {
+            eventType: PointerEventType.PET_DOWN,
+            eventInfo: {
+              button: InputAction.IA_POINTER,
+              maxDistance: 5,
+              showFeedback: true
+            }
+          }
+        ]
+      })
+      engine.addSystem(() => {
+        if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, statueCollider)) {
+          if (GameManager.instance !== null) {
+            GameManager.instance.showStatueMessage()
+          }
+        }
+      })
 
       const tower = this.loader.spawnSceneObject(som.scene.tower)
       const hammer01 = this.loader.spawnSceneObject(som.scene.hammer01)
@@ -1083,7 +1109,7 @@ export class GameManager {
   }
 
   showStatueMessage(): void {
-    if (GameManager.instance !== null) {
+    if (GameManager.instance !== null) { 
       GameUi.instance?.showTimedMessage(
         'At this spot, Cole Mole saw the first Glow Meteor\ncrash to earth. 4 June 2020.\n(The WC bonus is over, but might be back one day!).',
         12000
