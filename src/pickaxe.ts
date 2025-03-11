@@ -50,7 +50,7 @@ export class Pickaxe {
    * How many hits are left until it disappears
    */
   public hits: number = 0
-
+  public dataTest: PickaxeInstance
   public isBusy: boolean = false
   public currentTarget: Meteor | null = null
   public onMiningAnimCompleteCallback: ((m: Meteor | null) => void) | null = null
@@ -58,6 +58,7 @@ export class Pickaxe {
   // Create a Pickaxe given pickaxe data
   constructor(_data: PickaxeInstance) {
     console.log('Pickaxe constructor')
+    this.dataTest = _data
     if (_data != null && _data !== undefined) {
       if (this.loadInstance(_data)) {
         console.log('loaded Pickaxe at ', _data.pos)
@@ -136,6 +137,11 @@ export class Pickaxe {
   showAt(pos: Vector3.MutableVector3, _angles: Vector3.MutableVector3, m: Meteor): void {
     // log("Pickaxe.showAt()");
 
+    // Verificar si la entidad tiene un Transform
+    if (!Transform.has(this.entity)) {
+      console.error(`❌ Pickaxe entity ${this.entity} does not have a Transform`)
+      return
+    }
     const t: TransformType = Transform.getMutable(this.entity)
 
     let rotDelta = -90
@@ -256,7 +262,7 @@ export class Pickaxe {
   }
 
   removeEntity(): void {
-    if (engine.getEntityState(this.entity) === 1) engine.removeEntity(this.entity)
+    if (engine.getEntityState(this.entity) === 1) Transform.getMutable(this.modelEntity).scale = Vector3.create(0, 0, 0)
   }
 
   getShape(): PBGltfContainer {
