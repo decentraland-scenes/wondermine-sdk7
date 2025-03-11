@@ -3,7 +3,7 @@ import { engine, UiCanvasInformation, type Entity } from '@dcl/sdk/ecs'
 import { type UIImage, type IGameUi, type UIText } from './igameui'
 import { SoundManager } from 'shared-dcl/src/sound/soundmanager'
 import { som } from 'src/som'
-import { getSizeAsNumber, getSizeAsText, getUvs, trimLeadingSpaces } from './utils/utils'
+import { getSizeAsNumber, getSizeAsText, getUvs } from './utils/utils'
 import { PopupWindowType } from 'src/enums'
 import ReactEcs, { Label, UiEntity } from '@dcl/sdk/react-ecs'
 import { DclUser } from 'shared-dcl/src/playfab/dcluser'
@@ -43,6 +43,7 @@ export class UiPopupPanel {
   public arrowUpImage_visible: boolean = false
   public wearablesImage_visible: boolean = false
   public currentType: PopupWindowType = PopupWindowType.Mined
+  public invStack_visible: boolean = false
   private readonly hiddenY: number = -980
   private readonly visibleY: number = 80
   constructor(ui: IGameUi) {
@@ -202,6 +203,8 @@ export class UiPopupPanel {
         this.arrowUpImage_visible = false
         this.wearablesImage_visible = false
 
+        this.invStack_visible = false
+
         this.headerTextImage = this.parentUi.loadImageFromAtlas(
           getUvs(som.ui.popupPanel.image.meteorMined, { x: 1024, y: 1024 }),
           som.ui.popupPanel.image.meteorMined,
@@ -223,6 +226,8 @@ export class UiPopupPanel {
         this.arrowUpImage_visible = false
         this.wearablesImage_visible = false
 
+        this.invStack_visible = true
+
         this.headerTextImage = this.parentUi.loadImageFromAtlas(
           getUvs(som.ui.popupPanel.image.meteorMined, { x: 1024, y: 1024 }),
           som.ui.popupPanel.image.meteorMined,
@@ -239,6 +244,8 @@ export class UiPopupPanel {
         this.splashImage_visible = false
         this.arrowUpImage_visible = false
         this.wearablesImage_visible = true
+
+        this.invStack_visible = false
 
         // if (itemId == null)
         // {
@@ -267,6 +274,8 @@ export class UiPopupPanel {
         this.splashImage_visible = false
         this.arrowUpImage_visible = false
         this.wearablesImage_visible = true
+
+        this.invStack_visible = false
 
         this.headerTextImage = this.parentUi.loadImageFromAtlas(
           getUvs(som.ui.popupPanel.image.crafted, { x: 1024, y: 1024 }),
@@ -439,7 +448,7 @@ export class UiPopupPanel {
 
   renderUI(): ReactEcs.JSX.Element {
     const canvasInfo = UiCanvasInformation.get(engine.RootEntity)
-    const uiScaleFactor = (Math.min(canvasInfo.width, canvasInfo.height) / 1080) * 1.2
+    const uiScaleFactor = (Math.min(canvasInfo.width, canvasInfo.height) / 1080) * 1.4
     return (
       <UiEntity
         uiTransform={{
@@ -559,13 +568,13 @@ export class UiPopupPanel {
             uiTransform={{
               width: getSizeAsNumber(this.messageTxt.som.width) * uiScaleFactor,
               height: getSizeAsNumber(this.messageTxt.som.height) * uiScaleFactor,
-              position: { bottom: '25px', right: '0px' },
+              position: { bottom: '0px', right: '0px' },
               positionType: 'absolute',
               justifyContent: 'center'
             }}
           >
             <Label
-              value={`<b>${trimLeadingSpaces(this.messageTxt.value)}</b>`}
+              value={`<b>${this.messageTxt.value}</b>`}
               fontSize={getSizeAsNumber(this.messageTxt.som.fontSize) * uiScaleFactor}
               color={Color4.fromHexString(this.messageTxt.som.hexColor)}
               font="sans-serif"
@@ -582,7 +591,8 @@ export class UiPopupPanel {
               justifyContent: 'center',
               alignItems: 'center',
               width: '100%',
-              padding: '6px'
+              padding: '6px',
+              display: this.invStack_visible ? 'flex' : 'none'
             }}
           >
             {this.iconImages.slice(0, 4).map((ImageData, index) => (
