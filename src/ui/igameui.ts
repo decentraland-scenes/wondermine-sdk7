@@ -2,10 +2,12 @@ import { type PopupWindowType } from 'src/enums'
 import { type UiImageData } from 'src/projectdata'
 
 export type UIImage = {
-  uvs: number[],
-  som: any,
-  atlas: string
-}
+  uvs: number[];
+  som: any;
+  atlas: string;
+  onClick?: () => void;
+};
+
 
 export type UIText = {
   som: any,
