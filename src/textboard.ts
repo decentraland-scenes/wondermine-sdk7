@@ -180,12 +180,12 @@ export class TextBoard {
       ts.textAlign = TextAlignMode.TAM_TOP_LEFT
     }
 
-    // ts.outlineColor = Color3.Yellow();
+    // ts.outlineColor = Color4.Yellow();
     // ts.outlineWidth = 1;
 
     ts.shadowColor = Color4.Black()
-    ts.shadowOffsetX = -1
-    ts.shadowOffsetY = -1
+    ts.shadowOffsetX = -0.1
+    ts.shadowOffsetY = -0.1
     ts.textWrapping = false
     TextShape.create(ent, ts)
 
