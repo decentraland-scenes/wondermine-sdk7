@@ -235,7 +235,7 @@ export class Meteor {
     pointerEventsSystem.onPointerDown(
       {
         entity: this.modelEntity,
-        opts: { button: InputAction.IA_POINTER, hoverText: 'Mine', maxDistance: 8, showHighlight:false }
+        opts: { button: InputAction.IA_POINTER, hoverText: 'Mine', maxDistance: 8, showHighlight: false }
       },
       (event) => {
         if (event.hit != null) {
@@ -432,7 +432,7 @@ export class Meteor {
     // 2DO: Add delay here?
     // this.hitAnim.weight = 1;
     Animator.getClip(this.modelEntity, this.hitAnim.clip).shouldReset = true
-    Animator.playSingleAnimation(this.modelEntity,this.hitAnim.clip)
+    Animator.playSingleAnimation(this.modelEntity, this.hitAnim.clip)
   }
 
   /**
