@@ -91,5 +91,8 @@
   "source": {
     "origin": "creator-hub",
     "projectId": "387958b5-9b5c-41ce-99ef-f8b9616eed55"
+  },
+  "worldConfiguration": {
+    "name": "Maximocossetti.dcl.eth"
   }
 }

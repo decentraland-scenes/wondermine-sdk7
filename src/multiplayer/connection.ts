@@ -23,7 +23,7 @@ export async function connect(roomName: string, options: any = {}): Promise<Room
 
   const playerData = getPlayer()
   const isPreview = playerData?.isGuest
-
+  console.log('Testing data', playerData)
   // const realm = await getCurrentRealm();
 
   // // make sure users are matched together by the same "realm".
@@ -33,15 +33,6 @@ export async function connect(roomName: string, options: any = {}): Promise<Room
   console.log('userData:', options)
 
   // hardcode object to match SDK6 format.
-
-  const testOptions = {
-    realm: 'LocalPreview',
-    userData: {
-      displayName: 'GaffoMdz#3275',
-      publicKey: '0xc502975b49398f9754afc4e9693cf0e1594f3275',
-      userId: '0xc502975b49398f9754afc4e9693cf0e1594f3275'
-    }
-  }
 
   const ENDPOINT = 'wss://app-dev-west-wondermine-web.azurewebsites.net:443'
   // const ENDPOINT = (isPreview)
@@ -59,13 +50,11 @@ export async function connect(roomName: string, options: any = {}): Promise<Room
   const client = new Colyseus.Client(ENDPOINT)
 
   try {
-    console.log(roomName, 'this point')
     //
     // Docs: https://docs.colyseus.io/client/client/#joinorcreate-roomname-string-options-any
     //
-    console.log('Connection details', roomName, testOptions)
-    const room = await client.joinOrCreate<any>(roomName, testOptions)
-    console.log(room, 'this other point')
+    console.log('Connection details', roomName, options)
+    const room = await client.joinOrCreate<any>(roomName, options)
     if (isPreview !== null) {
       updateConnectionDebugger(room)
     }
@@ -73,7 +62,6 @@ export async function connect(roomName: string, options: any = {}): Promise<Room
     return room
   } catch (e) {
     console.log('ERROR', e)
-    // updateConnectionMessage(`Error: ${e}`, Color4.Red());
     updateConnectionMessage(`Not connected`, Color4.Red())
     // reconnect(roomName, 60000);
 
@@ -96,7 +84,7 @@ function addConnectionDebugger(endpoint: string): void {
 }
 
 export function updateConnectionMessage(value: string, color: Color4 = Color4.White()): void {
-  if (GameUi.instance !== null){
+  if (GameUi.instance !== null) {
     GameUi.instance.showTimedMessage(value, 6000, color)
   }
   //   // message.value = value;
