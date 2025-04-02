@@ -244,6 +244,14 @@ export class Meteor {
         }
       }
     )
+    // HACK: Remove highlight on new launcher
+    pointerEventsSystem.onPointerHoverEnter(
+      {
+        entity: this.modelEntity,
+        opts: { button: InputAction.IA_POINTER, hoverText: 'Mine', maxDistance: 8, showHighlight: false }
+      },
+      (event) => {}
+    )
 
     return true
   }
