@@ -61,7 +61,7 @@ export class MeteorSpawner {
 
   spawn(typeName: string): Meteor {
     // get meteor type data
-    const type: MeteorType = (typeName.length > 0) ? MeteorTypeList.getType(typeName) : MeteorTypeList.getRandomType()
+    const type: MeteorType = typeName.length > 0 ? MeteorTypeList.getType(typeName) : MeteorTypeList.getRandomType()
     console.log('meteor spawn', type)
     const dropX = this.xMin + Math.ceil(Math.random() * this.xWidth * 1)
     const dropZ = this.zMin + Math.ceil(Math.random() * this.zWidth * 1)

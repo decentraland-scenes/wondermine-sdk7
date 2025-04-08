@@ -117,7 +117,9 @@ export class GameManager {
     Eventful.createEventManager()
 
     // // Add the TimerSystem to support Delay and Ephemeral components
-    // TimerSystem.createAndAddToEngine()
+    engine.addSystem((dt) => {
+      this.update(dt)
+    })
     this.loader = new ProjectLoader()
 
     const ui: GameUi = GameUi.create()
@@ -1109,7 +1111,7 @@ export class GameManager {
   }
 
   showStatueMessage(): void {
-    if (GameManager.instance !== null) { 
+    if (GameManager.instance !== null) {
       GameUi.instance?.showTimedMessage(
         'At this spot, Cole Mole saw the first Glow Meteor\ncrash to earth. 4 June 2020.\n(The WC bonus is over, but might be back one day!).',
         12000

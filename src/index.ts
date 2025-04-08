@@ -24,7 +24,6 @@ function fetchPlayerData(): void {
     await GameManager.instance?.init()
     const Request = {}
     const userData = await getUserData(Request)
-    console.log('HERE', userData)
     if (userData.data != null) {
       if (userData.data.publicKey != null) {
         DclUser.setUserInfo(userData.data.userId, userData.data.displayName, userData.data.publicKey)

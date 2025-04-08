@@ -399,7 +399,6 @@ export class UiBottomBarPanel {
 
     this.toolTxt = current.substr(0, idx + 2) + qty
     this.iconValues.AxeStone = { ...this.iconValues.AxeStone, value: qty.toString() }
-    console.log('hereee', this.iconValues.AxeStone.value)
   }
 
   hide(): void {

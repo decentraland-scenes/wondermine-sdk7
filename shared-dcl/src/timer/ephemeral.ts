@@ -24,14 +24,12 @@ export function ephemeralSystem(dt: number): void {
 
     if (ephemeral.elapsedTime >= ephemeral.targetTime) {
       if (ephemeral.onTimeReachedCallback != null) {
-        console.log('Tiempo alcanzado. Ejecutando callback.')
         ephemeral.onTimeReachedCallback()
       }
 
       engine.removeEntity(entity)
 
       ephemeralEntities.delete(entity)
-      console.log('Entidad eliminada y sistema actualizado')
     }
   }
 }
