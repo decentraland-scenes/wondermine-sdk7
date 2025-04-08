@@ -37,12 +37,11 @@ export class WondermineApi extends PlayFabApi {
       CreateAccount: true
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const formattedReq = {
       Body: req
     }
-    console.log(formattedReq, 'HERE')
     const responseJson = await this.SendAsyncRequest('/Client/LoginWithCustomID', req, null)
-    console.log(responseJson, 'DOS')
     // log(req);
 
     // SUCCESS
