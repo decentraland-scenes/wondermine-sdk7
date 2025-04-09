@@ -31,26 +31,19 @@ export class SoundManager {
    * @param file The filename located in the folder specified by filePrefix
    */
   static attachSoundFile(entity: Entity, name: string, file: string): void {
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (!entity) return
-
-    let soundEntity = this.clips[name]
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (!soundEntity) {
-      soundEntity = engine.addEntity()
-      AudioSource.create(entity, {
-        audioClipUrl: this.filePrefix + file,
-        playing: false,
-        loop: false,
-        volume: 1.0
-      })
-      this.clips[name] = soundEntity
-      console.log('sound attached', this.filePrefix + file)
-    }
-
-    // const audioSource = AudioSource.getMutable(entity)
-    // audioSource.playing = false
+    if (entity === undefined) return
+    // Siempre adjunta el sonido al entity específico
+    AudioSource.createOrReplace(entity, {
+      audioClipUrl: this.filePrefix + file,
+      playing: false,
+      loop: false,
+      volume: 1.0
+    })
+  
+    // Guarda la referencia en clips si necesitás usarla luego
+    this.clips[name] = entity
   }
+  
 
   // /**
   //  * Play a named sound once.
@@ -73,7 +66,9 @@ export class SoundManager {
    * @param _vol Playback volume
    */
   static playOnce(_ent: Entity, _vol: number = 1.0): void {
+
     const as: PBAudioSource | null = AudioSource.getOrNull(_ent)
+    console.log('playing sound ',_ent,' vol ', _vol, 'as ', AudioSource.getOrNull(_ent))
     if (as != null) {
       AudioSource.getMutable(_ent).loop = false
       if (AudioSource.get(_ent).playing === true) {

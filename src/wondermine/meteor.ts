@@ -200,7 +200,7 @@ export class Meteor {
     if (mi.type.idleClip !== 'none') {
       this.idleAnim = { clip: mi.type.idleClip, loop: true }
     }
-    this.modelEntity = mod
+
 
     if (mi.type.dropClip !== 'none') {
       this.dropAnim = { clip: mi.type.dropClip, loop: false }
@@ -217,7 +217,7 @@ export class Meteor {
         states: [this.idleAnim, this.dropAnim, this.hitAnim, this.depleteAnim]
       })
     }
-
+    this.modelEntity = mod
     this.setupStateMachine()
 
     // add sounds
