@@ -167,7 +167,7 @@ export class MeteorSpawner {
       // GameManager.instance.spawnMeteor();
       this.elapsedSeconds = 0
       this.nextInterval = this.intervalSeconds + Math.random() * 30
-    }
+    } 
 
     // let millis:number = Math.floor(this.elapsedSeconds * 1000);
   }
