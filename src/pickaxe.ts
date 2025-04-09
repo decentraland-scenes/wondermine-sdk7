@@ -18,7 +18,7 @@ import {
 } from '@dcl/sdk/ecs'
 import { Vector3, Quaternion } from '@dcl/sdk/math'
 import { multiplyInPlace, rotationAxisToRef } from './sdk7utils'
-import * as utils from '@dcl-sdk/utils'
+import * as utils from '@dcl-sdk/utils' 
 
 /**
  * A Pickaxe tool that can be used to mine Meteors
@@ -225,7 +225,7 @@ export class Pickaxe {
       Animator.getClip(this.modelEntity, this.extraAnim2.clip).playing = true
     }
 
-    SoundManager.playOnce(this.modelEntity, 1.0)
+    SoundManager.playOnce(this.modelEntity, 1.0)  
     this.currentTarget = m
 
     utils.timers.setTimeout(() => {
