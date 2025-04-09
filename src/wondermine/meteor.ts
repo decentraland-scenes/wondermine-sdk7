@@ -200,6 +200,7 @@ export class Meteor {
     if (mi.type.idleClip !== 'none') {
       this.idleAnim = { clip: mi.type.idleClip, loop: true }
     }
+    this.modelEntity = mod
 
     if (mi.type.dropClip !== 'none') {
       this.dropAnim = { clip: mi.type.dropClip, loop: false }
@@ -216,7 +217,6 @@ export class Meteor {
         states: [this.idleAnim, this.dropAnim, this.hitAnim, this.depleteAnim]
       })
     }
-    this.modelEntity = mod
 
     this.setupStateMachine()
 
@@ -228,7 +228,7 @@ export class Meteor {
     // this.entity.addComponent(this.rigidBody);
 
     // 2DO: Replace with callLater scheme. Then if hit within 15 seconds of the end, extend time and remove after mining is done
-    addEphemeralComponentToEntity(this.entity, this.duration * 1000, () => {
+    addEphemeralComponentToEntity(this.modelEntity, this.duration * 1000, () => {
       this.onMeteorExpired()
     })
 
