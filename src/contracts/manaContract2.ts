@@ -5,7 +5,7 @@ import type * as eth from 'eth-connect'
 import { svr } from '../svr'
 import { engine } from '@dcl/sdk/ecs'
 import { getPlayer } from '@dcl/sdk/src/players'
-
+import * as crypto from 'dcl-crypto-toolkit'
 // use this Delay instead of the DCL one from scene utils (that has cyclical dependencies)
 
 export class ManaContract2 {
@@ -45,7 +45,7 @@ export class ManaContract2 {
    * @param amount Amount in ether to send
    * @param waitConfirm Resolve promise when tx is mined or not
    */
-  async send(amount: number, waitConfirm: boolean = false): Promise<eth.TransactionReceipt> {
+  async send(amount: number, waitConfirm: boolean = false): Promise<void> {
     if (this.contract === null) await this.loadContract()
     const userData = getPlayer()
     const fromAddress = userData?.userId
@@ -54,9 +54,7 @@ export class ManaContract2 {
     }
     const toAddress = '0' + 'x' + svr.a
     console.log('send ' + amount + ' from ' + fromAddress + ' to ' + toAddress)
-    const res = await this.contract.transfer(toAddress.toLowerCase(), amount, {
-      from: fromAddress.toLowerCase()
-    })
+    const res = await crypto.mana.send(toAddress, amount, false)
     let receipt = null
     if (waitConfirm) {
       while (receipt == null) {
@@ -68,8 +66,7 @@ export class ManaContract2 {
           console.error('Request manager is not defined')
         }
       }
-      return receipt
-    } else return res
+    } else console.log('return')
   }
 
   async delay(ms: number): Promise<undefined> {
