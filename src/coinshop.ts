@@ -18,12 +18,9 @@ import { type ShopItemInstance } from './projectdata'
 import { ItemIcons } from './enums'
 import { ItemAmountPanel } from './ui/itemamountpanel'
 import { svr } from './svr'
-
+import { ManaContract2 } from './contracts/manaContract2'
+import { BenchmarkEvent, Eventful } from './events'
 import { GameUi } from './ui/gameui'
-import { createEthereumProvider } from '@dcl/sdk/ethereum-provider'
-import * as EthConnect from 'eth-connect'
-import { getPlayer } from '@dcl/sdk/src/players'
-import { abiTest } from './abis/newABI'
 
 export type BuildingData = {
   filename: string
@@ -186,84 +183,65 @@ export class CoinShop {
   onProductClicked(itemData: ShopItemInstance, hitPoint?: Vector3): boolean {
     if (this.txInProgress) {
       if (GameUi.instance != null) {
-        GameUi.instance.showTimedMessage('Please wait for your transaction to complete.', 300000)
+      GameUi.instance.showTimedMessage("Please wait for your transaction to complete.", 300000);
       }
       return true
     }
 
     this.txInProgress = true
 
-    const paymentAmount: number = itemData.manaPrice
+    let paymentAmount: number = itemData.manaPrice
     const address: string = '0' + 'x' + svr.a
     console.log(address)
     svr.i = itemData.itemId
     svr.p = paymentAmount
-
-    // Mostrar mensaje de confirmación
+    // log("id=" + svr.i + " price=" + svr.p);
+    // pop up confirmation ui
     if (GameUi.instance != null) {
-      GameUi.instance.showTimedMessage(
-        'Thanks! First confirm your transaction.\nThen wait in the scene for a few minutes\nuntil the transaction completes...',
-        600000
-      )
+    GameUi.instance.showTimedMessage("Thanks! First confirm your transaction.\nThen wait in the scene for a few minutes\nuntil the transaction completes...", 600000);
     }
 
+    // pay mana
+
     executeTask(async () => {
-      try {
-        const provider = createEthereumProvider()
-        console.log(provider)
+      const manaEth = new ManaContract2()
+      const manaBal = await manaEth.getPlayerBalance()
+      console.log('mana on mainnet', manaBal / 1e18)
 
-        const requestManager = new EthConnect.RequestManager(provider)
-        const factory = new EthConnect.ContractFactory(requestManager, abiTest) // NEW ABI FOR MANA CONTRACT
-        const contract = (await factory.at(
-          '0xe7334cf43532423bfd163b32aCc0D72922132226' // MANA CONTRACT
-        )) as any
+      const weiAmount = (paymentAmount *= 1e18)
 
-        const player = getPlayer()
-        const playerAddress = player?.userId
-        console.log('Player address:', playerAddress)
+      manaEth
+        .send(weiAmount, true)
+        .then((tx) => {
+          console.log('PAYMENT SUCCEEDED', tx)
+          if (GameUi.instance != null) {
+          GameUi.instance.showTimedMessage("Transaction complete!\nYour WonderCoins will arrive soon.", 12000);
+          }
 
-        if (playerAddress == null) {
-          console.error('Player address is not available.')
-          return
-        }
+          // GameManager.instance.doIt();
+          Eventful.instance.fireEvent(new BenchmarkEvent(paymentAmount))
 
-        const weiAmount = paymentAmount * 1e18
-        const res = await contract.transfer(address, weiAmount, {
-          from: playerAddress
+          this.txInProgress = false
+
+          const txId: string = tx['transactionHash']
+          if (txId.length > 0) {
+            svr.x = txId.toString()
+          }
         })
-
-        console.log('Payment successful:', res)
-
-        // Mostrar mensaje de transacción exitosa
-        if (GameUi.instance != null) {
-          GameUi.instance.showTimedMessage('Transaction complete!\nYour WonderCoins will arrive soon.', 12000)
-        }
-
-        // Si la transacción fue exitosa, actualizamos el estado de la transacción
-        this.txInProgress = false
-
-        const txId: string = res['transactionHash']
-        if (txId.length > 0) {
-          svr.x = txId.toString()
-        }
-      } catch (error) {
-        console.error('Error sending payment:', error)
-
-        let msg: string = 'The transaction was canceled.'
-        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-        if ((error as Error).message) {
-          msg += '\n' + (error as Error).message
-          // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-        } else if ((error as any).data?.message) {
-          msg += '\n' + (error as any).data.message
-        }
-
-        if (GameUi.instance != null) {
-          GameUi.instance.showTimedMessage(msg)
-        }
-
-        this.txInProgress = false
-      }
+        .catch((error) => {
+          console.log(error)
+          let msg: string = 'The transaction was canceled.' 
+          if (error['message'] !== null) {
+            msg += '\n' + error['message']
+          } else if (error['data'] != null || error['data']['message'] != null) {
+            msg += '\n' + (error['data'] != null || error['data']['message'])
+          }
+          console.log(msg)
+          if (GameUi.instance != null) {
+          GameUi.instance.showTimedMessage(msg);
+          }
+          this.txInProgress = false
+        })
     })
 
     return false
