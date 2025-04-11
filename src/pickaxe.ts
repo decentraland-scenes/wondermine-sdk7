@@ -17,7 +17,7 @@ import {
   type TransformType
 } from '@dcl/sdk/ecs'
 import { Vector3, Quaternion } from '@dcl/sdk/math'
-import { multiplyInPlace, rotationAxisToRef } from './sdk7utils'
+import { rotationAxisToRef } from './sdk7utils'
 import * as utils from '@dcl-sdk/utils' 
 
 /**
@@ -153,13 +153,13 @@ export class Pickaxe {
       const dir: Vector3.MutableVector3 = Vector3.normalize(
         Vector3.subtract(mPos, Transform.get(engine.CameraEntity).position)
       )
-      dir.y = 0
+      dir.y = 0 
 
       // wondervroom model's origin is in the center, not at the point, so pull it back a little
-      let carRot: Quaternion.MutableQuaternion = Quaternion.lookRotation(dir, Vector3.Up())
+      let carRot: Quaternion = Quaternion.lookRotation(dir, Vector3.Up())
 
       const backVec: Vector3.MutableVector3 = Vector3.multiplyByFloats(
-        Vector3.rotate(Vector3.Backward(), carRot),
+        Vector3.rotate(Vector3.Backward(), carRot), 
         4.0,
         1,
         4.0
@@ -200,11 +200,11 @@ export class Pickaxe {
         cameraEntity.w
       )
 
-      rotMinus90 = multiplyInPlace(camRot, rotMinus90)
+      rotMinus90 = Quaternion.multiply(rotMinus90, camRot)
       t.rotation = rotMinus90
 
       t.position = pos
-    }
+    } 
 
     if (this.shape != null) {
       this.show()
