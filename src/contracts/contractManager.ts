@@ -125,7 +125,7 @@ export class ContractManager {
     }
   }
 
-  async getContract(contractName: string, chainId: ChainId): Promise<[eth.Contract, eth.RequestManager]> {
+  async getContract(contractName: string, chainId: ChainId): Promise<[eth.Contract, eth.RequestManager]> { 
     try {
       let provider: Provider, requestMgr: eth.RequestManager
 
