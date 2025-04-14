@@ -563,24 +563,6 @@ export class UiPopupPanel {
               this.parentUi.closePopup()
             }}
           />
-          {/* message */}
-          <UiEntity
-            uiTransform={{
-              width: getSizeAsNumber(this.messageTxt.som.width) * uiScaleFactor,
-              height: getSizeAsNumber(this.messageTxt.som.height) * uiScaleFactor,
-              position: { bottom: '0px', right: '0px' },
-              positionType: 'absolute',
-              justifyContent: 'center'
-            }}
-          >
-            <Label
-              value={`<b>${this.messageTxt.value}</b>`}
-              fontSize={getSizeAsNumber(this.messageTxt.som.fontSize) * uiScaleFactor}
-              color={Color4.fromHexString(this.messageTxt.som.hexColor)}
-              font="sans-serif"
-              textWrap="nowrap"
-            />
-          </UiEntity>
 
           {/* Inv Stack */}
           <UiEntity
@@ -591,10 +573,29 @@ export class UiPopupPanel {
               justifyContent: 'center',
               alignItems: 'center',
               width: '100%',
+              height: '45%',
               padding: '6px',
               display: this.invStack_visible ? 'flex' : 'none'
             }}
           >
+            {/* message */}
+            <UiEntity
+              uiTransform={{
+                width: getSizeAsNumber(this.messageTxt.som.width) * uiScaleFactor,
+                height: getSizeAsNumber(this.messageTxt.som.height) * uiScaleFactor,
+                position: { top: '0%', right: '0px' },
+                positionType: 'absolute',
+                justifyContent: 'center'
+              }}
+            >
+              <Label
+                value={`<b>${this.messageTxt.value}</b>`}
+                fontSize={getSizeAsNumber(this.messageTxt.som.fontSize) * uiScaleFactor}
+                color={Color4.fromHexString(this.messageTxt.som.hexColor)}
+                font="sans-serif"
+                textWrap="nowrap"
+              />
+            </UiEntity>
             {this.iconImages.slice(0, 4).map((ImageData, index) => (
               <UiEntity
                 key={index} // Using index as the key
@@ -602,7 +603,7 @@ export class UiPopupPanel {
                   flexDirection: 'row',
                   padding: '6px',
                   width: '50%',
-                  position: { left: '80px', top: '0px' }
+                  position: { left: '80px', top: '10%' }
                 }}
               >
                 <UiEntity
