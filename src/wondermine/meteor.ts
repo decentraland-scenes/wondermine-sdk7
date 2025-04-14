@@ -228,7 +228,7 @@ export class Meteor {
     // this.entity.addComponent(this.rigidBody);
 
     // 2DO: Replace with callLater scheme. Then if hit within 15 seconds of the end, extend time and remove after mining is done
-    addEphemeralComponentToEntity(this.entity, 15 * 1000, () => {
+    addEphemeralComponentToEntity(this.modelEntity, this.duration * 1000, () => {
       this.onMeteorExpired()
     })
 
