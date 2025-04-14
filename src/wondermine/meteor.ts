@@ -201,7 +201,6 @@ export class Meteor {
       this.idleAnim = { clip: mi.type.idleClip, loop: true }
     }
 
-
     if (mi.type.dropClip !== 'none') {
       this.dropAnim = { clip: mi.type.dropClip, loop: false }
     }
@@ -218,6 +217,7 @@ export class Meteor {
       })
     }
     this.modelEntity = mod
+
     this.setupStateMachine()
 
     // add sounds
@@ -228,7 +228,7 @@ export class Meteor {
     // this.entity.addComponent(this.rigidBody);
 
     // 2DO: Replace with callLater scheme. Then if hit within 15 seconds of the end, extend time and remove after mining is done
-    addEphemeralComponentToEntity(this.modelEntity, this.duration * 1000, () => {
+    addEphemeralComponentToEntity(this.entity, 15 * 1000, () => {
       this.onMeteorExpired()
     })
 
@@ -260,6 +260,12 @@ export class Meteor {
     if (this.instanceData !== null) console.log('removing meteor ' + this.instanceData.id)
 
     this.removeMeteor(this, false)
+    if (this.pb !== null) {
+      if (this.pb?.entity !== null) {
+        engine.removeEntity(this.pb.entity)
+        console.log('Meteor expired, removing progressBar')
+      }
+    }
   }
 
   setupStateMachine(): void {
