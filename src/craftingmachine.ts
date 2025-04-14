@@ -414,7 +414,7 @@ export class CraftingMachine {
       8,
       8,
       ItemIcons.Empty,
-      1.0,
+      1.5,
       true,
       true
     )
