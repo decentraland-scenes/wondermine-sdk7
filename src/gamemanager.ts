@@ -1269,6 +1269,7 @@ export class GameManager {
         this.axe.onMiningAnimCompleteCallback = null
         if (this.axe.entity != null && engine.getEntityState(this.axe.entity) === 1) {
           engine.removeEntity(this.axe.entity)
+          engine.removeEntity(this.axe.modelEntity)
         }
         // do we need to clear out the shape and other objects too?
         this.axe = null
