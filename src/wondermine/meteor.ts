@@ -205,7 +205,7 @@ export class Meteor {
       this.dropAnim = { clip: mi.type.dropClip, loop: false }
     }
     if (mi.type.hitClip !== 'none') {
-      this.hitAnim = { clip: mi.type.hitClip, loop: false }
+      this.hitAnim = { clip: mi.type.hitClip, loop: false, shouldReset: true }
     }
     if (mi.type.depleteClip !== 'none') {
       this.depleteAnim = { clip: mi.type.depleteClip, loop: false }
