@@ -1,4 +1,5 @@
-import { engine, type Entity } from '@dcl/sdk/ecs'
+import { Transform, engine, type Entity } from '@dcl/sdk/ecs'
+import { Vector3 } from '@dcl/sdk/math'
 
 const ephemeralEntities = new Map<Entity, Ephemeral>()
 
@@ -26,9 +27,7 @@ export function ephemeralSystem(dt: number): void {
       if (ephemeral.onTimeReachedCallback != null) {
         ephemeral.onTimeReachedCallback()
       }
-
-      engine.removeEntity(entity)
-
+      Transform.getMutable(entity).scale = Vector3.create(0, 0, 0)
       ephemeralEntities.delete(entity)
     }
   }

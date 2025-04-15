@@ -363,6 +363,7 @@ export class Meteor {
     // this.dropAnim.weight = 1;
     Animator.getClip(this.modelEntity, this.dropAnim.clip).playing = true
     Animator.getClip(this.modelEntity, this.dropAnim.clip).shouldReset = true
+
     // this.dropAnim.playing = true
 
     // log("meteor audio clip = " + as.audioClip.url);
