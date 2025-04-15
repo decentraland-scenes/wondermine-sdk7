@@ -361,8 +361,9 @@ export class Meteor {
 
     // this.idleAnim.weight = 0;
     // this.dropAnim.weight = 1;
-    Animator.getClip(this.modelEntity, this.dropAnim.clip).playing = true
-    Animator.getClip(this.modelEntity, this.dropAnim.clip).shouldReset = true
+    Animator.playSingleAnimation(this.modelEntity, this.dropAnim.clip, false)
+    // Animator.getClip(this.modelEntity, this.dropAnim.clip).playing = true
+    // Animator.getClip(this.modelEntity, this.dropAnim.clip).shouldReset = true
 
     // this.dropAnim.playing = true
 
@@ -370,9 +371,13 @@ export class Meteor {
 
     SoundManager.playOnce(this.modelEntity, 1.0)
 
+    Transform.getMutable(this.modelEntity).scale = Vector3.create(0, 0, 0) // Hack to fix flashlight meteor before landing
     // put it up at the drop point
     this.moveY(this.yAdjust)
-
+    // Hack to fix flashlight meteor before landing
+    utils.timers.setTimeout(() => {
+      Transform.getMutable(this.modelEntity).scale = Vector3.create(1, 1, 1)
+    }, 500)
     // let trans = this.entity.getComponent(Transform);
     // log("active meteor at " + trans.position + "; scale=" + trans.scale);
     // let shape = this.modelEntity.getComponent(GLTFShape);
