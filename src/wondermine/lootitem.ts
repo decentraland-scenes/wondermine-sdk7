@@ -2,15 +2,15 @@ import { ProjectLoader } from '../projectloader'
 import { type LootItemInstance } from '../projectdata'
 import {
   Animator,
+  ColliderLayer,
   engine,
   type Entity,
   GltfContainer,
   InputAction,
+  MeshCollider,
   type PBAnimator,
   type PBGltfContainer,
-  PointerEvents,
   pointerEventsSystem,
-  PointerEventType,
   Transform
 } from '@dcl/sdk/ecs'
 import { Quaternion, Vector3 } from '@dcl/sdk/math'
@@ -103,17 +103,9 @@ export class LootItem {
         ]
       }
 
-      PointerEvents.createOrReplace(this.modelEntity, {
-        pointerEvents: [
-          {
-            eventType: PointerEventType.PET_DOWN,
-            eventInfo: {
-              hoverText: 'Collect',
-              maxDistance: 8
-            }
-          }
-        ]
-      })
+      // Add a collider to GLBs that don't already have one
+      MeshCollider.setBox(this.modelEntity, ColliderLayer.CL_POINTER)
+
 
       // Evento dentro de la función de callback
       pointerEventsSystem.onPointerDown(
@@ -149,7 +141,7 @@ export class LootItem {
   showAt(newPos: Vector3): void {
     this.enabled = true
     this.moveTo(newPos)
-       GltfContainer.getMutable(this.modelEntity).src = this.shape.src
+    GltfContainer.getMutable(this.modelEntity).src = this.shape.src
     this.idle()
     // if (this.instanceData.itemId.substring(0,3) != "Axe")
     // {

@@ -202,7 +202,7 @@ export class CraftingMachine {
     })
 
     engine.addSystem(() => {
-      if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.backButton)) { 
+      if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.backButton)) {
         this.prevRecipe()
       }
       if (inputSystem.isTriggered(InputAction.IA_POINTER, PointerEventType.PET_DOWN, this.nextButton)) {
@@ -802,6 +802,7 @@ export class CraftingMachine {
 
   animateMachine(itemEnt: LootItem, isRepair: boolean = false): void {
     console.log('animateMachine()')
+
     Animator.stopAllAnimations(this.machineModelEntity)
     Animator.playSingleAnimation(this.machineModelEntity, this.craftingClip)
 
@@ -813,22 +814,23 @@ export class CraftingMachine {
       if (isRepair) {
         if (GameUi.instance !== null) {
           GameUi.instance.showTimedMessage('Your pickaxe is fixed!', 7000)
-        } 
+        }
       }
     }, 7200)
-  } 
+  }
 
   showCraftedItem(itemEnt: LootItem): void {
     console.log('CRAFTED ' + itemEnt.instanceData?.itemId + '!')
 
     if (itemEnt?.instanceData != null) {
-      // Obtener la posición actual del objeto
+      // Get the current position of the object
       const pos = Transform.get(this.entity).position
 
-      // Sumar los valores (-2.5, 0.2, -2.5) y reasignar a pos
+      // Add the values (-2.5, 0.2, -2.5) and reassign to pos
       const newPos = Vector3.add(pos, Vector3.create(-2.5, 0.2, -2.5))
 
-      // Mostrar el objeto en la nueva posición
+
+      // Show Item at new position
       itemEnt.showAt(newPos)
     }
 
