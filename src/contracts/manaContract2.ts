@@ -20,6 +20,8 @@ export class ManaContract2 {
   async loadContract(): Promise<void> {
     console.log('loading.... contratc')
     // chainId:ChainId = ChainId.ETHEREUM_MAINNET
+    // Asegurarse que esté inicializado
+    ContractManager.create()
     const [c, r] = (await ContractManager.instance.getContract('mana', this.chainId)) as any
     this.contract = c
     this.reqMgr = r
