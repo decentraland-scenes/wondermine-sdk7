@@ -449,6 +449,7 @@ export class UiPopupPanel {
   renderUI(): ReactEcs.JSX.Element {
     const canvasInfo = UiCanvasInformation.get(engine.RootEntity)
     const uiScaleFactor = (Math.min(canvasInfo.width, canvasInfo.height) / 1080) * 1.4
+
     return (
       <UiEntity
         uiTransform={{
@@ -563,7 +564,6 @@ export class UiPopupPanel {
               this.parentUi.closePopup()
             }}
           />
-
           {/* Inv Stack */}
           <UiEntity
             uiTransform={{
@@ -574,8 +574,7 @@ export class UiPopupPanel {
               alignItems: 'center',
               width: '100%',
               height: '45%',
-              padding: '6px',
-              display: this.invStack_visible ? 'flex' : 'none'
+              padding: '6px'
             }}
           >
             {/* message */}
@@ -596,46 +595,54 @@ export class UiPopupPanel {
                 textWrap="nowrap"
               />
             </UiEntity>
-            {this.iconImages.slice(0, 4).map((ImageData, index) => (
-              <UiEntity
-                key={index} // Using index as the key
-                uiTransform={{
-                  flexDirection: 'row',
-                  padding: '6px',
-                  width: '50%',
-                  position: { left: '80px', top: '10%' }
-                }}
-              >
+
+            {this.iconImages.slice(0, 4).map((ImageData, index) => {
+              const iconValue = this.iconValues[index]?.value
+              if (iconValue.length === 0) return null
+
+              return (
                 <UiEntity
+                  key={index}
                   uiTransform={{
-                    width: getSizeAsNumber(ImageData.som.width) * uiScaleFactor, // Using the width from the ImageData
-                    height: getSizeAsNumber(ImageData.som.height) * uiScaleFactor, // Using the height from the ImageData
-                    margin: { bottom: '0px' }
-                  }}
-                  uiBackground={{
-                    textureMode: 'stretch',
-                    uvs: ImageData.uvs, // Using the uvs from the ImageData ImageData.uvs
-                    texture: { src: ImageData.atlas } // Using the atlas from the ImageData ImageData.atlas
-                  }}
-                />
-                {/* Label */}
-                <UiEntity
-                  uiTransform={{
-                    width: getSizeAsText(this.iconValues[index].value) * uiScaleFactor,
-                    height: getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.height) * uiScaleFactor,
-                    margin: { left: '10px' }
+                    flexDirection: 'row',
+                    padding: '6px',
+                    width: '50%',
+                    position: { left: '80px', top: '10%' },
+                    display: this.invStack_visible ? 'flex' : 'none'
                   }}
                 >
-                  <Label
-                    value={`<b>${this.iconValues[index].value}</b>`}
-                    fontSize={getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.fontSize) * uiScaleFactor}
-                    color={Color4.fromHexString(som.ui.bottomBarPanel.textField.invItemTxt.hexColor)}
-                    font="sans-serif"
-                    textWrap="nowrap"
+                  <UiEntity
+                    uiTransform={{
+                      width: getSizeAsNumber(ImageData.som.width) * uiScaleFactor,
+                      height: getSizeAsNumber(ImageData.som.height) * uiScaleFactor,
+                      margin: { bottom: '0px' },
+                      display: this.invStack_visible ? 'flex' : 'none'
+                    }}
+                    uiBackground={{
+                      textureMode: 'stretch',
+                      uvs: ImageData.uvs,
+                      texture: { src: ImageData.atlas }
+                    }}
                   />
+                  <UiEntity
+                    uiTransform={{
+                      width: getSizeAsText(iconValue) * uiScaleFactor,
+                      height: getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.height) * uiScaleFactor,
+                      margin: { left: '10px' },
+                      display: this.invStack_visible ? 'flex' : 'none'
+                    }}
+                  >
+                    <Label
+                      value={`<b>${iconValue}</b>`}
+                      fontSize={getSizeAsNumber(som.ui.bottomBarPanel.textField.invItemTxt.fontSize) * uiScaleFactor}
+                      color={Color4.fromHexString(som.ui.bottomBarPanel.textField.invItemTxt.hexColor)}
+                      font="sans-serif"
+                      textWrap="nowrap"
+                    />
+                  </UiEntity>
                 </UiEntity>
-              </UiEntity>
-            ))}
+              )
+            })}
           </UiEntity>
         </UiEntity>
       </UiEntity>
